@@ -4,7 +4,7 @@
 # This file is formatted using YAML syntax - learn more at https://learnxinyminutes.com/docs/yaml/
 
 title: Atif Quamar # Website name
-baseURL: 'https://example.com/' # Website URL
+baseURL: 'https://atifquamar07.github.io/' # Website URL
 
 ############################
 ## LANGUAGE
@@ -70,3 +70,6 @@ security:
   _merge: deep
 sitemap:
   _merge: deep
+  changefreq: monthly
+  priority: 0.5
+  filename: sitemap.xml

@@ -17,9 +17,9 @@ marketing:
   seo:
     site_type: Person
     local_business_type: ''
-    org_name: ''
-    description: 'A highly-customizable Hugo academic resume theme powered by Wowchemy website builder.'
-    twitter: 'wowchemy'
+    org_name: 'Atif Quamar'
+    description: 'Atif Quamar - Research Scientist, Machine Learning Engineer, and AI Researcher. Explore my portfolio of cutting-edge projects in artificial intelligence, computer vision, and data science.'
+    twitter: 'atifquamar07'
   analytics:
     google_analytics: ''
     baidu_tongji: ''
@@ -43,7 +43,7 @@ header:
 
 footer:
   copyright:
-    notice: '© {year} Me. This work is licensed under {license}'
+    notice: '© {year} Atif Quamar. All rights reserved.'
     license:
       enable: true
       allow_derivatives: false
@@ -67,12 +67,32 @@ features:
       - latex
   math:
     enable: false
+  seo:
+    enable: true
+    keywords: 'machine learning, artificial intelligence, computer vision, data science, research, deep learning, neural networks, ai, ml, dl, phd, research intern'
+    author: 'Atif Quamar'
+    robots: 'index, follow'
+    canonical_url: true
+  social:
+    enable: true
+    open_graph:
+      enable: true
+      type: 'website'
+      locale: 'en_US'
+      site_name: 'Atif Quamar'
+      images:
+        - 'media/icon.png'
+    twitter_card:
+      enable: true
+      card: 'summary_large_image'
+      site: '@atifquamar07'
+      creator: '@atifquamar07'
   privacy_pack:
     enable: false
   repository:
-    url: 'https://github.com/<username>/<repository>'
+    url: 'https://github.com/atifquamar07/atifquamar07.github.io'
     content_dir: content
-    branch: master
+    branch: main
   avatar:
     gravatar: false
     shape: circle
