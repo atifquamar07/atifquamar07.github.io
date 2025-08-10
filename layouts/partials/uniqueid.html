@@ -1,0 +1,4 @@
+{{/* drop-in replacement for .File.UniqueID */}}
+{{- define "uniqueid" -}}
+  {{- substr (sha1 (printf "%s|%s" .RelPermalink .Date)) 0 12 -}}
+{{- end -}}

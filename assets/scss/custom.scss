@@ -1,0 +1,50 @@
+/* Load Nunito from Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800&display=swap');
+
+/* Apply Nunito globally */
+:root {
+  /* Bootstrap 5 font variables */
+  --bs-font-sans-serif: "Nunito", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "Liberation Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  --bs-body-font-family: var(--bs-font-sans-serif);
+}
+
+body,
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--bs-font-sans-serif);
+}
+
+/* Vertically center all logos in Experience rows */
+.wg-experience .card-body .d-flex {
+  align-items: center;
+}
+
+/* Optional minor tweak: ensure image boxes don't add extra baseline gap */
+.wg-experience .card-body .d-flex img {
+  display: block;
+}
+
+/* Add spacing below Projects heading */
+.wg-portfolio .section-heading {
+  margin-bottom: 2rem !important;
+}
+
+/* Alternative selector for Projects section */
+section[id*="projects"] .section-heading {
+  margin-bottom: 2rem !important;
+}
+
+/* More specific targeting for portfolio widget */
+.home-section.wg-portfolio .section-heading {
+  margin-bottom: 2rem !important;
+}
+
+/* Force spacing on Projects section */
+.wg-portfolio {
+  padding-top: 3rem !important;
+}
+
+/* Target the heading directly */
+h2:contains("Projects") {
+  margin-bottom: 1.5rem !important;
+}
+
