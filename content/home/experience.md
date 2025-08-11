@@ -31,8 +31,7 @@ experience:
     date_end: ''
     description: |2-
     
-        Developing multimodal reasoning system - interleaving text and visuals within the chain-of-thought, enabling models to “think” with sketches, diagrams, and images.
-        This work bridges language and vision to solve complex problems with richer, more interpretable reasoning.
+        Working on multimodal reasoning - interleaving text and visuals within the chain-of-thought, enabling models to “think” with sketches, diagrams, and images. This work bridges language and vision to solve complex problems with richer, more interpretable reasoning.
 
   - title: Research Assistant
     company: Purdue University
@@ -42,7 +41,7 @@ experience:
     date_start: '2025-02-15'
     date_end: ''
     description: |2-
-        Worked on a novel inference-time alignment method that improves win rates by up to 30% over SOTA, Best-of-N decoding while reducing reward model calls by 20%. Aligned LLMs in reducing harmlessness, improved reasoning and positive sentiment generation. Submitted the work to AAAI’26 conference and TACL journal.
+        Proposed an inference-time alignment method that outperforms the SOTA - Best-of-N decoding by over 30%, while reducing reward model calls by 20%. Aligned LLMs in reducing harmlessness, improved reasoning and positive sentiment generation. Submitted the work to AAAI’26 conference and TACL journal.
 
   - title: Founder & CTO
     company: Insituate
@@ -52,7 +51,7 @@ experience:
     date_start: '2023-09-15'
     date_end: '2025-02-01'
     description: |2-
-        Founded and scaled an AI startup to $250K ARR. Developed agentic solutions for global banks and financial insitutions.
+        Founded and scaled an AI startup to $250K ARR. Shipped agentic solutions to global banks and financial insitutions.
 
   - title: Software Engineering Intern
     company: Tweek Labs
@@ -62,7 +61,7 @@ experience:
     date_start: '2023-05-16'
     date_end: '2020-07-31'
     description: |2-
-        Engineered the company's android's application. Developed multiple features currently running in production.
+        Engineered the company's android's application. Worked on Jetpack-Compose library for developing. Developed multiple features currently running in production.
 
   - title: Research Intern
     company: Singapore University of Technology & Design
