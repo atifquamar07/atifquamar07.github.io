@@ -46,6 +46,6 @@ In extensive tests across eight LLM families, ADASEARCH consistently outperforms
 Will add more details soon...
 
 
- {{< figure src="projects/blockwise/res.png" caption="Performance of ADASEARCH across 8 different LLMs on various metrics" >}}
+ {{< figure src="projects/adasearch/res.png" caption="Performance of ADASEARCH across 8 different LLMs on various metrics" >}}
 
 
