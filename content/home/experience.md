@@ -22,7 +22,7 @@ date_format: Jan 2006
 #   Leave `date_end` empty if it's your current employer.
 #   Begin multi-line descriptions with YAML's `|2-` multi-line prefix.
 experience:
-  - title: Researcher
+  - title: Researcher Intern
     company: University of California - San Diego
     company_url: 'https://ucsd.edu/'
     company_logo: ucsd
@@ -34,7 +34,7 @@ experience:
         Developing multimodal reasoning system - interleaving text and visuals within the chain-of-thought, enabling models to “think” with sketches, diagrams, and images.
         This work bridges language and vision to solve complex problems with richer, more interpretable reasoning.
 
-  - title: Researcher
+  - title: Research Assistant
     company: Purdue University
     company_url: 'https://purdue.edu'
     company_logo: pp
