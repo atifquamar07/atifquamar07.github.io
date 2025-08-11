@@ -78,6 +78,8 @@ Currently working on making LLMs better reasoners at UC San Diego.  Previously, 
 
 My research explores methods to enhance language model reasoning, generalization, and alignment with human goals by building AI systems that are adversarially robust, decision-transparent, and computationally efficient. While LLMs are a primary area of interest, I’m also open to exploring other areas that have the potential to significantly expand the capabilities of intelligent systems.
 
+*I am currently looking for research opportunities in both academia (PhD) and industry for a 2026 start.*
+
 
 [//]: # (Path: content/authors/admin/_index.md)
 
