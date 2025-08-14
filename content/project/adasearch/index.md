@@ -14,6 +14,7 @@ image:
   size: actual
   caption: 
   focal_point: Smart
+  preview_only: true
 
 links:
 #   - icon: github
@@ -36,16 +37,72 @@ url_video: ''
 #   Otherwise, set `slides = ""`.
 slides: ""
 ---
+<br>
 
-We proposed ADASEARCH - an inference-time alignment strategy for large language models (LLMs) that makes them safer, more accurate, and more controllable—without retraining. Traditional decoding methods like Best-of-N sampling spread computing power evenly across every token, even though the earliest tokens often matter most for setting the quality and tone of a response.
+Most inference-time alignment methods spend the same effort on every token. That is wasteful, because early tokens often set the path for the whole answer. The paper introduces **ADASEARCH** and **ADABEAM**, which reallocate a fixed compute budget to focus more on the first blocks of text. Across eight LLMs and multiple tasks, this yields higher win-rates than strong Best-of-N baselines and even some fine-tuned models, all under the same budget. 
 
-Our approach adaptively reallocates the same fixed computational budget to focus more on these critical early stages, boosting performance in tasks like harmless response generation, sentiment control, and mathematical reasoning. We also extend the idea to reward-guided beam search with ADABEAM, showing the method’s flexibility.
+> **Why it matters:** The approach is training-free, works at decode time, and improves harmlessness, sentiment control, and math reasoning. Reported gains exceed 10 percent for harmlessness, 33 percent for sentiment, and 24 percent for reasoning relative to Best-of-N. 
 
-In extensive tests across eight LLM families, ADASEARCH consistently outperforms both strong decoding baselines and expensive fine-tuning methods—sometimes enabling small models to match the alignment quality of models over 50× larger. This makes it a powerful, cost-efficient tool for building AI systems that are not only capable, but also safer and more aligned with human intent.
+ {{< figure src="projects/adasearch/fig1.png" caption="Decay vs Uniform vs Growth under equal compute, across HH-RLHF, HarmfulQA, IMDB, GSM8K" >}}<br>
 
-Will add more details soon...
+# Approach
+
+### Blockwise search with adaptive budgets
+
+Generation is divided into fixed-size blocks. Instead of sampling a full response N times, ADASEARCH sets a **schedule** α = [α(1), …, α(K)] that decides how many samples to draw for each block, with a fixed total budget C. The greedy pick per block uses a **process reward model (PRM)** to score partial continuations, then accepts the best segment and moves on. Common schedules: **Uniform**, **Decay** (front-loaded), **Growth** (back-loaded). 
+
+Mathematically, the schedule satisfies ∑i α(i) = C. Decay is exponential with rate γ, which concentrates more samples on early blocks. 
+
+ {{< figure src="projects/adasearch/block-1.png" caption="Toy example showing why a decay schedule finds a better first block and steers the whole answer" >}}
+
+### Reward models, tasks, and datasets
+
+PRMs used:
+- **DeBERTa-v3-large-v2** for helpful and harmless generation.  
+- **DistilBERT-base** for sentiment control.  
+- **Qwen-2.5-Math** for reasoning quality. 
+
+Datasets:
+- **HH-RLHF** and **HarmfulQA** for safety.  
+- **IMDB** for positive sentiment.  
+- **GSM8K** for math reasoning. 
+
+### Extending to tree search
+
+ADABEAM applies the same schedule idea to reward-guided beam search by varying beam width per block. Compute is matched across schedules using a cost function and decay again allocates more search early. <br>
+
+<br>
+
+# What we achieved
+
+**Front-loading wins:** Decay > Uniform > Growth across tasks, at equal compute. This holds for harmlessness, sentiment, and reasoning. 
+
+**Against Best-of-N:** ADASEARCH improves win-rates over compute-matched Best-of-N on all four datasets for many 7B to 8B models. Table 1 shows consistent gains, for example on IMDB and GSM8K. 
+
+**Quality and fluency:** On DeepSeek-7B, ADASEARCH achieves higher reward scores with competitive perplexity, diversity, and coherence compared to baselines. 
+
+**Beats fine-tuning in some settings:** With the same inference budget, ADASEARCH surpasses SFT on IMDB and improves over DPO in safety comparisons. 
+
+ {{< figure src="projects/adasearch/fig3.png" caption="Decay schedule outperforming SFT on IMDB and improving safety vs DPO settings" >}}
 
 
- {{< figure src="projects/adasearch/res.png" caption="Performance of ADASEARCH across 8 different LLMs on various metrics" >}}
+**Small models can punch up:** With ADASEARCH-Decay, several ~7B models achieve win-rates that beat a LLaMA-405B baseline in head-to-head comparisons on HH-RLHF. See Table 3 for per-model numbers. :contentReference[oaicite:14]{index=14}
+
+**Generalizes to beam search:** ADABEAM with a Decay schedule outperforms uniform Tree-BoN and Growth on HH-RLHF across models. 
+
+**Ablations:** Intermediate decay rates work best. Win-tie peaks near γ = 0.4, which balances early exploration and later coverage. 
 
 
+ {{< figure src="projects/adasearch/fig4.png" caption="ADASEARCH vs Best-of-N as compute grows, with consistent wins at matched budgets" >}}
+<br>
+
+# Future Work
+
+**Practical recipe.** Keep compute fixed, shift more of it to the first blocks. This is drop-in for sequential decoding and tree search. 
+
+**Flexible objectives.** You can mix rewards at decode time, for example balancing non-toxicity with positive sentiment using a weighted combination. Static fine-tuned models cannot do this without retraining. 
+
+**Limits and next steps.**
+- Reasoning gains depend on PRM quality. Better process-level reward models should help. 
+- Learn schedules from data or adapt them online.  
+- Explore adaptive block sizes and uncertainty-aware allocation.  
