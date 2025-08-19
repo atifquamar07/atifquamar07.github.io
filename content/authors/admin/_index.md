@@ -74,7 +74,7 @@ email: 'atif7102@gmail.com'
 highlight_name: true
 ---
 
-Currently working on making LLMs better reasoners at UC San Diego.  Previously, at Purdue University, my research focused on inference-time alignment for language models. I founded [Insituate](https://insituate.ai), where we shipped agentic systems to global banks and financial institutions. I earned my bachelors in Computer Science and Biosciences from [IIIT Delhi](https://iiitd.ac.in) in 2024, and have a deep passion for AI, particularly in exploring and expanding the capabilities of language models.
+Currently working on making LLMs better reasoners at UC San Diego.  Previously, at Purdue University, my research focused on inference-time alignment for language models. I founded [Insituate](https://insituate.ai), where we shipped agentic systems to global banks and financial institutions. I earned my bachelors in Computer Science and Biosciences from [IIIT Delhi](https://iiitd.ac.in) in 2024.
 
 My research explores methods to enhance language model reasoning, generalization, and alignment with human goals by building AI systems that are adversarially robust, decision-transparent, and computationally efficient. While LLMs are a primary area of interest, I’m also open to exploring other areas that have the potential to significantly expand the capabilities of intelligent systems.
 
