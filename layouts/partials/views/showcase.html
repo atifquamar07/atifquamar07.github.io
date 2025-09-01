@@ -37,6 +37,27 @@
         {{- if $do_link}}</a>{{end -}}
       </div>
 
+      {{ with $item.Params.authors }}
+      <div class="project-authors mb-2">
+        {{- range $index, $author := . -}}
+          {{- if eq $index 0 -}}
+            {{- if reflect.IsMap $author -}}
+              <a href="{{ $author.url }}" target="_blank" rel="noopener noreferrer"><strong>{{ $author.name }}<sup>1</sup></strong></a>
+            {{- else -}}
+              <strong>{{ $author }}<sup>1</sup></strong>
+            {{- end -}}
+          {{- else -}}
+            {{- if reflect.IsMap $author -}}
+              <a href="{{ $author.url }}" target="_blank" rel="noopener noreferrer">{{ $author.name }}</a>
+            {{- else -}}
+              {{ $author }}
+            {{- end -}}
+          {{- end -}}
+          {{- if lt $index (sub (len $item.Params.authors) 1) -}}, {{ end -}}
+        {{- end }}
+      </div>
+      {{ end }}
+
       {{ with $summary }}
       <div class="article-style">
         {{ . }}

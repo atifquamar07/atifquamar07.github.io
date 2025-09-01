@@ -1,0 +1,40 @@
+{{- define "main" -}}
+
+<article class="article project-article">
+
+  {{- partial "page_header" . -}}
+
+  <div class="article-container">
+
+    {{ if .Params.authors }}
+    <div class="project-page-authors">
+      {{ range $index, $author := .Params.authors }}
+        <span class="author-chip">
+          {{ if eq $index 0 }}
+            {{ if reflect.IsMap $author }}
+              <a href="{{ $author.url }}" target="_blank" rel="noopener noreferrer"><strong>{{ $author.name }}<sup>1</sup></strong></a>
+            {{ else }}
+              <strong>{{ $author }}<sup>1</sup></strong>
+            {{ end }}
+          {{ else }}
+            {{ if reflect.IsMap $author }}
+              <a href="{{ $author.url }}" target="_blank" rel="noopener noreferrer">{{ $author.name }}</a>
+            {{ else }}
+              {{ $author }}
+            {{ end }}
+          {{ end }}
+        </span>
+      {{ end }}
+    </div>
+    {{ end }}
+
+    <div class="article-style">
+      {{ .Content }}
+    </div>
+
+    {{- partial "page_footer" . -}}
+
+  </div>
+</article>
+
+{{- end -}}

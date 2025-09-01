@@ -48,3 +48,116 @@ h2:contains("Projects") {
   margin-bottom: 1.5rem !important;
 }
 
+/* Style project authors on homepage cards */
+.project-authors {
+  font-size: 1.05rem !important;
+  font-weight: 600 !important;
+  color: #4a90e2 !important; /* Light blue to match the example */
+  margin-bottom: 1.2rem !important;
+  margin-top: 0.7rem !important;
+  font-style: normal !important;
+  line-height: 1.5 !important;
+  letter-spacing: 0.01em !important;
+}
+
+/* Make authors more prominent in dark mode */
+[data-theme="dark"] .project-authors {
+  color: #7bb3f0 !important; /* Lighter blue for dark mode */
+}
+
+/* Style the superscript for first author */
+.project-authors sup {
+  font-size: 0.7em !important;
+  font-weight: 700 !important;
+  vertical-align: super !important;
+  line-height: 0 !important;
+}
+
+/* Style author links */
+.project-authors a {
+  color: inherit !important;
+  text-decoration: none !important;
+  transition: opacity 0.2s ease !important;
+}
+
+.project-authors a:hover {
+  opacity: 0.8 !important;
+  text-decoration: underline !important;
+}
+
+/* Style authors on project detail pages */
+.project-page-authors {
+  font-size: 1.2rem !important;
+  font-weight: 600 !important;
+  color: #4a90e2 !important;
+  margin-bottom: 2rem !important;
+  margin-top: 1rem !important;
+  line-height: 1.5 !important;
+  letter-spacing: 0.01em !important;
+}
+
+.project-page-authors a {
+  color: inherit !important;
+  text-decoration: none !important;
+  transition: opacity 0.2s ease !important;
+}
+
+.project-page-authors a:hover {
+  opacity: 0.8 !important;
+  text-decoration: underline !important;
+}
+
+.project-page-authors sup {
+  font-size: 0.7em !important;
+  font-weight: 700 !important;
+  vertical-align: super !important;
+  line-height: 0 !important;
+}
+
+/* Dark mode styling for project page authors */
+[data-theme="dark"] .project-page-authors {
+  color: #7bb3f0 !important;
+}
+
+/* Add commas between authors via CSS to avoid whitespace issues */
+.project-page-authors .author-chip::after {
+  content: ",";
+}
+.project-page-authors .author-chip:last-child::after {
+  content: "";
+}
+
+/* Widen project detail page container */
+.project-article .article-container {
+  max-width: 1080px !important;
+}
+
+@media (min-width: 1400px) {
+  .project-article .article-container {
+    max-width: 970px !important;
+  }
+}
+
+/* Widen the projects section by reducing margins */
+.wg-portfolio .container,
+.home-section.wg-portfolio .container {
+  max-width: 85% !important;
+  padding-left: 2rem !important;
+  padding-right: 2rem !important;
+}
+
+/* On larger screens, use even more width */
+@media (min-width: 1200px) {
+  .wg-portfolio .container,
+  .home-section.wg-portfolio .container {
+    max-width: 88% !important;
+    padding-left: 2rem !important;
+    padding-right: 2rem !important;
+  }
+}
+
+/* Ensure project cards use the full available width */
+.wg-portfolio .isotope {
+  width: 100% !important;
+}
+

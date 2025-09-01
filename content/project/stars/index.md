@@ -7,6 +7,18 @@ tags:
   - Large Language Models
 date: '2025-06-11T00:00:00Z'
 
+authors:
+  - name: Mohammad Atif Quamar
+    url: https://atifquamar07.github.io/  # Your website
+  - name: Mohammad Areeb
+    url: https://www.linkedin.com/in/mohammad-areeb-b6487511b  
+  - name: Mikhail Kuznetsov
+    url: https://www.linkedin.com/in/mikhail-kuznetsov-887568104
+  - name: Muslum Ozgur Ozmen
+    url: https://ozgurozmen.github.io/
+  - name: Z. Berkay Celik
+    url: https://beerkay.github.io/
+
 # Optional external URL for project (replaces project detail page).
 external_link: ''
 
