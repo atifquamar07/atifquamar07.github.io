@@ -8,19 +8,19 @@ tags:
 date: '2025-08-02T00:00:00Z'
 
 authors:
-  - name: Mohammad Atif Quamar
+  - name: M. Atif Quamar
     url: https://atifquamar07.github.io/  # Your website
-  - name: Mohammad Areeb
+  - name: M. Areeb
     url: https://www.linkedin.com/in/mohammad-areeb-b6487511b  
-  - name: Nishant Sharma
+  - name: N. Sharma
     url: https://www.nishant-sharma.com 
-  - name: Ananth Shreekumar
+  - name: A. Shreekumar
     url: https://thiswasnttaken.github.io/
-  - name: Jonathan Rosenthal
+  - name: J. Rosenthal
     url: https://www.linkedin.com/in/jonathan-rosenthal-515384174/
-  - name: Mikhail Kuznetsov
+  - name: M. Kuznetsov
     url: https://www.linkedin.com/in/mikhail-kuznetsov-887568104
-  - name: Muslum Ozgur Ozmen
+  - name: M. Ozgur Ozmen
     url: https://ozgurozmen.github.io/
   - name: Z. Berkay Celik
     url: https://beerkay.github.io/
