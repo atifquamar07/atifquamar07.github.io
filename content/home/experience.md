@@ -22,7 +22,7 @@ date_format: Jan 2006
 #   Leave `date_end` empty if it's your current employer.
 #   Begin multi-line descriptions with YAML's `|2-` multi-line prefix.
 experience:
-  - title: Research Intern
+  - title: Researcher
     company: University of California - San Diego
     company_url: 'https://ucsd.edu/'
     company_logo: ucsd
@@ -33,7 +33,7 @@ experience:
     
         Working on multimodal reasoning - interleaving text and visuals within the chain-of-thought, enabling models to “think” with sketches, diagrams, and images. This work bridges language and vision to solve complex problems with richer, more interpretable reasoning.
 
-  - title: Research Assistant
+  - title: Researcher
     company: Purdue University
     company_url: 'https://purdue.edu'
     company_logo: pp
@@ -41,7 +41,7 @@ experience:
     date_start: '2025-02-15'
     date_end: ''
     description: |2-
-        Proposed an inference-time alignment method that outperforms the SOTA - Best-of-N decoding by over 30%, while reducing reward model calls by 20%. Aligned LLMs in reducing harmlessness, improved reasoning and positive sentiment generation. Submitted the work to AAAI’26 conference and TACL journal.
+        Worked on inference-time alignment method that outperforms the SOTA - Best-of-N decoding by over 30%, while reducing reward model calls by 20%. Aligned LLMs in reducing harmlessness, improved reasoning and positive sentiment generation. Submitted the work to AAAI’26 conference and TACL journal.
 
   - title: Founder & CTO
     company: Insituate
@@ -51,7 +51,7 @@ experience:
     date_start: '2023-09-15'
     date_end: '2025-02-01'
     description: |2-
-        Founded and scaled an AI startup to $250K ARR. Shipped agentic solutions to global banks and financial insitutions.
+        Founded and scaled Insituate to $250K ARR. Shipped agentic solutions to global banks and financial insitutions.
 
   - title: Software Engineering Intern
     company: Tweek Labs
