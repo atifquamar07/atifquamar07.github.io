@@ -23,7 +23,7 @@ date_format: Jan 2006
 #   Begin multi-line descriptions with YAML's `|2-` multi-line prefix.
 experience:
 
-  - title: Researcher
+  - title: Research Intern
     company: Virginia University
     company_url: 'https://www.virginia.edu/'
     company_logo: virginia
@@ -34,7 +34,7 @@ experience:
     
         Working on improving masked diffusion language models by designing masking curricula and principled unmasking policies to improve non-autoregressive decoding efficiency and accuracy.
 
-  - title: Researcher
+  - title: Research Intern
     company: University of California - San Diego
     company_url: 'https://ucsd.edu/'
     company_logo: ucsd
@@ -45,7 +45,7 @@ experience:
     
         Working on multimodal reasoning - interleaving text and visuals within the chain-of-thought, enabling models to “think” with sketches, diagrams, and images. This work bridges language and vision to solve complex problems with richer, more interpretable reasoning.
 
-  - title: Researcher
+  - title: Research Intern
     company: Purdue University
     company_url: 'https://purdue.edu'
     company_logo: pp
