@@ -7,7 +7,7 @@ widget: experience
 headless: true
 
 # Order that this section appears on the page.
-weight: 40
+weight: 30
 
 title: Experience
 subtitle:
@@ -22,13 +22,25 @@ date_format: Jan 2006
 #   Leave `date_end` empty if it's your current employer.
 #   Begin multi-line descriptions with YAML's `|2-` multi-line prefix.
 experience:
+
+  - title: Researcher
+    company: Virginia University
+    company_url: 'https://www.virginia.edu/'
+    company_logo: virginia
+    location: Charlottesville, Virginia, United States
+    date_start: '2025-10-01'
+    date_end: ''
+    description: |2-
+    
+        Working on improving masked diffusion language models by designing masking curricula and principled unmasking policies to improve non-autoregressive decoding efficiency and accuracy.
+
   - title: Researcher
     company: University of California - San Diego
     company_url: 'https://ucsd.edu/'
     company_logo: ucsd
     location: San Diego, California, United States
-    date_start: '2025-07-01'
-    date_end: ''
+    date_start: '2025-07-31'
+    date_end: '2025-10-07'
     description: |2-
     
         Working on multimodal reasoning - interleaving text and visuals within the chain-of-thought, enabling models to “think” with sketches, diagrams, and images. This work bridges language and vision to solve complex problems with richer, more interpretable reasoning.
@@ -39,7 +51,7 @@ experience:
     company_logo: pp
     location: West Lafayette, Indiana, United States
     date_start: '2025-02-15'
-    date_end: ''
+    date_end: '2025-07-30'
     description: |2-
         Worked on inference-time alignment method that outperforms the SOTA - Best-of-N decoding by over 30%, while reducing reward model calls by 20%. Aligned LLMs in reducing harmlessness, improved reasoning and positive sentiment generation. Submitted the work to AAAI’26 conference and TACL journal.
 
@@ -51,7 +63,9 @@ experience:
     date_start: '2023-09-15'
     date_end: '2025-02-01'
     description: |2-
-        Founded and scaled Insituate to $250K ARR. Shipped agentic solutions to global banks and financial insitutions.
+        Built agentic software for the Supreme Court of India, Mizuho Bank, PNC Bank and Indian High Courts.
+
+        Insituate is a no-code platform that enables companies to make custom AI agents for industry-specific needs, and allowing them to productionize these copilots 10x faster securely on their data.
 
   - title: Software Engineering Intern
     company: Tweek Labs

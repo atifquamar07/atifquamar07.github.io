@@ -38,25 +38,42 @@
       </div>
 
       {{ with $item.Params.authors }}
-      <div class="project-authors mb-2">
-        {{- range $index, $author := . -}}
-          {{- if eq $index 0 -}}
-            {{- if reflect.IsMap $author -}}
-              <a href="{{ $author.url }}" target="_blank" rel="noopener noreferrer"><strong>{{ $author.name }}<sup>1</sup></strong></a>
-            {{- else -}}
-              <strong>{{ $author }}<sup>1</sup></strong>
-            {{- end -}}
-          {{- else -}}
-            {{- if reflect.IsMap $author -}}
-              <a href="{{ $author.url }}" target="_blank" rel="noopener noreferrer">{{ $author.name }}</a>
-            {{- else -}}
-              {{ $author }}
-            {{- end -}}
-          {{- end -}}
-          {{- if lt $index (sub (len $item.Params.authors) 1) -}}, {{ end -}}
-        {{- end }}
-      </div>
-      {{ end }}
+<div class="project-authors mb-2">
+  {{/* Controls (page-level) */}}
+  {{ $primary := $item.Params.primary_author_index | default -1 }}   {{/* zero-based index to bold; -1 = none */}}
+  {{ $sups := $item.Params.author_superscripts }}                    {{/* array of superscripts by index ("" for none) */}}
+
+  {{ range $i, $a := . }}
+    {{ $isMap := reflect.IsMap $a }}
+    {{ $name := cond $isMap ($a.name) $a }}
+    {{ $url  := cond $isMap ($a.url)  "" }}
+
+    {{/* Determine bold: author-level .bold overrides, else primary index */}}
+    {{ $bold := false }}
+    {{ if $isMap }}
+      {{ with $a.bold }}{{ $bold = . }}{{ end }}
+    {{ end }}
+    {{ if and (not $bold) (eq $i $primary) }}{{ $bold = true }}{{ end }}
+
+    {{/* Determine superscript: author-level .sup overrides, else from author_superscripts */}}
+    {{ $sup := "" }}
+    {{ if $isMap }}{{ with $a.sup }}{{ $sup = printf "%v" . }}{{ end }}{{ end }}
+    {{ if and (eq $sup "") $sups (lt $i (len $sups)) }}
+      {{ $sup = printf "%v" (index $sups $i) }}
+    {{ end }}
+
+    <span class="author-chip">
+      {{ if $url }}<a href="{{ $url }}" target="_blank" rel="noopener noreferrer">{{ end }}
+      {{ if $bold }}<strong>{{ end }}
+      {{ $name }}
+      {{ if ne $sup "" }}<sup>{{ $sup }}</sup>{{ end }}
+      {{ if $bold }}</strong>{{ end }}
+      {{ if $url }}</a>{{ end }}
+    </span>{{ if lt $i (sub (len $item.Params.authors) 1) }}, {{ end }}
+  {{ end }}
+</div>
+{{ end }}
+
 
       {{ with $summary }}
       <div class="article-style">

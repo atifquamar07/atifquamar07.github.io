@@ -10,6 +10,8 @@ date: '2025-06-11T00:00:00Z'
 authors:
   - name: M. Atif Quamar
     url: https://atifquamar07.github.io/  # Your website
+    bold: true       
+    sup:  1
   - name: M. Areeb
     url: https://www.linkedin.com/in/mohammad-areeb-b6487511b  
   - name: M. Kuznetsov
@@ -26,6 +28,7 @@ image:
   size: actual
   caption: 
   focal_point: Smart
+  preview_only: true
 
 links:
 #   - icon: github

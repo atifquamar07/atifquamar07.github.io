@@ -8,25 +8,21 @@
 
     {{ if .Params.authors }}
     <div class="project-page-authors">
-      {{ range $index, $author := .Params.authors }}
+    {{ range $i, $a := .Params.authors }}
+        {{ $isMap := reflect.IsMap $a }}
+        {{ $name := cond $isMap ($a.name) $a }}
         <span class="author-chip">
-          {{ if eq $index 0 }}
-            {{ if reflect.IsMap $author }}
-              <a href="{{ $author.url }}" target="_blank" rel="noopener noreferrer"><strong>{{ $author.name }}<sup>1</sup></strong></a>
-            {{ else }}
-              <strong>{{ $author }}<sup>1</sup></strong>
-            {{ end }}
-          {{ else }}
-            {{ if reflect.IsMap $author }}
-              <a href="{{ $author.url }}" target="_blank" rel="noopener noreferrer">{{ $author.name }}</a>
-            {{ else }}
-              {{ $author }}
-            {{ end }}
-          {{ end }}
+        {{ if $isMap }}{{ with $a.url }}<a href="{{ . }}" target="_blank" rel="noopener noreferrer">{{ end }}{{ end }}
+        {{ if and $isMap $a.bold }}<strong>{{ end }}
+        {{ $name }}
+        {{ if $isMap }}{{ with $a.sup }}<sup>{{ . }}</sup>{{ end }}{{ end }}
+        {{ if and $isMap $a.bold }}</strong>{{ end }}
+        {{ if $isMap }}{{ with $a.url }}</a>{{ end }}{{ end }}
         </span>
-      {{ end }}
+    {{ end }}
     </div>
     {{ end }}
+
 
     <div class="article-style">
       {{ .Content }}

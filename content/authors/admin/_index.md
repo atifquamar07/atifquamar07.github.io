@@ -18,8 +18,9 @@ bio: Working on improving reasoning, generalization, and alignment in LLMs
 
 # Interests to show in About widget
 interests:
-  - Large Language Models
-  - Reasoning in LLMs
+  - LLM Reasoning
+  - Trustworthy AI
+  - Diffusion Models
   - Reinforcement Learning
 
 # Education to show in About widget
@@ -74,9 +75,9 @@ email: 'atif7102@gmail.com'
 highlight_name: true
 ---
 
-Currently working on making LLMs better reasoners at UC San Diego.  Previously, at Purdue University, my research focused on inference-time alignment for language models. I founded [Insituate](https://insituate.ai), where we shipped agentic systems to global banks and financial institutions. I earned my bachelors in Computer Science and Biosciences from [IIIT Delhi](https://iiitd.ac.in) in 2024.
+I am currently working on diffusion language models at Virginia University. Previously, at UC San Diego, I worked on introducing a new paradigm for reasoning in vision language models, and at Purdue University, where I focused on inference-time alignment for language models. I also founded [Insituate](https://insituate.ai), where we shipped agentic systems to global banks and financial institutions. I earned my bachelors degree in Computer Science and Biosciences from [IIIT Delhi](https://iiitd.ac.in) in 2024.
 
-My research explores methods to enhance language model reasoning, generalization, and alignment with human goals by building AI systems that are adversarially robust, decision-transparent, and computationally efficient. While LLMs are a primary area of interest, I’m also open to exploring other areas that have the potential to significantly expand the capabilities of intelligent systems.
+My research focuses on advancing the reasoning capabilities of language models and developing trustworthy AI systems that are aligned with human values. While LLMs are a primary focus, I am also open to exploring other areas that can meaningfully expand the capabilities of intelligent systems.
 
 *I am currently looking for research opportunities in both academia (PhD) and industry for a 2026 start.*
 

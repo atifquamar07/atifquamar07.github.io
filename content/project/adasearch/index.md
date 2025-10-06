@@ -5,11 +5,13 @@ tags:
   - Inference-Time Alignment
   - Search Algorithms
   - Large Language Models
-date: '2025-08-02T00:00:00Z'
+date: '2025-09-26T00:00:00Z'
 
 authors:
   - name: M. Atif Quamar
     url: https://atifquamar07.github.io/  # Your website
+    bold: true       
+    sup:  1
   - name: M. Areeb
     url: https://www.linkedin.com/in/mohammad-areeb-b6487511b  
   - name: N. Sharma
