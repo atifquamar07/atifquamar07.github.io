@@ -63,7 +63,7 @@ slides: ""
 
 *TLDR: This work proposes a way for multimodal models to reason with both words and tiny visual “sketches” that live in latent space. These sketches are generated on the fly, guided by the model’s language reasoning, and they help on vision intensive puzzles. The team trains this in two stages, first with supervised traces, then with reinforcement learning. Results across many tasks show steady gains over language only chain of thought.*
 
-{{< figure src="projects\visual-cot\visual-cot-image.png" caption="The overview of our proposed method" >}}
+{{< figure src="projects/visual-cot/visual-cot-image.png" caption="The overview of our proposed method" >}}
 <br>
 
 # Why this is interesting
@@ -94,7 +94,7 @@ The model writes normal text until it emits `<START>`, then it generates K laten
    - **Reinforcement learning:** roll out self generated traces and reward correct answers, which teaches when to switch modalities and how long the sketch segments should be. The training uses a group relative preference objective with a KL penalty for stability.
 
 
- {{< figure src="projects\visual-cot\visual-cot-image.png" caption="The diffusion decoder turns hidden states into compact latent sketches between ⟨START⟩ and ⟨END⟩." >}}
+ {{< figure src="projects/visual-cot/visual-cot-image.png" caption="The diffusion decoder turns hidden states into compact latent sketches between ⟨START⟩ and ⟨END⟩." >}}
 
 <br>
 
@@ -102,7 +102,7 @@ The model writes normal text until it emits `<START>`, then it generates K laten
 
 The team evaluates on multimodal tasks that demand either careful perception or composed visual reasoning. Examples include abstract pattern completion, spatial logic, spot the difference, auxiliary geometric lines, and visual search. Across these, modal mixed chain of thought beats language only chain of thought and is competitive with or better than strong VLM baselines.
 
-{{< figure src="projects\visual-cot\table1.png" caption="Reasoning benchmarks where interleaving text with latent sketches helps, especially on inductive and spatial tasks." >}}
+{{< figure src="projects/visual-cot/table1.png" caption="Reasoning benchmarks where interleaving text with latent sketches helps, especially on inductive and spatial tasks." >}}
 
 
 <br>
@@ -114,12 +114,12 @@ The team evaluates on multimodal tasks that demand either careful perception or 
 - **Ablations:** Removing latents and training on text only hurts. Replacing the diffusion head with a simple similarity loss helps a bit, but still trails the full method. This supports the claim that explicit latent generation matters.  
 - **Forgetting check:** The fine tuned VLM retains language only chain of thought ability at a comparable level once the latent machinery is removed at test time. The alignment choice and modular decoder help avoid catastrophic forgetting. 
 
-{{< figure src="projects\visual-cot\table4.png" caption="Ability forgetting study where the fine-tuned VLM runs language-only chain of thought again. It shows the base capability is largely preserved." >}}
+{{< figure src="projects/visual-cot/table4.png" caption="Ability forgetting study where the fine-tuned VLM runs language-only chain of thought again. It shows the base capability is largely preserved." >}}
 
 
 - **Efficiency:** Latents add tokens and a small diffusion loop, so latency increases but stays within a reasonable range for the reported setup.
 
-{{< figure src="projects\visual-cot\table3.png" caption="Removing latents or replacing the diffusion decoder hurts performance, which shows the value of the latent pathway." >}}
+{{< figure src="projects/visual-cot/table3.png" caption="Removing latents or replacing the diffusion decoder hurts performance, which shows the value of the latent pathway." >}}
 
 
 <br>
