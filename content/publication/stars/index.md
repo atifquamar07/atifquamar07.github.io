@@ -36,5 +36,5 @@ publishDate: ''
 publication_types:
 - '1'
 abstract: ''
-publication: 'Accepted at the Frontiers in Probabilistic Inference Workshop at NeurIPS 2025 and under review at the Transactions of the Association for Computational Linguistics (TACL) journal'
+publication: 'Accepted at the Frontiers in Probabilistic Inference: Sampling Meets Learning workshop at NeurIPS 2025'
 ---

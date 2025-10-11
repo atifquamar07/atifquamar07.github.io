@@ -33,5 +33,5 @@ publishDate: ''
 publication_types:
 - '1'
 abstract: ''
-publication: 'Under review at The Efficient Reasoning Workshop at NeurIPS 2025'
+publication: 'Under review at The Efficient Reasoning workshop at NeurIPS 2025'
 ---
