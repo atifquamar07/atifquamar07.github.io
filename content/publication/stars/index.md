@@ -34,7 +34,8 @@ image:
 projects: ["stars"]
 publishDate: ''
 publication_types:
-- '1'
-abstract: ''
+- ''
+abstract: 'Aligning large language models (LLMs) with human values is critical for their safe deployment, but existing methods like fine-tuning are computationally expensive, while inference-time approaches like Best-of-N sampling are inefficient. We propose STARS: Segment-level Token Alignment via Rejection Sampling, a decoding-time algorithm that steers model generation by iteratively sampling, scoring, and rejecting/accepting short, fixed-size token segments. This allows for early correction of the generation path, significantly improving computational efficiency and boosting alignment quality. Across a suite of six LLMs, we show that STARS outperforms Supervised Fine-Tuning (SFT) by up to 14.9 percentage points and Direct Preference Optimization (DPO) by up to 4.3 percentage points on win-rates, while remaining highly competitive with strong Best-of-N baselines. Our work establishes granular, reward-guided sampling as a generalizable, powerful and efficient alternative to traditional fine-tuning and full-sequence ranking methods for aligning LLMs.'
+
 publication: 'Accepted at the Frontiers in Probabilistic Inference: Sampling Meets Learning workshop at NeurIPS 2025'
 ---

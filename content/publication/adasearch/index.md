@@ -37,7 +37,8 @@ image:
 projects: ["adasearch"]
 publishDate: ''
 publication_types:
-- '1'
-abstract: ''
+- ''
+abstract: 'LLM alignment remains a critical challenge. Inference-time methods provide a flexible alternative to fine-tuning, but their uniform computational effort often yields suboptimal alignment. We hypothesize that for many alignment tasks, the initial tokens of a response are disproportionately more critical. To leverage this principle, we introduce ADASEARCH, a novel blockwise search strategy. It adaptively allocates a fixed computational budget using a sampling schedule, focusing search effort on these critical tokens. We apply ADASEARCH to sequential decoding and introduce its tree-search counterpart, ADABEAM. Our comprehensive evaluation across eight LLMs demonstrates that ADASEARCH outperforms strong Best-ofN and fine-tuning baselines. Specifically, win-rates improve by over 10% for harmlessness generation, over 33% for controlled sentiment generation, and over 24% for mathematical reasoning tasks relative to Best-of-N.'
+
 publication: 'Under review at The 40th Annual AAAI Conference on Artificial Intelligence (AAAI 2026)'
 ---
