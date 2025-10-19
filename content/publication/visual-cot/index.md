@@ -21,6 +21,14 @@ lastmod: '2025-09-30T00:00:00Z'
 featured: false
 draft: false
 
+# Resource links (e.g., OpenReview)
+links:
+  - name: "OpenReview"
+    url: "https://openreview.net/forum?id=MHZaDAoYru&noteId=MHZaDAoYru"
+    icon_pack: fas
+    icon: 
+    primary: true
+
 # Featured image
 # To use, add an image named `featured.jpg/png` to your page's folder.
 # Focal points: Smart, Center, TopLeft, Top, TopRight, Left, Right, BottomLeft, Bottom, BottomRight.
