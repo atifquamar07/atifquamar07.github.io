@@ -2,6 +2,7 @@
 title: Greedy, Not Needy - A General Paradigm for Efficient Decoding in Large Language Models
 summary: Adaptively focuses computation on the most critical early tokens during LLM decoding, boosting alignment performance across multiple tasks compared to Best-of-N and fine-tuning.
 tags:
+  - Trustworthy AI
   - Inference-Time Alignment
   - Search Algorithms
   - Large Language Models
@@ -103,10 +104,10 @@ ADABEAM applies the same schedule idea to reward-guided beam search by varying b
 
 **Beats fine-tuning in some settings:** With the same inference budget, ADASEARCH surpasses SFT on IMDB and improves over DPO in safety comparisons. 
 
- {{< figure src="projects/adasearch/fig3.png" caption="Decay schedule outperforming SFT on IMDB and improving safety vs DPO settings" >}}
+ {{< figure src="projects/adasearch/res.png" caption="Win-Rates(%) of ADASEARCH vs BON" >}}
 
 
-**Small models can punch up:** With ADASEARCH-Decay, several ~7B models achieve win-rates that beat a LLaMA-405B baseline in head-to-head comparisons on HH-RLHF. See Table 3 for per-model numbers. :contentReference[oaicite:14]{index=14}
+**Small models can punch up:** With ADASEARCH-Decay, several ~7B models achieve win-rates that beat a LLaMA-405B baseline in head-to-head comparisons on HH-RLHF. See Table 3 for per-model numbers. 
 
 **Generalizes to beam search:** ADABEAM with a Decay schedule outperforms uniform Tree-BoN and Growth on HH-RLHF across models. 
 

@@ -53,7 +53,7 @@ experience:
     date_start: '2025-02-15'
     date_end: '2025-07-30'
     description: |2-
-        Worked on inference-time alignment method that outperforms the SOTA - Best-of-N decoding by over 30%, while reducing reward model calls by 20%. Aligned LLMs in reducing harmlessness, improved reasoning and positive sentiment generation. Submitted the work to AAAI’26 conference and TACL journal.
+        Worked on inference-time alignment method that outperforms Best-of-N decoding by over 30%, while reducing reward model calls by 20%. Aligned LLMs in reducing harmlessness, improved reasoning and positive sentiment generation. Submitted the work to AAAI’26 conference and TACL journal.
 
   - title: Founder & CTO
     company: Insituate

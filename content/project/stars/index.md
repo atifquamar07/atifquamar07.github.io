@@ -2,6 +2,7 @@
 title: STARS - Segment-level Token Alignment via Rejection Sampling in Large Language Models
 summary: Decoding method that aligns large language models with human preferences at inference time by accepting only high-reward text segments, boosting quality without retraining.
 tags:
+  - Trustworthy AI
   - Inference-Time Alignment
   - Search Algorithms
   - Large Language Models
