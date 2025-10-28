@@ -1,5 +1,5 @@
 ---
-title: Greedy, Not Needy - A General Paradigm for Efficient Decoding in Large Language Models
+title: "Adaptive Blockwise Search : Inference-Time Alignment for Large Language Models"
 summary: Adaptively focuses computation on the most critical early tokens during LLM decoding, boosting alignment performance across multiple tasks compared to Best-of-N and fine-tuning.
 tags:
   - Trustworthy AI

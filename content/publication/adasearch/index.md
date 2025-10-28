@@ -1,7 +1,7 @@
 ---
 # Documentation: https://wowchemy.com/docs/managing-content/
 
-title: 'Greedy, Not Needy: A General Paradigm for Efficient Decoding in Large Language Models'
+title: 'Adaptive Blockwise Search: Inference-Time Alignment for Large Language Models'
 subtitle: ''
 summary: ''
 authors:
@@ -20,6 +20,13 @@ date: '2025-10-05'
 lastmod: '2025-09-26T00:00:00Z'
 featured: false
 draft: false
+
+links:
+  - name: "arXiv"
+    url: "https://arxiv.org/abs/2510.23334"
+    icon_pack: fas
+    icon: 
+    primary: true
 
 # Featured image
 # To use, add an image named `featured.jpg/png` to your page's folder.
