@@ -24,7 +24,7 @@ date_format: Jan 2006
 experience:
 
   - title: Research Intern
-    company: Virginia University
+    company: University of Virginia
     company_url: 'https://www.virginia.edu/'
     company_logo: virginia
     location: Charlottesville, Virginia, United States
