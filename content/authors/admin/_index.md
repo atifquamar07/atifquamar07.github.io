@@ -58,7 +58,7 @@ social:
     link: https://github.com/atifquamar07
   - icon: linkedin
     icon_pack: fab
-    link: https://www.linkedin.com/in/atifquamar/
+    link: https://www.linkedin.com/in/atifquamar
 
 
 # Link to a PDF of your resume/CV.
@@ -75,7 +75,7 @@ email: 'atif7102@gmail.com'
 highlight_name: true
 ---
 
-Currently working on diffusion language models at Virginia University. Previously, at UC San Diego, I worked on introducing a new paradigm for reasoning in vision–language models, and at Purdue University, my work was focused on inference-time alignment of language models. I also founded [Insituate](https://insituate.ai), where we shipped agentic systems to global banks and financial institutions. I earned my bachelors degree in Computer Science and Biosciences from [IIIT Delhi](https://iiitd.ac.in) in 2024.
+Currently working on diffusion language models at Virginia University. Previously, at UC San Diego, I worked on introducing a new paradigm for reasoning in vision language models, and at Purdue University, my work was focused on inference-time alignment of language models. I also founded [Insituate](https://insituate.ai), where we shipped agentic systems to banks and judiciary. I earned my bachelors degree in Computer Science and Biosciences from [IIIT Delhi](https://iiitd.ac.in) in 2024.
 
 My research focuses on advancing the reasoning capabilities of language models and developing trustworthy AI systems that are aligned with human values. While LLMs are a primary focus, I am also open to exploring other areas that can meaningfully expand the capabilities of intelligent systems.
 

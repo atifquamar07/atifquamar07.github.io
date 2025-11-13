@@ -20,8 +20,8 @@ draft: false
 
 # Resource links (e.g., OpenReview)
 links:
-  - name: "OpenReview"
-    url: "https://openreview.net/forum?id=uQS90tIjGH"
+  - name: "arXiv"
+    url: "https://arxiv.org/abs/2511.03827"
     icon_pack: fas
     icon: 
     primary: true
