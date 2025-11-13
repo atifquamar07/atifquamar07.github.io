@@ -18,9 +18,9 @@ bio: Working on improving reasoning, generalization, and alignment in LLMs
 
 # Interests to show in About widget
 interests:
-  - LLM Reasoning
-  - Trustworthy AI
-  - Diffusion Models
+  - Reasoning in Language Models
+  - Trustworthiness in AI Systems
+  - Agentic System Capabilities
   - Reinforcement Learning
 
 # Education to show in About widget
