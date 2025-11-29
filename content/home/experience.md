@@ -32,7 +32,9 @@ experience:
     date_end: ''
     description: |2-
     
-        Working on improving masked diffusion language models by designing masking curricula and principled unmasking policies to improve non-autoregressive decoding efficiency and accuracy.
+        Developing a drift-resilient memory framework for code-execution agents using KL-constrained adapter
+        updates, mitigating embedding distribution shifts during online learning to reduce unsafe code generation
+        without compromising task success rates.
 
   - title: Research Intern
     company: University of California - San Diego
@@ -43,7 +45,7 @@ experience:
     date_end: '2025-10-07'
     description: |2-
     
-        Working on multimodal reasoning - interleaving text and visuals within the chain-of-thought, enabling models to “think” with sketches, diagrams, and images. This work bridges language and vision to solve complex problems with richer, more interpretable reasoning.
+        Worked on multimodal reasoning - interleaving text and visuals within the chain-of-thought, enabling models to “think” with sketches, diagrams, and images. This work bridges language and vision to solve complex problems with richer, more interpretable reasoning.
 
   - title: Research Intern
     company: Purdue University
