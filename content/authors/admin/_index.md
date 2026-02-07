@@ -75,7 +75,7 @@ email: 'atif7102@gmail.com'
 highlight_name: true
 ---
 
-Currently investigating methods for drift-resilient code-execution agents at Virginia University. Previously, at UC San Diego, I worked on introducing a new paradigm for reasoning in vision language models, and at Purdue University, my work was focused on inference-time alignment of language models. I also founded [Insituate](https://insituate.ai), where we shipped agentic systems to banks and judiciary. I earned my bachelors degree in Computer Science and Biosciences from [IIIT Delhi](https://iiitd.ac.in) in 2024.
+Currently investigating methods for drift-resilient code-execution agents at University of Virginia. Previously, at UC San Diego, I worked on introducing a new paradigm for reasoning in vision language models, and at Purdue University, my work was focused on inference-time alignment of language models. I also founded [Insituate](https://insituate.ai), where we shipped agentic systems to banks and judiciary. I earned my bachelors degree in Computer Science and Biosciences from [IIIT Delhi](https://iiitd.ac.in) in 2024.
 
 My research focuses on advancing the reasoning capabilities of language models and developing trustworthy AI systems aligned with human values. I am also interested in developing such systems in the biomedical domain, such as healthcare, where reliability and safety are essential. While LLMs are a primary focus, I am also open to exploring other areas that can meaningfully expand the capabilities of intelligent systems.
 
