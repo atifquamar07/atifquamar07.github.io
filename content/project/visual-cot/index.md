@@ -13,12 +13,13 @@ authors:
     url: 
   - name: K. Zhou
     url: https://lancelot39.github.io/
+  - name: Z. Xu
+    url: https://www.linkedin.com/in/ziming-xu-7942a2320/
   - name: M. Atif Quamar
     url: https://www.atifquamar.com 
     bold: true       
     sup:  
-  - name: Z. Xu
-    url: https://www.linkedin.com/in/ziming-xu/
+  
   - name: S. Hao
     url: https://ber666.github.io/
   - name: Z. Wang
