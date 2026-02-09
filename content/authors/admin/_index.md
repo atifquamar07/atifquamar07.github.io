@@ -10,8 +10,8 @@ role: 23, New Delhi
 
 # Organizations/Affiliations to show in About widget
 organizations:
-  - name: 
-    url: 
+  - name:
+    url:
 
 # Short bio (displayed in user profile at end of posts)
 bio: Working on improving reasoning, generalization, and alignment in LLMs
@@ -46,20 +46,19 @@ education:
 social:
   - icon: envelope
     icon_pack: fas
-    link: '/#contact'
-#   - icon: twitter
-#     icon_pack: fab
-#     link: https://twitter.com/
-#   - icon: graduation-cap # Alternatively, use `google-scholar` icon from `ai` icon pack
-#     icon_pack: fas
-#     link: https://scholar.google.com/
+    link: "/#contact"
+  #   - icon: twitter
+  #     icon_pack: fab
+  #     link: https://twitter.com/
+  - icon: google-scholar
+    icon_pack: ai
+    link: https://scholar.google.com/citations?view_op=list_works&hl=en&hl=en&user=6T8mnw0AAAAJ
   - icon: github
     icon_pack: fab
     link: https://github.com/atifquamar07
   - icon: linkedin
     icon_pack: fab
     link: https://www.linkedin.com/in/atifquamar
-
 
 # Link to a PDF of your resume/CV.
 # To use: copy your resume to `static/uploads/resume.pdf`, enable `ai` icons in `params.toml`,
@@ -69,7 +68,7 @@ social:
 # link: static/uploads/resume.pdf
 
 # Enter email to display Gravatar (if Gravatar enabled in Config)
-email: 'atif7102@gmail.com'
+email: "atif7102@gmail.com"
 
 # Highlight the author in author lists? (true/false)
 highlight_name: true
@@ -79,9 +78,7 @@ Currently investigating methods for drift-resilient code-execution agents at Uni
 
 My research focuses on advancing the reasoning capabilities of language models and developing trustworthy AI systems aligned with human values. I am also interested in developing such systems in the biomedical domain, such as healthcare, where reliability and safety are essential. While LLMs are a primary focus, I am also open to exploring other areas that can meaningfully expand the capabilities of intelligent systems.
 
-*I am currently looking for research opportunities in both academia (PhD) and industry for a 2026 start.*
+_I am currently looking for research opportunities in both academia (PhD) and industry for a 2026 start._
 
-
-[//]: # (Path: content/authors/admin/_index.md)
-
-[//]: # ({{< icon name="download" pack="fas" >}} Download my {{< staticref "static/uploads/resume.pdf" "newtab" >}}resumé{{< /staticref >}}.)
+[//]: # "Path: content/authors/admin/_index.md"
+[//]: # '{{< icon name="download" pack="fas" >}} Download my {{< staticref "static/uploads/resume.pdf" "newtab" >}}resumé{{< /staticref >}}.'

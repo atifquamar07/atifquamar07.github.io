@@ -4,12 +4,20 @@
 /* Apply Nunito globally */
 :root {
   /* Bootstrap 5 font variables */
-  --bs-font-sans-serif: "Nunito", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "Liberation Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  --bs-font-sans-serif:
+    "Nunito", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue",
+    Arial, "Noto Sans", "Liberation Sans", sans-serif, "Apple Color Emoji",
+    "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
   --bs-body-font-family: var(--bs-font-sans-serif);
 }
 
 body,
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   font-family: var(--bs-font-sans-serif);
 }
 
@@ -161,3 +169,11 @@ h2:contains("Projects") {
   width: 100% !important;
 }
 
+/* Add small spacing between social icons in the About widget */
+.network-icon li {
+  margin-right: 15px !important;
+}
+
+.network-icon li:last-child {
+  margin-right: 0 !important;
+}
