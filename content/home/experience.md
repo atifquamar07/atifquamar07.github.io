@@ -23,13 +23,24 @@ date_format: Jan 2006
 #   Begin multi-line descriptions with YAML's `|2-` multi-line prefix.
 experience:
 
+  - title: Visiting Researcher 
+    company: MBZUAI
+    company_url: 'https://mbzuai.ac.ae/'
+    company_logo: mbzuai
+    location: Abu Dhabi, UAE
+    date_start: '2026-02-15'
+    date_end: ''
+    description: |2-
+    
+        Working with Dr. Junpei Komiyama on advancing the reasoning capabilities of language models.
+
   - title: Research Intern
     company: University of Virginia
     company_url: 'https://www.virginia.edu/'
     company_logo: virginia
     location: Charlottesville, Virginia, United States
     date_start: '2025-10-01'
-    date_end: ''
+    date_end: '2026-02-15'
     description: |2-
     
         Developing a drift-resilient memory framework for code-execution agents using KL-constrained adapter
