@@ -1,0 +1,11 @@
+# Font style metadata
+name = "Google Sans"
+
+# Loaded via custom.scss (@import from cdnfonts), so keep this empty.
+google_fonts = ""
+
+# Font families
+heading_font = "Google Sans"
+body_font = "Google Sans"
+nav_font = "Google Sans"
+mono_font = "Roboto Mono"

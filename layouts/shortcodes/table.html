@@ -1,0 +1,45 @@
+{{/* Table Shortcode override for Hugo versions where getCSV is removed. */}}
+{{/* Load a CSV table from page dir, falling back to remote URL. */}}
+
+{{ $src := .Get "path" }}
+{{ $delimiter := .Get "delimiter" | default "," }}
+{{ $useHeaderRow := (eq (lower (.Get "header")) "true") | default true }}
+{{ $caption := .Get "caption" }}
+
+{{ $isRemote := strings.HasPrefix $src "http" }}
+{{ $rows := slice }}
+{{ $opts := dict "format" "csv" "delimiter" $delimiter }}
+
+{{ if $isRemote }}
+  {{ $remote := resources.GetRemote $src }}
+  {{ with $remote }}
+    {{ $rows = transform.Unmarshal $opts .Content }}
+  {{ else }}
+    {{ errorf "Unable to fetch remote CSV %q" $src }}
+  {{ end }}
+{{ else }}
+  {{ $localPath := path.Join "content" $.Page.File.Dir $src }}
+  {{ $rows = transform.Unmarshal $opts (os.ReadFile $localPath) }}
+{{ end }}
+
+<table class="table">
+  {{ if $useHeaderRow }}
+    {{ $headerRow := index $rows 0 }}
+    {{ $rows = after 1 $rows }}
+    <tr> {{ range $headerRow }} <th>{{ . | markdownify | emojify }}</th> {{ end }} </tr>
+  {{ end }}
+  {{ range $rows }}
+    <tr>
+      {{ range . }}
+        {{ if (findRE "^\\d+$" .) }}
+          <td data-table-dtype="number">{{ . }}</td>
+        {{ else }}
+          <td data-table-dtype="text">{{ . | markdownify | emojify }}</td>
+        {{ end }}
+      {{ end }}
+    </tr>
+  {{ end }}
+  {{ if $caption }}
+    <caption>{{ $caption | markdownify | emojify }}</caption>
+  {{ end }}
+</table>

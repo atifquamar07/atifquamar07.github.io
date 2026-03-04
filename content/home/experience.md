@@ -68,7 +68,7 @@ experience:
     description: |2-
         Worked on inference-time alignment method that outperforms Best-of-N decoding by over 30%, while reducing reward model calls by 20%. Aligned LLMs in reducing harmlessness, improved reasoning and positive sentiment generation.
 
-  - title: Founder & CTO
+  - title: Co-Founder
     company: Insituate
     company_url: 'https://insituate.ai'
     company_logo: isx
