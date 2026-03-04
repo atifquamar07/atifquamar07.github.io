@@ -14,12 +14,12 @@ organizations:
     url:
 
 # Short bio (displayed in user profile at end of posts)
-bio: Working on improving reasoning, trustworthiness and alignment in LLMs
+bio: Working on improving reasoning, safety and alignment in LLMs
 
 # Interests to show in About widget
 interests:
   - Reasoning in Language Models
-  - Trustworthiness in AI Systems
+  - AI Safety
   - Agentic System Capabilities
   - Reinforcement Learning
 
