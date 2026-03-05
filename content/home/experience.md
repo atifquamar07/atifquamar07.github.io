@@ -43,7 +43,7 @@ experience:
     date_end: '2026-02-15'
     description: |2-
     
-        Developing a drift-resilient memory framework for code-execution agents using KL-constrained adapter
+        Worked on developing a drift-resilient memory framework for code-execution agents using KL-constrained adapter
         updates, mitigating embedding distribution shifts during online learning to reduce unsafe code generation
         without compromising task success rates.
 
@@ -56,7 +56,7 @@ experience:
     date_end: '2025-10-07'
     description: |2-
     
-        Worked on multimodal reasoning - interleaving text and visuals within the chain-of-thought, enabling models to “think” with sketches, diagrams, and images. This work bridges language and vision to solve complex problems with richer, more interpretable reasoning.
+        Worked on multimodal reasoning -- interleaving text and visuals within the chain-of-thought, enabling models to “think” with sketches, diagrams, and images. This work bridges language and vision to solve complex problems with richer, more interpretable reasoning.
 
   - title: Research Intern
     company: Purdue University
@@ -80,25 +80,7 @@ experience:
 
         Insituate is a no-code platform that enables companies to make custom AI agents for industry-specific needs, and allowing them to productionize these copilots 10x faster securely on their data.
 
-  - title: Software Engineering Intern
-    company: Tweek Labs
-    company_url: 'https://www.linkedin.com/company/tweek-labs/posts/?feedView=all'
-    company_logo: tt
-    location: New Delhi, India
-    date_start: '2023-05-16'
-    date_end: '2020-07-31'
-    description: |2-
-        Engineered the company's android's application. Worked on Jetpack-Compose library for developing. Developed multiple features currently running in production.
 
-  - title: Research Intern
-    company: Singapore University of Technology & Design
-    company_url: 'https://www.sutd.edu.sg/'
-    company_logo: sutd
-    location: Singapore
-    date_start: '2022-09-01'
-    date_end: '2021-12-31'
-    description: |2-
-         Designed an edge-friendly Stream Processing Engine (SPE) with a congestion-aware scheduler, optimizing task-to-resource allocation using graph-based optimization.
 design:
       columns: '2'
 ---
