@@ -42,5 +42,5 @@ publishDate: ''
 publication_types:
 - '1'
 abstract: ''
-publication: 'Accepted at the Multi-modal Foundation Models and Large Language Models for Life Sciences workshop at NeurIPS 2025'
+publication: 'Multi-modal Foundation Models and Large Language Models for Life Sciences Workshop at NeurIPS 2025'
 ---
