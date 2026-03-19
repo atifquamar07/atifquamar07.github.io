@@ -60,20 +60,18 @@
     {{ block "main" . }}{{ end }}
   </div>
 
-  <div class="page-footer">
+  <div class="page-footer" style="padding-bottom: 30px;">
     {{/* Docs and Updates layouts include the site footer in a different location. */}}
     {{ if not (in (slice "book" "docs" "updates") .Type) }}
     <div class="container">
+      <div style="max-width: 250px; margin: 80px auto 40px; text-align: center; border-radius: 12px; overflow: hidden;">
+        <script type="text/javascript" id="mapmyvisitors" src="//mapmyvisitors.com/map.js?d=jXbSyu9yHiqrIMG4S_wgh10OvbCo0cw11tLcV38Qv30&cl=ffffff&w=a"></script>
+      </div>
       {{ partial "site_footer" . }}
     </div>
     {{ end }}
   </div>
 
-  <div id="flag-counter-widget" style="position:fixed;left:12px;bottom:12px;z-index:1100;line-height:0;">
-    <a href="http://s01.flagcounter.com/more/cj9"><img src="https://s01.flagcounter.com/count2/cj9/bg_9EBBFF/txt_000000/border_CCCCCC/columns_2/maxflags_10/viewers_0/labels_0/pageviews_1/flags_0/percent_0/" alt="Flag Counter" border="0"></a>
-  </div>
-
   {{ partial "site_js" . }}
-
 </body>
 </html>
