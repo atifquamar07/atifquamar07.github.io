@@ -74,9 +74,9 @@ email: "atif7102@gmail.com"
 highlight_name: true
 ---
 
-I am currently a Visiting Researcher at MBZUAI, where I work under the supervision of [Dr. Junpei Komiyama](https://jkomiyama.github.io/). Previously, at UC San Diego, I worked on latent reasoning in vision-language models, and at Purdue University, my work was focused on inference-time alignment of language models. I also founded [Insituate](https://insituate.ai), where we shipped agentic systems to banks and judiciary. I earned my bachelors degree in Computer Science and Biosciences from [IIIT Delhi](https://iiitd.ac.in) in 2024.
+I am currently a Visiting Researcher at MBZUAI, where I work under the supervision of [Prof. Junpei Komiyama](https://jkomiyama.github.io/). Previously, at UC San Diego, I worked on latent reasoning in vision-language models, and at Purdue University, my work was focused on inference-time alignment of language models. I also founded [Insituate](https://insituate.ai), where we shipped agentic systems to banks and judiciary. I earned my bachelors degree in Computer Science and Biosciences from [IIIT Delhi](https://iiitd.ac.in) in 2024.
 
-My research focuses on advancing the reasoning capabilities of language models and developing trustworthy AI systems aligned with human values. I am also interested in developing such systems in the biomedical domain, such as healthcare, where reliability and safety are essential. While LLMs are a primary focus, I am also open to exploring other areas that can meaningfully expand the capabilities of intelligent systems.
+I like to understand how foundation models reason, and how we can make that reasoning more efficient and trustworthy. My work focuses on improving reasoning in settings that involve language and vision, while ensuring these models remain safe, reliable, and aligned with human values.
 
 _I am currently looking for research opportunities in both academia (PhD) and industry for a 2026 start._
 
