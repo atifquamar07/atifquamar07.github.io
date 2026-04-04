@@ -18,10 +18,10 @@ bio: Working on improving reasoning, safety and alignment in LLMs
 
 # Interests to show in About widget
 interests:
-  - Reasoning in Language Models
-  - AI Safety
-  - Agentic System Capabilities
-  - Reinforcement Learning
+  - Multimodal Reasoning
+  - Trustworthy AI
+  - AI Alignment and Safety 
+  - Reinforcement Learning 
 
 # Education to show in About widget
 education:
