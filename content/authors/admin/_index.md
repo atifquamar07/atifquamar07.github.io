@@ -78,7 +78,6 @@ I am currently a Visiting Researcher at MBZUAI, where I work under the supervisi
 
 I like to understand how foundation models reason, and how we can make that reasoning more efficient and trustworthy. My work focuses on improving reasoning in settings that involve language and vision, while ensuring these models remain safe, reliable, and aligned with human values.
 
-_I am currently looking for research opportunities in both academia (PhD) and industry for a 2026 start._
 
 [//]: # "Path: content/authors/admin/_index.md"
 [//]: # '{{< icon name="download" pack="fas" >}} Download my {{< staticref "static/uploads/resume.pdf" "newtab" >}}resumé{{< /staticref >}}.'
