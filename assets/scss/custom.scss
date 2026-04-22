@@ -8,6 +8,10 @@
     Arial, "Noto Sans", "Liberation Sans", sans-serif, "Apple Color Emoji",
     "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
   --bs-body-font-family: var(--bs-font-sans-serif);
+
+  /* Custom size between Wowchemy M and L */
+  --site-font-size-mobile: 15px;
+  --site-font-size-desktop: 19.5px;
 }
 
 html,
@@ -23,6 +27,16 @@ input,
 select,
 textarea {
   font-family: "Google Sans", "Product Sans", var(--bs-font-sans-serif) !important;
+}
+
+html {
+  font-size: var(--site-font-size-mobile) !important;
+}
+
+@media screen and (min-width: 58em) {
+  html {
+    font-size: var(--site-font-size-desktop) !important;
+  }
 }
 
 /* Force Google Sans on navbar/menu and section headings */
@@ -145,6 +159,7 @@ h2:contains("Projects") {
 }
 
 /* Make authors more prominent in dark mode */
+.dark .project-authors,
 [data-theme="dark"] .project-authors {
   color: #7bb3f0 !important; /* Lighter blue for dark mode */
 }
@@ -199,6 +214,7 @@ h2:contains("Projects") {
 }
 
 /* Dark mode styling for project page authors */
+.dark .project-page-authors,
 [data-theme="dark"] .project-page-authors {
   color: #7bb3f0 !important;
 }
@@ -252,4 +268,119 @@ h2:contains("Projects") {
 
 .network-icon li:last-child {
   margin-right: 0 !important;
+}
+
+/* Extreme black dark mode with higher-contrast text and surfaces */
+.dark body,
+body.dark {
+  background: #000000 !important;
+  color: #f5f5f5 !important;
+}
+
+.dark .home-section,
+body.dark .home-section,
+.dark .navbar,
+body.dark .navbar,
+.dark .navbar-collapse,
+body.dark .navbar-collapse,
+.dark .dropdown-menu,
+body.dark .dropdown-menu,
+.dark .dropdown-item,
+body.dark .dropdown-item {
+  background: #000000 !important;
+}
+
+.dark .navbar,
+body.dark .navbar {
+  box-shadow: none !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.dark .navbar-collapse,
+body.dark .navbar-collapse,
+.dark .dropdown-menu,
+body.dark .dropdown-menu {
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.55);
+}
+
+.dark .dropdown-item:hover,
+body.dark .dropdown-item:hover,
+.dark .dropdown-item:focus,
+body.dark .dropdown-item:focus {
+  background: #111111 !important;
+  color: #ffffff !important;
+}
+
+.dark .card,
+body.dark .card,
+.dark .card-simple,
+body.dark .card-simple {
+  background: #090909 !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.45) !important;
+}
+
+.dark .card .section-subheading a,
+body.dark .card .section-subheading a,
+.dark .card .section-subheading a:hover,
+body.dark .card .section-subheading a:hover {
+  color: #f5f5f5 !important;
+  border-bottom-color: rgba(255, 255, 255, 0.4) !important;
+}
+
+.dark .card .card-image.hover-overlay::before,
+body.dark .card .card-image.hover-overlay::before {
+  background: #000000 !important;
+}
+
+.dark .card .card-image.hover-overlay::after,
+body.dark .card .card-image.hover-overlay::after {
+  color: #ffffff !important;
+}
+
+.dark .section-heading p,
+body.dark .section-heading p,
+.dark .portrait-title h3,
+body.dark .portrait-title h3,
+.dark .article-metadata,
+body.dark .article-metadata,
+.dark .article-metadata a,
+body.dark .article-metadata a,
+.dark .stream-meta,
+body.dark .stream-meta,
+.dark .talk-metadata,
+body.dark .talk-metadata,
+.dark .pub-icon,
+body.dark .pub-icon,
+.dark ul.ul-edu li .description p.institution,
+body.dark ul.ul-edu li .description p.institution,
+.dark .exp-meta,
+body.dark .exp-meta,
+.dark .experience .text-muted,
+body.dark .experience .text-muted {
+  color: rgba(255, 255, 255, 0.72) !important;
+}
+
+.dark .card .card-text p,
+body.dark .card .card-text p,
+.dark .experience .card-text,
+body.dark .experience .card-text,
+.dark .experience .card-text p,
+body.dark .experience .card-text p {
+  color: rgba(255, 255, 255, 0.86) !important;
+}
+
+.dark .form-control,
+body.dark .form-control,
+.dark select,
+body.dark select {
+  background: #0b0b0b !important;
+  border-color: rgba(255, 255, 255, 0.14) !important;
+  color: #f5f5f5 !important;
+}
+
+.dark .form-control::placeholder,
+body.dark .form-control::placeholder {
+  color: rgba(255, 255, 255, 0.58) !important;
 }

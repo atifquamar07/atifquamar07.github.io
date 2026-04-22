@@ -1,0 +1,22 @@
+# Theme metadata
+name = "Extreme Black"
+
+[dark]
+  # Primary
+  primary = "#bbdefb"
+
+  link = "#bbdefb"
+  link_hover = "#d7ecff"
+
+  # Menu
+  menu_primary = "#000000"
+  menu_text = "rgba(255, 255, 255, 0.82)"
+  menu_text_active = "#bbdefb"
+  menu_title = "#ffffff"
+
+  # Global background
+  background = "#000000"
+
+  # Home sections
+  home_section_odd = "#000000"
+  home_section_even = "#000000"

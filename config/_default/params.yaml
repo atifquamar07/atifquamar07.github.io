@@ -7,9 +7,9 @@
 
 appearance:
   theme_day: minimal
-  theme_night: minimal
+  theme_night: extreme_black
   font: google_sans
-  font_size: L
+  font_size: M
 
 # SEO
 
