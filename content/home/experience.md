@@ -24,8 +24,8 @@ date_format: Jan 2006
 experience:
 
   - title: Visiting Researcher 
-    company: MBZUAI
-    company_url: 'https://mbzuai.ac.ae/'
+    company: Mohamed bin Zayed University of Artificial Intelligence
+    company_url: 
     company_logo: mbzuai
     location: Abu Dhabi, UAE
     date_start: '2026-02-15'
@@ -36,7 +36,7 @@ experience:
 
   - title: Research Intern
     company: University of Virginia
-    company_url: 'https://www.virginia.edu/'
+    company_url: 
     company_logo: virginia
     location: Charlottesville, Virginia, United States
     date_start: '2025-10-01'
@@ -49,7 +49,7 @@ experience:
 
   - title: Research Intern
     company: University of California - San Diego
-    company_url: 'https://ucsd.edu/'
+    company_url: 
     company_logo: ucsd
     location: San Diego, California, United States
     date_start: '2025-07-31'
@@ -60,7 +60,7 @@ experience:
 
   - title: Research Intern
     company: Purdue University
-    company_url: 'https://purdue.edu'
+    company_url: 
     company_logo: pp
     location: West Lafayette, Indiana, United States
     date_start: '2025-02-15'
@@ -70,7 +70,7 @@ experience:
 
   - title: Co-Founder
     company: Insituate
-    company_url: 'https://insituate.ai'
+    company_url: 
     company_logo: isx
     location: New Delhi, India
     date_start: '2023-09-15'

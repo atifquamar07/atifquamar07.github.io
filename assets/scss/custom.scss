@@ -51,6 +51,24 @@ html {
   font-family: "Google Sans", "Product Sans", var(--bs-font-sans-serif) !important;
 }
 
+/* Keep the top navbar open and unboxed. */
+.page-header,
+.page-header.header--fixed,
+.navbar,
+.navbar-collapse {
+  border: 0 !important;
+  box-shadow: none !important;
+}
+
+.navbar {
+  background: transparent !important;
+}
+
+.navbar .nav-link,
+.navbar .navbar-nav .nav-link {
+  font-size: 0.85rem !important;
+}
+
 /* Make paragraph/body text thinner and keep headings clearly heavier */
 body,
 p,
@@ -293,11 +311,15 @@ body.dark .dropdown-item {
 .dark .navbar,
 body.dark .navbar {
   box-shadow: none !important;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  border-bottom: 0 !important;
 }
 
 .dark .navbar-collapse,
-body.dark .navbar-collapse,
+body.dark .navbar-collapse {
+  border: 0 !important;
+  box-shadow: none !important;
+}
+
 .dark .dropdown-menu,
 body.dark .dropdown-menu {
   border: 1px solid rgba(255, 255, 255, 0.08);
