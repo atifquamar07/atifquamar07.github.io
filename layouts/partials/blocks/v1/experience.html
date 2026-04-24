@@ -1,0 +1,50 @@
+{{/* Premium portfolio timeline based on Wowchemy Blocks: Experience. */}}
+{{ $block := .wcBlock }}
+{{ $columns := $block.Params.design.columns | default "2" }}
+
+<div class="col-12 {{if eq $columns "2"}}col-lg-8{{end}}">
+  {{ with $block.Content }}{{ . }}{{ end }}
+
+  {{ if $block.Params.experience }}
+  <div class="experience-timeline">
+    {{ range $idx, $key := $block.Params.experience }}
+    <article class="timeline-item">
+      <div class="timeline-node {{if not .date_end}}is-current{{end}}" aria-hidden="true"></div>
+
+      <div class="timeline-card glass-card">
+        <div class="timeline-card-header">
+          {{- if .company_logo}}
+          {{- $svg_icon := resources.Get (printf "media/icons/brands/%s.svg" .company_logo) -}}
+          {{ if not $svg_icon }}{{ errorf "Brand logo not found at `assets/media/icons/brands/%s.svg`" .company_logo }}{{end}}
+          <div class="timeline-logo">
+            {{- with .company_url}}<a href="{{.}}" target="_blank" rel="noopener">{{end -}}
+            <img src="{{ $svg_icon.RelPermalink }}" width="56" height="56" alt="{{.company | plainify}}" loading="lazy">
+            {{- with .company_url}}</a>{{end -}}
+          </div>
+          {{ end }}
+
+          <div class="timeline-role">
+            <h3>{{ .title | markdownify | emojify }}</h3>
+            <p>
+              {{- with .company_url}}<a href="{{.}}" target="_blank" rel="noopener">{{end}}{{.company | markdownify | emojify}}{{with .company_url}}</a>{{end -}}
+            </p>
+          </div>
+        </div>
+
+        {{ $start := (time .date_start) | time.Format ($block.Params.date_format | default "January 2006") }}
+        {{ $end := i18n "present" | default "Present" }}
+        {{ if .date_end }}
+          {{ $end = (time .date_end) | time.Format ($block.Params.date_format | default "January 2006") }}
+        {{ end }}
+        <div class="timeline-meta">
+          <span>{{ $start }} - {{ $end }}</span>
+          {{with .location}}<span>{{ . }}</span>{{end}}
+        </div>
+
+        {{with .description}}<div class="timeline-description">{{ . | markdownify | emojify }}</div>{{end}}
+      </div>
+    </article>
+    {{end}}
+  </div>
+  {{ end }}
+</div>

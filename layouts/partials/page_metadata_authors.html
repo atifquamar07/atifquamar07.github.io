@@ -1,0 +1,23 @@
+{{/* Display author list with the site owner's publication name emphasized. */}}
+
+{{- $taxonomy := "authors" }}
+{{ if .Param $taxonomy }}
+  {{ range $index, $value := (.GetTerms $taxonomy) }}
+    {{- $highlight_name := .Page.Params.highlight_name | default false -}}
+    {{- $is_owner_publication_name := eq .LinkTitle "M. Atif Quamar" -}}
+
+    {{- if gt $index 0 }}, {{ end -}}
+    <span {{ if $highlight_name }}class="author-highlighted"{{end}}>
+      {{- if .RelPermalink -}}
+        <a href="{{.RelPermalink}}">{{ if $is_owner_publication_name }}<strong>{{.LinkTitle}}</strong>{{ else }}{{.LinkTitle}}{{ end }}</a>
+      {{- else -}}
+        {{ if $is_owner_publication_name }}<strong>{{.LinkTitle}}</strong>{{ else }}{{ .LinkTitle }}{{ end }}
+      {{- end -}}
+    </span>
+    {{- if isset $.Params "author_notes" -}}
+      {{- with (index $.Params.author_notes $index) -}}
+        <i class="author-notes fas fa-info-circle" data-toggle="tooltip" title="{{.}}"></i>
+      {{- end -}}
+    {{- end -}}
+  {{- end -}}
+{{- end -}}

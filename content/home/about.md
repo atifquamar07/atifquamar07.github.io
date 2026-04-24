@@ -14,6 +14,12 @@ weight: 10
 
 title: About
 
+# Homepage hero copy. Keep this editable here rather than baking it into CSS.
+hero_label: ''
+headline: ''
+research_tagline: 'I study **efficient and reliable reasoning** in foundation models.'
+philosophy_label: 
+
 # Choose the user profile to display
 # This should be the username (folder name) of a profile in your `content/authors/` folder.
 # See https://wowchemy.com/docs/get-started/#introduce-yourself

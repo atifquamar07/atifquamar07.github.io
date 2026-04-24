@@ -1,0 +1,63 @@
+{{- /* Generate the search index with support for local map-shaped author entries. */ -}}
+{{- $index := slice -}}
+{{- $pages := site.RegularPages -}}
+{{- $pages := $pages | union (where (where site.Pages "Kind" "section") "Type" "book") -}}
+{{- $pages := $pages | union (where (where site.Pages "Section" "authors") "Params.superuser" "!=" nil) -}}
+
+{{- range $pages -}}
+  {{- if and (not .Draft) (not .Params.private) | and (ne .Params.searchable false) -}}
+
+    {{- $desc := "" -}}
+    {{- if .Params.summary -}}
+      {{- $desc = .Params.summary -}}
+    {{- else if .Params.abstract -}}
+      {{- $desc = .Params.abstract -}}
+    {{- else -}}
+      {{- $desc = .Summary -}}
+    {{- end -}}
+
+    {{- $authors := .Params.authors -}}
+    {{- $title := .Title -}}
+    {{- $rel_permalink := .RelPermalink -}}
+    {{- $permalink := .Permalink -}}
+
+    {{- if eq .Section "authors" -}}
+      {{- $username := path.Base .File.Dir -}}
+      {{- with site.GetPage (printf "/authors/%s" $username) -}}
+        {{- $permalink = .Permalink -}}
+        {{- $rel_permalink = .RelPermalink -}}
+      {{- end -}}
+    {{- else -}}
+      {{- if .Params.authors -}}
+        {{- $authorLen := len .Params.authors -}}
+        {{- if gt $authorLen 0 -}}
+          {{- $authors = slice -}}
+          {{- range $k, $v := .Params.authors -}}
+            {{- $author_name := "" -}}
+            {{- $author_key := "" -}}
+            {{- if reflect.IsMap $v -}}
+              {{- $author_name = $v.name | default "" -}}
+              {{- $author_key = $v.username | default $author_name -}}
+            {{- else -}}
+              {{- $author_name = $v -}}
+              {{- $author_key = $v -}}
+            {{- end -}}
+            {{- $person_page_path := (printf "/authors/%s" (urlize $author_key)) -}}
+            {{- $person_page := site.GetPage $person_page_path -}}
+            {{- if and $person_page $person_page.File -}}
+              {{- $authors = $authors | append $person_page.Title -}}
+            {{- else -}}
+              {{- $authors = $authors | append ($author_name | plainify) -}}
+            {{- end -}}
+          {{- end -}}
+        {{- end -}}
+      {{- end -}}
+    {{- end -}}
+
+    {{- if .File -}}
+      {{- $index = $index | append (dict "objectID" .File.UniqueID "date" .Date.UTC.Unix "publishdate" .PublishDate "lastmod" .Lastmod.UTC.Unix "expirydate" .ExpiryDate.UTC.Unix "lang" .Lang "permalink" $permalink "relpermalink" $rel_permalink "title" $title "summary" (plainify $desc | htmlUnescape) "content" (.Plain | htmlUnescape | truncate 5000) "authors" $authors "kind" .Kind "type" .Type "section" .Section "tags" .Params.Tags "categories" .Params.Categories) -}}
+    {{- end -}}
+  {{- end -}}
+{{- end -}}
+
+{{- $index | jsonify -}}

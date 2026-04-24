@@ -1,0 +1,34 @@
+{{/* Get name of primary author. Accept both Wowchemy author strings and local map-shaped authors. */}}
+
+{{ $page := . }}
+{{ $publisher := site.Params.marketing.seo.org_name | default site.Title }}
+
+{{ $author := "" }}
+{{ $author_username := "" }}
+
+{{ if and (not $page.Params.authors) ($page.Scratch.Get "superuser_username") }}
+  {{ $author_username = $page.Scratch.Get "superuser_username" }}
+{{ else if $page.Params.authors }}
+  {{ $first_author := index $page.Params.authors 0 }}
+  {{ if reflect.IsMap $first_author }}
+    {{ $author = $first_author.name | default "" }}
+    {{ with $first_author.username }}
+      {{ $author_username = urlize . }}
+    {{ else }}
+      {{ with $author }}{{ $author_username = urlize . }}{{ end }}
+    {{ end }}
+  {{ else }}
+    {{ $author = $first_author }}
+    {{ $author_username = urlize $author }}
+  {{ end }}
+{{ end }}
+
+{{ $taxonomy := "authors" }}
+{{ $profile_page := site.GetPage (printf "/%s/%s" $taxonomy $author_username) }}
+{{ with $profile_page }}
+  {{ $author = .Title }}
+{{ else }}
+  {{ $author = $author | default $publisher }}
+{{ end }}
+
+{{ return $author }}

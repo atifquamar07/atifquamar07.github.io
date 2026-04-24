@@ -1,8 +1,4 @@
-{{/* Wowchemy Blocks: About */}}
-{{/* Documentation: https://wowchemy.com/blocks/ */}}
-{{/* License: https://github.com/wowchemy/wowchemy-hugo-themes/blob/main/LICENSE.md */}}
-
-{{/* Initialise */}}
+{{/* Premium portfolio hero based on Wowchemy Blocks: About. */}}
 {{ $page := .wcPage }}
 {{ $block := .wcBlock }}
 
@@ -21,19 +17,25 @@
 {{ $person := $person_page.Params }}
 {{ $avatar := ($person_page.Resources.ByType "image").GetMatch "*avatar*" }}
 {{ $avatar_shape := site.Params.features.avatar.shape | default "circle" }}
+{{ $hero_label := $block.Params.hero_label }}
+{{ $headline := $block.Params.headline }}
+{{ $research_tagline := $block.Params.research_tagline }}
 
-<!-- About widget -->
-<div class="row">
-  <div class="col-12 col-lg-4">
-    <div id="profile">
+<div class="research-hero">
+  <aside class="profile-card glass-card" id="profile" aria-label="Profile summary">
+    <div class="profile-card-inner">
 
       {{ if site.Params.features.avatar.gravatar }}
-      <img class="avatar {{if eq $avatar_shape "square"}}avatar-square{{else}}avatar-circle{{end}}" src="https://s.gravatar.com/avatar/{{ md5 $person.email }}?s=270')" alt="{{$person_page.Title}}">
+      <div class="portrait-glow">
+        <img class="avatar {{if eq $avatar_shape "square"}}avatar-square{{else}}avatar-circle{{end}}" src="https://s.gravatar.com/avatar/{{ md5 $person.email }}?s=360')" alt="{{$person_page.Title}}">
+      </div>
       {{ else if $avatar }}
-      {{ $avatar_image := $avatar.Fill "810x810 Center" }}
-      <img class="avatar {{if eq $avatar_shape "square"}}avatar-square{{else}}avatar-circle{{end}}"
-           width="270" height="270"
-           src="{{ $avatar_image.RelPermalink }}" alt="{{$person_page.Title}}">
+      {{ $avatar_image := $avatar.Fill "900x900 Center" }}
+      <div class="portrait-glow">
+        <img class="avatar {{if eq $avatar_shape "square"}}avatar-square{{else}}avatar-circle{{end}}"
+             width="270" height="270"
+             src="{{ $avatar_image.RelPermalink }}" alt="{{$person_page.Title}}">
+      </div>
       {{ end }}
 
       <div class="portrait-title">
@@ -52,15 +54,17 @@
         {{ with $person.role }}<h3>{{ . | markdownify | emojify }}</h3>{{ end }}
 
         {{ range $person.organizations }}
-        <h3>
-          {{ with .url }}<a href="{{ . }}" target="_blank" rel="noopener">{{ end }}
-          <span>{{ .name }}</span>
-          {{ if .url }}</a>{{ end }}
-        </h3>
+          {{ if .name }}
+          <h3>
+            {{ with .url }}<a href="{{ . }}" target="_blank" rel="noopener">{{ end }}
+            <span>{{ .name }}</span>
+            {{ if .url }}</a>{{ end }}
+          </h3>
+          {{ end }}
         {{ end }}
       </div>
 
-      <ul class="network-icon" aria-hidden="true">
+      <ul class="network-icon" aria-label="Social and contact links">
         {{ range $person.social }}
         {{ $pack := or .icon_pack "fas" }}
         {{ $pack_prefix := $pack }}
@@ -76,30 +80,31 @@
           {{ $target = "target=\"_blank\" rel=\"noopener\"" }}
         {{ end }}
         <li>
-          <a href="{{ $link | safeURL }}" {{ $target | safeHTMLAttr }} aria-label="{{ .icon }}">
+          <a href="{{ $link | safeURL }}" {{ $target | safeHTMLAttr }} aria-label="{{ .icon }}"{{ with .label }} title="{{ . }}"{{ end }}>
             <i class="{{ $pack }} {{ $pack_prefix }}-{{ .icon }} big-icon"></i>
           </a>
         </li>
         {{ end }}
       </ul>
-
     </div>
-  </div>
-  <div class="col-12 col-lg-8">
+  </aside>
 
-    {{/* Only display widget title in explicit instances of about widget, not in author pages. */}}
-    {{ if and $block.Params.widget $block.Title }}<h1>{{ $block.Title | markdownify | emojify }}</h1>{{ end }}
+  <div class="hero-copy">
+    {{ with $hero_label }}<div class="eyebrow">{{ . | markdownify | emojify }}</div>{{ end }}
+    {{ with $headline }}<h1>{{ . | markdownify | emojify }}</h1>{{ end }}
+    {{ with $research_tagline }}
+    <div class="research-tagline">{{ . | markdownify | emojify }}</div>
+    {{ end }}
 
     <div class="article-style">
       {{ $person_page.Content }}
     </div>
 
-    <div class="row">
-
+    <section class="hero-info-card glass-card" aria-label="Interests and education">
       {{ with $person.interests }}
-      <div class="col-md-5">
+      <div class="hero-info-column">
         <div class="section-subheading">{{ i18n "interests" | markdownify }}</div>
-        <ul class="ul-interests mb-0">
+        <ul class="interest-pills">
           {{ range . }}
           <li>{{ . | markdownify | emojify }}</li>
           {{ end }}
@@ -108,12 +113,12 @@
       {{ end }}
 
       {{ with $person.education }}
-      <div class="col-md-7">
+      <div class="hero-info-column">
         <div class="section-subheading">{{ i18n "education" | markdownify }}</div>
-        <ul class="ul-edu fa-ul mb-0">
+        <ul class="education-list">
           {{ range .courses }}
           <li>
-            <i class="fa-li fas fa-graduation-cap"></i>
+            <i class="fas fa-graduation-cap" aria-hidden="true"></i>
             <div class="description">
               <p class="course">{{ .course }}{{ with .year }}, {{ . }}{{ end }}</p>
               <p class="institution">{{ .institution }}</p>
@@ -123,7 +128,6 @@
         </ul>
       </div>
       {{ end }}
-
-    </div>
+    </section>
   </div>
 </div>

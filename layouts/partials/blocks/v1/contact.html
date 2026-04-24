@@ -1,0 +1,150 @@
+{{/* Premium portfolio contact block based on Wowchemy Blocks: Contact. */}}
+{{ $block := .wcBlock }}
+{{ $autolink := default true $block.Params.content.autolink }}
+{{ $data := $block.Params.content }}
+
+{{ $form_provider := lower $block.Params.content.form.provider | default "" }}
+{{ $form_provider_legacy := $block.Params.email_form | default 0 }}
+
+{{ $use_netlify_form := eq $form_provider "netlify" | or (eq $form_provider_legacy 1) }}
+{{ $use_formspree_form := eq $form_provider "formspree" | or (eq $form_provider_legacy 2) }}
+{{ $use_form := or $use_netlify_form $use_formspree_form }}
+
+{{ $use_netlify_captcha := $block.Params.content.form.netlify.captcha | default true }}
+{{ $use_formspree_captcha := $block.Params.content.form.formspree.captcha | default false }}
+
+{{ $columns := $block.Params.design.columns | default "2" }}
+
+{{ if and $use_formspree_form $use_formspree_captcha }}
+  <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+{{ end }}
+
+<div class="col-12 {{if eq $columns "2"}}col-lg-8{{end}}">
+  {{ with $block.Content }}{{ . }}{{ end }}
+
+  <div class="contact-layout">
+    {{ if $use_form }}
+      {{ $post_action := "" }}
+      {{ if $use_netlify_form }}
+        {{ $post_action = "netlify" }}
+      {{ else if $use_formspree_form }}
+        {{ if not $block.Params.content.form.formspree.id }}
+          {{ errorf "You have chosen to use Formspree as the provider for the contact form. Please set your Formspree Form ID in the Contact widget or disable the form." }}
+        {{ end }}
+        {{ if and $use_formspree_captcha (not $block.Params.content.form.formspree.captcha_key) }}
+          {{ errorf "You have chosen to use reCAPTCHA for Formspree. Please set your Formspree CAPTCHA KEY in the Contact widget or disable reCAPTCHA." }}
+        {{ end }}
+        {{ $post_action = printf "action=\"https://formspree.io/f/%s\"" $block.Params.content.form.formspree.id }}
+      {{ end }}
+
+      <section class="contact-form-card glass-card">
+        <form name="contact" method="POST" {{ $post_action | safeHTMLAttr }} {{ if $use_netlify_form }}netlify-honeypot="_gotcha"{{ end }} {{ if $use_netlify_captcha }}data-netlify-recaptcha="true"{{ end }} {{ with $block.Params.content.form.netlify.success_url }}action="{{ . | relLangURL }}"{{ end }}>
+          <div class="form-group">
+            <label for="inputName">{{ i18n "contact_name" | default "Name" }}</label>
+            <input type="text" name="name" class="form-control w-100" id="inputName" placeholder="{{ i18n "contact_name" | default "Name" }}" required>
+          </div>
+          <div class="form-group">
+            <label for="inputEmail">{{ i18n "contact_email" | default "Email" }}</label>
+            <input type="email" name="email" class="form-control w-100" id="inputEmail" placeholder="{{ i18n "contact_email" | default "Email" }}" required>
+          </div>
+          <div class="form-group">
+            <label for="inputMessage">{{ i18n "contact_message" | default "Message" }}</label>
+            <textarea name="message" class="form-control" id="inputMessage" rows="5" placeholder="{{ i18n "contact_message" | default "Message" }}" required></textarea>
+          </div>
+          {{ if $block.Params.content.form.netlify.attachments }}
+            <div class="form-group">
+              <label for="fileUpload">{{ i18n "contact_attachment" | default "Attach file" }}</label>
+              <input type="file" name="file" class="form-control w-100" id="fileUpload" placeholder="{{ i18n "contact_attachment" | default "Attach file" }}">
+            </div>
+          {{ end }}
+          <div class="d-none">
+            <label>Do not fill this field unless you are a bot: <input name="_gotcha"></label>
+          </div>
+          {{ if and $use_netlify_form $use_netlify_captcha }}
+            <div class="form-group" data-netlify-recaptcha="true"></div>
+          {{ else if and $use_formspree_form $use_formspree_captcha }}
+            <div class="g-recaptcha" data-sitekey="{{ $block.Params.content.form.formspree.captcha_key }}"></div>
+            <br>
+          {{ end }}
+          <button type="submit" class="btn btn-primary contact-submit">{{ i18n "contact_send" | default "Send" }}</button>
+        </form>
+      </section>
+    {{ end }}
+
+    <aside class="contact-side-stack">
+      <div class="contact-methods glass-card">
+        <div class="eyebrow">Contact</div>
+        <ul>
+          {{ if $data.email }}
+          <li>
+            <i class="fas fa-envelope" aria-hidden="true"></i>
+            <span>
+              <strong>Email</strong>
+              {{- if $autolink }}<a href="mailto:{{ $data.email }}">{{ $data.email }}</a>{{ else }}{{ $data.email }}{{ end -}}
+            </span>
+          </li>
+          {{ end }}
+
+          {{ with $data.phone }}
+          <li>
+            <i class="fas fa-phone" aria-hidden="true"></i>
+            <span>
+              <strong>Phone</strong>
+              {{- if $autolink }}<a href="tel:{{ . }}">{{ . }}</a>{{ else }}{{ . }}{{ end -}}
+            </span>
+          </li>
+          {{ end }}
+
+          {{ $addr_formatted := "" }}
+          {{ if $data.address.street | or $data.address.city | or $data.address.region | or $data.address.postcode | or $data.address.country }}
+            {{ $addr_formatted = partial "functions/get_address" (dict "root" . "address" $data.address) }}
+            <li>
+              <i class="fas fa-map-marker-alt" aria-hidden="true"></i>
+              <span>
+                <strong>Address</strong>
+                <span id="person-address">{{$addr_formatted}}</span>
+              </span>
+            </li>
+          {{ end }}
+
+          {{ with $data.appointment_url }}
+          <li>
+            <i class="fas fa-calendar-check" aria-hidden="true"></i>
+            <span>
+              <strong>Appointment</strong>
+              <a href="{{ . }}" target="_blank" rel="noopener">{{ i18n "book_appointment" | default "Book an appointment" }}</a>
+            </span>
+          </li>
+          {{ end }}
+
+          {{ range $data.contact_links }}
+          {{ $pack := or .icon_pack "fas" }}
+          {{ $pack_prefix := $pack }}
+          {{ if in (slice "fab" "fas" "far" "fal") $pack }}
+            {{ $pack_prefix = "fa" }}
+          {{ end }}
+          {{ $link := .link }}
+          {{ $scheme := (urls.Parse $link).Scheme }}
+          {{ $target := "" }}
+          {{ if not $scheme }}
+            {{ $link = .link | relLangURL }}
+          {{ else if in (slice "http" "https") $scheme }}
+            {{ $target = "target=\"_blank\" rel=\"noopener\"" }}
+          {{ end }}
+          <li>
+            <i class="{{ $pack }} {{ $pack_prefix }}-{{ .icon }}" aria-hidden="true"></i>
+            <span>
+              <strong>{{ .name | markdownify | emojify | safeHTML }}</strong>
+              <a href="{{ $link | safeURL }}" {{ $target | safeHTMLAttr }}>{{ .link }}</a>
+            </span>
+          </li>
+          {{ end }}
+        </ul>
+      </div>
+
+      <div class="contact-map" aria-label="Visitor map">
+        <script type="text/javascript" id="mapmyvisitors" src="//mapmyvisitors.com/map.js?d=jXbSyu9yHiqrIMG4S_wgh10OvbCo0cw11tLcV38Qv30&cl=ffffff&w=a"></script>
+      </div>
+    </aside>
+  </div>
+</div>

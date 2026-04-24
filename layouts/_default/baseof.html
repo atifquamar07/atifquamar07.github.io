@@ -10,6 +10,8 @@
 {{- $highlight_active_link := site.Params.header.navbar.highlight_active_link | default true -}}
 <body id="top" data-spy="scroll" {{ if $show_navbar }}data-offset="70"{{end}} data-target="{{ if or .IsHome (eq .Type "widget_page") | and $highlight_active_link }}#navbar-main{{else}}#TableOfContents{{end}}" class="page-wrapper {{with .Params.design.css_class}}{{.}}{{end}} {{ if not (.Scratch.Get "light") }}dark{{end}} {{ if not $show_navbar }}no-navbar{{end}}" data-wc-page-id="{{ template "uniqueid" . }}" {{with .Params.design.css_style}}style="{{. | safeCSS}}"{{end}}>
 
+  <div id="vanta-bg" aria-hidden="true"></div>
+
   {{/* Initialise Wowchemy. */}}
   {{ $js_license := printf "/*! Wowchemy v%s | https://wowchemy.com/ */\n" site.Data.wowchemy.version }}
   {{ $js_license := $js_license | printf "%s/*! Copyright 2016-present George Cushen (https://georgecushen.com/) */\n" }}
@@ -64,14 +66,36 @@
     {{/* Docs and Updates layouts include the site footer in a different location. */}}
     {{ if not (in (slice "book" "docs" "updates") .Type) }}
     <div class="container">
-      <div style="max-width: 250px; margin: 80px auto 40px; text-align: center; border-radius: 12px; overflow: hidden;">
-        <script type="text/javascript" id="mapmyvisitors" src="//mapmyvisitors.com/map.js?d=jXbSyu9yHiqrIMG4S_wgh10OvbCo0cw11tLcV38Qv30&cl=ffffff&w=a"></script>
-      </div>
       {{ partial "site_footer" . }}
     </div>
     {{ end }}
   </div>
 
   {{ partial "site_js" . }}
+  <script src="{{ "js/three.r134.min.js" | relURL }}"></script>
+  <script src="{{ "js/vanta.dots.min.js" | relURL }}"></script>
+  <script>
+    window.addEventListener('DOMContentLoaded', function () {
+      if (!window.VANTA || !window.VANTA.DOTS) {
+        return;
+      }
+
+      window.siteVantaBackground = window.VANTA.DOTS({
+        el: "#vanta-bg",
+        mouseControls: true,
+        touchControls: true,
+        gyroControls: false,
+        minHeight: 200.00,
+        minWidth: 200.00,
+        scale: 1.00,
+        scaleMobile: 1.00,
+        color: 0x8184be,
+        backgroundColor: 0x030712,
+        size: 3.40,
+        spacing: 46.00,
+        showLines: false
+      });
+    });
+  </script>
 </body>
 </html>

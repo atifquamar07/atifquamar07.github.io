@@ -7,7 +7,7 @@ widget: experience
 headless: true
 
 # Order that this section appears on the page.
-weight: 30
+weight: 20
 
 title: Experience
 subtitle:
@@ -32,7 +32,7 @@ experience:
     date_end: ''
     description: |2-
     
-        Working with Dr. Junpei Komiyama on advancing the reasoning capabilities of language models.
+        Exploring self-consistency and uncertainty in language model reasoning.
 
   - title: Research Intern
     company: University of Virginia
@@ -43,7 +43,7 @@ experience:
     date_end: '2026-02-15'
     description: |2-
     
-        Worked on developing a drift-resilient memory framework for code-execution agents using KL-constrained adapter
+        Developed a drift-resilient memory framework for code-execution agents using KL-constrained adapter
         updates, mitigating embedding distribution shifts during online learning to reduce unsafe code generation
         without compromising task success rates.
 
@@ -66,7 +66,7 @@ experience:
     date_start: '2025-02-15'
     date_end: '2025-07-30'
     description: |2-
-        Worked on inference-time alignment method that outperforms Best-of-N decoding by over 30%, while reducing reward model calls by 20%. Aligned LLMs in reducing harmlessness, improved reasoning and positive sentiment generation.
+        Proposed an inference-time alignment method that outperforms Best-of-N decoding by over 30%, while reducing reward model calls by 20%. Aligned LLMs in reducing harmlessness, improved reasoning and positive sentiment generation.
 
   - title: Co-Founder
     company: Insituate
@@ -77,8 +77,6 @@ experience:
     date_end: '2025-02-01'
     description: |2-
         Built agentic software for the Supreme Court of India, Mizuho Bank, PNC Bank and Indian High Courts.
-
-        Insituate is a no-code platform that enables companies to make custom AI agents for industry-specific needs, and allowing them to productionize these copilots 10x faster securely on their data.
 
 
 design:
