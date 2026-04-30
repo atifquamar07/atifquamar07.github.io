@@ -57,9 +57,9 @@
 <meta name="theme-color" content="{{ $theme_color }}" />
 
 {{/* Get page image for social sharing. */}}
-{{ $sharing_image := resources.Get "thumbnail.jpg" }}
+{{ $sharing_image := resources.Get "thumbnail.png" }}
 {{ if not $sharing_image }}
-  {{ $sharing_image = resources.Get "thumbnail.png" }}
+  {{ $sharing_image = resources.Get "thumbnail.jpg" }}
 {{ end }}
 {{ if not $sharing_image }}
   {{ $sharing_image = resources.GetMatch (path.Join "media" "thumbnail.*") }}
@@ -71,21 +71,27 @@
 {{ $featured_image := partial "wowchemy-core/functions/get_featured_image.html" . }}
 {{ $avatar_image := (.Resources.ByType "image").GetMatch "avatar*" }}
 {{ $has_logo := fileExists "assets/media/logo.png" | or (fileExists "assets/media/logo.svg") }}
+{{ $og_image_resource := "" }}
 {{ $og_image := "" }}
 {{ $twitter_card := "summary_large_image" }}
 {{ if (and (eq .Kind "term") $avatar_image) }}
   {{/* Match image processing in About widget to prevent generating more images than necessary. */}}
-  {{ $og_image = ($avatar_image.Fill "270x270 Center").Permalink }}
+  {{ $og_image_resource = $avatar_image.Fill "270x270 Center" }}
+  {{ $og_image = $og_image_resource.Permalink }}
   {{ $twitter_card = "summary" }}
 {{ else if $featured_image }}
+  {{ $og_image_resource = $featured_image }}
   {{ $og_image = $featured_image.Permalink }}
 {{ else if $sharing_image }}
+  {{ $og_image_resource = $sharing_image }}
   {{ $og_image = $sharing_image.Permalink }}
 {{ else if $has_logo }}
-  {{ $og_image = (partial "wowchemy-core/functions/get_logo" (dict "constraint" "fit" "size" 300)).Permalink }}
+  {{ $og_image_resource = partial "wowchemy-core/functions/get_logo" (dict "constraint" "fit" "size" 300) }}
+  {{ $og_image = $og_image_resource.Permalink }}
   {{ $twitter_card = "summary" }}
 {{ else }}
-  {{ $og_image = (partial "wowchemy-core/functions/get_icon" 512).Permalink }}
+  {{ $og_image_resource = partial "wowchemy-core/functions/get_icon" 512 }}
+  {{ $og_image = $og_image_resource.Permalink }}
   {{ $twitter_card = "summary" }}
 {{ end }}
 {{ $scr.Set "og_image" $og_image }}{{/* Set `og_image` globally for `rss.xml`. */}}
@@ -125,6 +131,11 @@
 <meta property="og:description" content="{{ $desc }}" />
 {{- with $og_image -}}
   <meta property="og:image" content="{{ . }}" />
+{{- end -}}
+{{- with $og_image_resource -}}
+  <meta property="og:image:width" content="{{ .Width }}" />
+  <meta property="og:image:height" content="{{ .Height }}" />
+  {{ with .MediaType }}<meta property="og:image:type" content="{{ .Type }}" />{{ end }}
 {{- end -}}
 <meta property="og:locale" content="{{ site.LanguageCode | default "en-us" }}" />
 {{ if .IsPage }}

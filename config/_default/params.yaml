@@ -83,7 +83,7 @@ features:
       locale: 'en_US'
       site_name: 'Atif Quamar'
       images:
-        - 'thumbnail.jpg'
+        - 'thumbnail.png'
     twitter_card:
       enable: true
       card: 'summary_large_image'
