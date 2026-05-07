@@ -42,5 +42,5 @@ publishDate: ''
 publication_types:
 - '1'
 abstract: ''
-publication: 'Multi-modal Foundation Models and LLMs for Life Sciences Workshop at NeurIPS 2025'
+publication: 'NeurIPS 2025 - FM4LS Workshop'
 ---
