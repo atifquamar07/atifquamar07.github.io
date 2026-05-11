@@ -2,6 +2,7 @@
 # Documentation: https://wowchemy.com/docs/managing-content/
 
 title: 'Logit–Entropy Adaptive Stopping Heuristic for Efficient Chain-of-Thought Reasoning'
+weight: 40
 subtitle: ''
 summary: ''
 authors:

@@ -2,6 +2,7 @@
 # Documentation: https://wowchemy.com/docs/managing-content/
 
 title: 'Decoding Histone Modification Signatures of Non-Coding RNAs via Foundation Models'
+weight: 60
 subtitle: ''
 summary: ''
 authors:

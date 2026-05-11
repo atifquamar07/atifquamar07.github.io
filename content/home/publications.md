@@ -31,8 +31,9 @@ content:
   count: 0
   # Choose how many pages you would like to offset by
   offset: 0
-  # Page order: descending (desc) or ascending (asc) date.
-  order: desc
+  # Manually order publications by each page's `weight` value.
+  sort_by: Weight
+  sort_ascending: true
 design:
   # Choose a view for the listings:
   view: citation

@@ -2,6 +2,8 @@
 # Documentation: https://wowchemy.com/docs/managing-content/
 
 title: 'STARS: Synchronous Token Alignment for Robust Supervision in Large Language Models'
+weight: 50
+
 subtitle: ''
 summary: ''
 authors:
