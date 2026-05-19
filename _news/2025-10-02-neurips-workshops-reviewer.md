@@ -5,4 +5,4 @@ inline: true
 related_posts: false
 ---
 
-📝 Served as a peer reviewer in NeurIPS'25 workshops.
+📝 Served on the Program Committee for NeurIPS 2025 Workshops.

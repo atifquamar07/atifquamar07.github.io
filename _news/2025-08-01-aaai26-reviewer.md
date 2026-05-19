@@ -5,4 +5,4 @@ inline: true
 related_posts: false
 ---
 
-📝 Served as a peer reviewer in AAAI'26 conference.
+📝 Served on the Program Committee for AAAI 2026 conference.
