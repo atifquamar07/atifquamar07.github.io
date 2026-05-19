@@ -43,6 +43,19 @@ jobs:
           done
           rm gh-md-toc
 
+      - name: Format updated markdown files
+        if: steps.changed-files.outputs.any_changed == 'true'
+        env:
+          ALL_CHANGED_FILES: ${{ steps.changed-files.outputs.all_changed_files }}
+        run: |
+          npm ci
+          for file in ${ALL_CHANGED_FILES}; do
+            if [[ "$file" != *.md ]]; then
+              continue
+            fi
+            npx prettier "$file" --write
+          done
+
       - name: Commit changes
         if: steps.changed-files.outputs.any_changed == 'true'
         uses: stefanzweifel/git-auto-commit-action@v5.0.1
