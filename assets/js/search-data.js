@@ -30,14 +30,14 @@ ninja.data = [{
           handler: () => {
             window.location.href = "/contact/";
           },
-        },{id: "news-served-as-a-peer-reviewer-in-aaai-26-conference",
-          title: '📝 Served as a peer reviewer in AAAI’26 conference.',
+        },{id: "news-served-on-the-program-committee-for-aaai-2026-conference",
+          title: '📝 Served on the Program Committee for AAAI 2026 conference.',
           description: "",
           section: "News",},{id: "news-two-papers-accepted-at-neurips-workshops-efficient-reasoning-and-fm4ls",
           title: '🎉 Two papers accepted at NeurIPS workshops — Efficient Reasoning and FM4LS.',
           description: "",
-          section: "News",},{id: "news-served-as-a-peer-reviewer-in-neurips-25-workshops",
-          title: '📝 Served as a peer reviewer in NeurIPS’25 workshops.',
+          section: "News",},{id: "news-served-on-the-program-committee-for-neurips-2025-workshops",
+          title: '📝 Served on the Program Committee for NeurIPS 2025 Workshops.',
           description: "",
           section: "News",},{id: "news-joined-mbzuai-as-a-visiting-researcher-to-work-on-improving-reasoning-in-language-models",
           title: '🚀 Joined MBZUAI as a Visiting Researcher to work on improving reasoning in...',
