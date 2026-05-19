@@ -2,6 +2,114 @@
  * CV shared styles
  *****************************/
 
+.cv-page {
+  .post-title {
+    color: var(--global-theme-color);
+    font-size: clamp(2rem, 4vw, 2.6rem);
+    font-variant-caps: all-small-caps;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    line-height: 1.1;
+    text-transform: lowercase;
+  }
+}
+
+.cv {
+  .card {
+    border-radius: 8px;
+    box-shadow: 0 0.45rem 1.3rem rgba(15, 23, 42, 0.035);
+  }
+
+  .card-title {
+    color: var(--global-theme-color);
+    font-size: 1.25rem;
+    font-variant-caps: all-small-caps;
+    font-weight: 650;
+    letter-spacing: 0.04em;
+    text-transform: lowercase;
+  }
+}
+
+.cv-experience {
+  margin: 0;
+
+  .cv-entry {
+    display: grid;
+    grid-template-columns: minmax(10.5rem, 13rem) minmax(0, 1fr);
+    column-gap: 1.5rem;
+    padding: 1.25rem 0;
+  }
+
+  .cv-entry:first-child {
+    padding-top: 0.5rem;
+  }
+
+  .cv-entry-meta {
+    min-width: 0;
+  }
+
+  .cv-date {
+    display: inline-block;
+    padding: 0.3rem 0.55rem;
+    color: var(--global-card-bg-color);
+    background: var(--global-theme-color);
+    border-radius: 6px;
+    box-shadow: 0 0.25rem 0.75rem rgba(31, 78, 121, 0.16);
+    font-size: 0.78rem;
+    font-weight: 700;
+    line-height: 1.2;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  .location {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.35rem;
+    margin: 0.45rem 0 0;
+    color: var(--global-text-color-light);
+    font-size: 0.84rem;
+    line-height: 1.35;
+    white-space: normal;
+  }
+
+  .cv-entry-title {
+    margin: 0 0 0.3rem;
+    color: var(--global-text-color);
+    font-size: 1.05rem;
+    font-weight: 700;
+    line-height: 1.25;
+  }
+
+  .cv-entry-company {
+    margin: 0 0 0.45rem;
+    color: var(--global-text-color);
+    font-size: 1rem;
+    line-height: 1.35;
+  }
+
+  .cv-entry-summary {
+    margin: 0;
+    color: var(--global-text-color-light);
+    font-size: 0.96rem;
+    line-height: 1.55;
+  }
+
+  .items {
+    margin-top: 0.55rem;
+    padding-left: 1.1rem;
+  }
+}
+
+@media (max-width: 767px) {
+  .cv-experience {
+    .cv-entry {
+      grid-template-columns: 1fr;
+      row-gap: 0.7rem;
+    }
+  }
+}
+
 div.container-link-button {
   margin-right: 0.5rem;
 }

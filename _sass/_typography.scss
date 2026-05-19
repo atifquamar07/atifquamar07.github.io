@@ -4,6 +4,19 @@
 
 @use "variables" as v;
 
+html,
+body {
+  font-family: "Nunito", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+button,
+input,
+optgroup,
+select,
+textarea {
+  font-family: inherit;
+}
+
 p,
 h1,
 h2,

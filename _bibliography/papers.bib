@@ -1,115 +1,80 @@
 ---
 ---
 
-@string{aps = {American Physical Society,}}
 
-@book{einstein1920relativity,
-  title     = {Relativity: the Special and General Theory},
-  author    = {Einstein, Albert},
-  year      = {1920},
-  publisher = {Methuen & Co Ltd},
-  html      = {relativity.html}
+@misc{quamar2025adaptive,
+  abbr     = {arXiv},
+  title    = {Adaptive Blockwise Search: Inference-Time Alignment for Large Language Models},
+  author   = {Quamar, M. Atif and Areeb, M. and Sharma, N. and Shreekumar, A. and Rosenthal, J. and Kuznetsov, M. and Ozmen, M. Ozgur and Celik, Z. Berkay},
+  year     = {2025},
+  month    = {October},
+  abstract = {LLM alignment remains a critical challenge. Inference-time methods provide a flexible alternative to fine-tuning, but their uniform computational effort often yields suboptimal alignment. We hypothesize that for many alignment tasks, the initial tokens of a response are disproportionately more critical. To leverage this principle, we introduce ADASEARCH, a novel blockwise search strategy. It adaptively allocates a fixed computational budget using a sampling schedule, focusing search effort on these critical tokens. We apply ADASEARCH to sequential decoding and introduce its tree-search counterpart, ADABEAM. Our comprehensive evaluation across eight LLMs demonstrates that ADASEARCH outperforms strong Best-of-N and fine-tuning baselines. Specifically, win-rates improve by over 10\% for harmlessness generation, over 33\% for controlled sentiment generation, and over 24\% for mathematical reasoning tasks relative to Best-of-N.},
+  arxiv    = {2510.23334},
+  preview  = {adasearch.png},
+  selected = {true}
 }
 
-@book{einstein1956investigations,
-  bibtex_show = {true},
-  title       = {Investigations on the Theory of the Brownian Movement},
-  author      = {Einstein, Albert},
-  year        = {1956},
-  publisher   = {Courier Corporation},
-  preview     = {brownian-motion.gif}
+@misc{quamar2025stars,
+  abbr     = {arXiv},
+  title    = {STARS: Synchronous Token Alignment for Robust Supervision in Large Language Models},
+  author   = {Quamar, M. Atif and Areeb, M. and Kuznetsov, M. and Ozmen, M. Ozgur and Celik, Z. Berkay},
+  year     = {2025},
+  month    = {September},
+  abstract = {Aligning large language models (LLMs) with human values is critical for their safe deployment, but existing methods like fine-tuning are computationally expensive, while inference-time approaches like Best-of-N sampling are inefficient. We propose STARS: Segment-level Token Alignment via Rejection Sampling, a decoding-time algorithm that steers model generation by iteratively sampling, scoring, and rejecting/accepting short, fixed-size token segments. This allows for early correction of the generation path, significantly improving computational efficiency and boosting alignment quality. Across a suite of six LLMs, we show that STARS outperforms Supervised Fine-Tuning (SFT) by up to 14.9 percentage points and Direct Preference Optimization (DPO) by up to 4.3 percentage points on win-rates, while remaining highly competitive with strong Best-of-N baselines. Our work establishes granular, reward-guided sampling as a generalizable, powerful and efficient alternative to traditional fine-tuning and full-sequence ranking methods for aligning LLMs.},
+  arxiv    = {2511.03827},
+  preview  = {stars.png},
+  selected = {true}
 }
 
-@article{einstein1950meaning,
-  abbr        = {AJP},
-  bibtex_show = {true},
-  title       = {The meaning of relativity},
-  author      = {Einstein, Albert and Taub, AH},
-  journal     = {American Journal of Physics},
-  volume      = {18},
-  number      = {6},
-  pages       = {403--404},
-  year        = {1950},
-  publisher   = {American Association of Physics Teachers}
+@misc{quamar2025leash,
+  abbr            = {NeurIPS 2025},
+  title           = {Logit--Entropy Adaptive Stopping Heuristic for Efficient Chain-of-Thought Reasoning},
+  author          = {Quamar, M. Atif and Areeb, M.},
+  year            = {2025},
+  month           = {September},
+  abstract        = {Chain-of-thought (CoT) decoding improves reasoning in LLMs, yet fixed-length rationales and vote-heavy schemes waste tokens and inflate latency. We introduce LEASH -- Logit-Entropy Adaptive Stopping Heuristic, a training-free, decoding-time algorithm that adaptively halts CoT generation by monitoring two intrinsic signals: (i) the local slope of token-level entropy and (ii) the improvement in top-logit margin. LEASH accepts a rationale when both signals plateau within a short sliding window after a small minimum length, then elicits a concise final answer. Across GSM8K (n=300) and four instruction-tuned models, LEASH retains approximately 85\% of vanilla CoT accuracy (approximately 15\% relative drop) while using about 50\% fewer tokens and reducing the end-to-end inference time by about 50\%. A brief check on AQuA-RAT dataset exhibits the same trend. LEASH is model-agnostic, robust across sampling temperatures, and requires no additional training or supervision, offering a simple and efficient alternative to CoT decoding.},
+  arxiv           = {2511.04654},
+  openreview      = {https://openreview.net/forum?id=5UTXI0iNn5},
+  additional_info = {NeurIPS 2025 - Efficient Reasoning Workshop},
+  preview         = {entropy.png},
+  selected        = {true}
 }
 
-@article{PhysRev.47.777,
-  abbr              = {PhysRev},
-  title             = {Can Quantum-Mechanical Description of Physical Reality Be Considered Complete?},
-  author            = {Einstein*†, A. and Podolsky*, B. and Rosen*, N.},
-  abstract          = {In a complete theory there is an element corresponding to each element of reality. A sufficient condition for the reality of a physical quantity is the possibility of predicting it with certainty, without disturbing the system. In quantum mechanics in the case of two physical quantities described by non-commuting operators, the knowledge of one precludes the knowledge of the other. Then either (1) the description of reality given by the wave function in quantum mechanics is not complete or (2) these two quantities cannot have simultaneous reality. Consideration of the problem of making predictions concerning a system on the basis of measurements made on another system that had previously interacted with it leads to the result that if (1) is false then (2) is also false. One is thus led to conclude that the description of reality as given by a wave function is not complete.},
-  journal           = {Phys. Rev.},
-  location          = {New Jersey},
-  volume            = {47},
-  issue             = {10},
-  pages             = {777--780},
-  numpages          = {0},
-  year              = {1935},
-  month             = {May},
-  publisher         = aps,
-  doi               = {10.1103/PhysRev.47.777},
-  url               = {https://link.aps.org/doi/10.1103/PhysRev.47.777},
-  html              = {https://journals.aps.org/pr/abstract/10.1103/PhysRev.47.777},
-  pdf               = {example_pdf.pdf},
-  altmetric         = {248277},
-  dimensions        = {true},
-  google_scholar_id = {qyhmnyLat1gC},
-  video             = {https://www.youtube-nocookie.com/embed/aqz-KE-bpKQ},
-  additional_info   = {. *More Information* can be [found here](https://github.com/alshedivat/al-folio/)},
-  annotation        = {* Example use of superscripts<br>† Albert Einstein},
-  selected          = {true},
-  inspirehep_id     = {3255}
+@misc{iwase2026reliable,
+  abbr     = {arXiv},
+  title    = {Reliable Chain-of-Thought via Prefix Consistency},
+  author   = {Iwase, N. and Ichihara, Y. and Quamar, M. Atif and Komiyama, J.},
+  year     = {2026},
+  month    = {May},
+  abstract = {Large Language Models often improve accuracy on reasoning tasks by sampling multiple Chain-of-Thought (CoT) traces and aggregating them with majority voting (MV), a test-time technique called self-consistency. When we truncate a CoT partway through and regenerate the remainder, we observe that traces with correct answers reproduce their original answer more often than traces with wrong answers. We use this difference as a reliability signal, prefix consistency, that weights each candidate answer by how often it reappears under regeneration. It requires no access to token log-probabilities or self-rating prompts. Across five reasoning models and four math and science benchmarks, prefix consistency is the best correctness predictor in most settings, and reweighting votes by it reaches Standard MV plateau accuracy at up to 21x fewer tokens (median 4.6x).},
+  arxiv    = {2605.07654},
+  preview  = {reliable-cot.png},
+  selected = {true}
 }
 
-@article{einstein1905molekularkinetischen,
-  title     = {{\"U}ber die von der molekularkinetischen Theorie der W{\"a}rme geforderte Bewegung von in ruhenden Fl{\"u}ssigkeiten suspendierten Teilchen},
-  author    = {Einstein, A.},
-  journal   = {Annalen der physik},
-  volume    = {322},
-  number    = {8},
-  pages     = {549--560},
-  year      = {1905},
-  publisher = {Wiley Online Library}
+
+@misc{shao2025modalmixed,
+  abbr     = {arXiv},
+  title    = {Learning Modal-Mixed Chain-of-Thought Reasoning with Latent Embeddings},
+  author   = {Shao, Y. and Zhou, K. and Xu, Z. and Quamar, M. Atif and Hao, S. and Wang, Z. and Hu, Z. and Huang, B.},
+  year     = {2025},
+  month    = {September},
+  abstract = {We study how to extend chain-of-thought (CoT) beyond language to better handle multimodal reasoning. While CoT helps LLMs and VLMs articulate intermediate steps, its text-only form often fails on vision-intensive problems where key intermediate states are inherently visual. We introduce modal-mixed CoT, which interleaves textual tokens with compact visual sketches represented as latent embeddings. To bridge the modality gap without eroding the original knowledge and capability of the VLM, we use the VLM itself as an encoder and train the language backbone to reconstruct its own intermediate vision embeddings, to guarantee the semantic alignment of the visual latent space. We further attach a diffusion-based latent decoder, invoked by a special control token and conditioned on hidden states from the VLM. In this way, the diffusion head carries fine-grained perceptual details while the VLM specifies high-level intent, which cleanly disentangles roles and reduces the optimization pressure of the VLM. Training proceeds in two stages: supervised fine-tuning on traces that interleave text and latents with a joint next-token and latent-reconstruction objective, followed by reinforcement learning that teaches when to switch modalities and how to compose long reasoning chains. Extensive experiments across 11 diverse multimodal reasoning tasks, demonstrate that our method yields better performance than language-only and other CoT methods.},
+  arxiv    = {2602.00574},
+  preview  = {visual-cot.png},
+  selected = {true}
 }
 
-@article{einstein1905movement,
-  abbr    = {Ann. Phys.},
-  title   = {Un the movement of small particles suspended in statiunary liquids required by the molecular-kinetic theory 0f heat},
-  author  = {Einstein, A.},
-  journal = {Ann. Phys.},
-  volume  = {17},
-  pages   = {549--560},
-  year    = {1905}
-}
 
-@article{einstein1905electrodynamics,
-  title  = {On the electrodynamics of moving bodies},
-  author = {Einstein, A.},
-  year   = {1905}
-}
 
-@article{einstein1905photoelectriceffect,
-  bibtex_show = {true},
-  abbr        = {Ann. Phys.},
-  title       = {{{\"U}ber einen die Erzeugung und Verwandlung des Lichtes betreffenden heuristischen Gesichtspunkt}},
-  author      = {Albert Einstein},
-  abstract    = {This is the abstract text.},
-  journal     = {Ann. Phys.},
-  volume      = {322},
-  number      = {6},
-  pages       = {132--148},
-  year        = {1905},
-  doi         = {10.1002/andp.19053220607},
-  award       = {Albert Einstein receveid the **Nobel Prize in Physics** 1921 *for his services to Theoretical Physics, and especially for his discovery of the law of the photoelectric effect*},
-  award_name  = {Nobel Prize}
-}
-
-@book{przibram1967letters,
-  bibtex_show = {true},
-  title       = {Letters on wave mechanics},
-  author      = {Einstein, Albert and Schrödinger, Erwin and Planck, Max and Lorentz, Hendrik Antoon and Przibram, Karl},
-  year        = {1967},
-  publisher   = {Vision},
-  preview     = {wave-mechanics.gif},
-  abbr        = {Vision}
+@inproceedings{sharma2025histone,
+  abbr      = {NeurIPS 2025},
+  title     = {Decoding Histone Modification Signatures of Non-Coding RNAs via Foundation Models},
+  author    = {Sharma, N. and Quamar, M. Atif and Xie, P.},
+  booktitle = {NeurIPS 2025 - FM4LS Workshop},
+  year      = {2025},
+  month     = {September},
+  openreview = {https://openreview.net/forum?id=SIVkGvPDuM},
+  preview   = {histone.png},
+  selected  = {true}
 }

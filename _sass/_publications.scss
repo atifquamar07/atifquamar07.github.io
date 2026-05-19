@@ -38,9 +38,15 @@
 
     li {
       margin-bottom: 1rem;
+      padding: 1rem;
+      background: var(--global-card-bg-color);
+      border: 1px solid var(--global-divider-color);
+      border-radius: 8px;
+      box-shadow: 0 0.4rem 1.2rem rgba(15, 23, 42, 0.04);
 
       .preview {
         display: inline-block;
+        border-radius: 6px;
       }
 
       .abbr {
@@ -51,6 +57,7 @@
           background-color: var(--global-theme-color);
           margin-bottom: 0.5rem;
           color: var(--global-card-bg-color) !important;
+          border-radius: 6px;
 
           a {
             color: white;
@@ -69,6 +76,7 @@
 
       .title {
         font-weight: bolder;
+        letter-spacing: 0;
       }
 
       .author {
@@ -101,14 +109,18 @@
       .links {
         a.btn {
           color: var(--global-text-color);
-          border: 1px solid var(--global-text-color);
-          padding-left: 1rem;
-          padding-right: 1rem;
+          background: transparent;
+          border: 1px solid var(--global-divider-color);
+          border-radius: 6px;
+          padding-left: 0.85rem;
+          padding-right: 0.85rem;
           padding-top: 0.25rem;
           padding-bottom: 0.25rem;
           margin-left: 0;
+          margin-top: 0.3rem;
 
           &:hover {
+            background: rgba(31, 78, 121, 0.08);
             color: var(--global-theme-color);
             border-color: var(--global-theme-color);
           }
@@ -166,18 +178,18 @@
       }
 
       div.abstract.hidden {
-        border: dashed 1px var(--global-bg-color);
+        border: 0;
       }
 
       div.abstract.hidden.open {
-        border-color: var(--global-text-color);
+        border: dashed 1px var(--global-text-color);
       }
     }
     div.award.hidden {
-      border: dashed 1px var(--global-bg-color);
+      border: 0;
     }
     div.award.hidden.open {
-      border-color: var(--global-highlight-color);
+      border: dashed 1px var(--global-highlight-color);
     }
   }
 }

@@ -5,10 +5,19 @@
 @use "variables" as v;
 
 .navbar {
-  box-shadow: none;
+  box-shadow: 0 0.45rem 1.3rem rgba(15, 23, 42, 0.04);
   border-bottom: 1px solid var(--global-divider-color);
-  background-color: var(--global-bg-color);
-  opacity: 0.95;
+  background-color: rgba(251, 250, 247, 0.92);
+  opacity: 1;
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+}
+
+html[data-theme="dark"] {
+  .navbar {
+    background-color: rgba(28, 28, 29, 0.9);
+    box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.18);
+  }
 }
 
 .navbar .dropdown-menu,
@@ -61,15 +70,19 @@
 
   .navbar-nav .nav-item .nav-link {
     color: var(--global-text-color);
+    border-radius: 6px;
+    padding-right: 0.75rem;
+    padding-left: 0.75rem;
 
     &:hover {
+      background-color: rgba(31, 78, 121, 0.08);
       color: var(--global-hover-color);
     }
   }
 
   .navbar-nav .nav-item.active > .nav-link {
-    background-color: inherit;
-    font-weight: bolder;
+    background-color: transparent;
+    font-weight: 600;
     color: var(--global-theme-color);
 
     &:hover {
