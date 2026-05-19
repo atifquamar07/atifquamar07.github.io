@@ -520,6 +520,19 @@ ul.task-list input[type="checkbox"] {
       overflow: hidden;
     }
 
+    .mapmyvisitors-visitors {
+      padding-top: 0.3rem;
+    }
+
+    .visitor-map-pageviews {
+      display: block;
+      color: #fff !important;
+      font-weight: 400 !important;
+      letter-spacing: 0;
+      line-height: 1.15;
+      text-transform: none;
+    }
+
     iframe,
     img,
     canvas,
