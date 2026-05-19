@@ -6,7 +6,7 @@ subtitle:
 
 profile:
   align: right
-  image: atif_quamar_profile.png
+  image: atif_quamar_profile.jpg
   image_circular: false
   role: Visiting Researcher at MBZUAI
   location: Abu Dhabi, UAE
