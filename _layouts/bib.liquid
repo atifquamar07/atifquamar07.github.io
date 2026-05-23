@@ -154,11 +154,11 @@
     {% assign proceedings = 'inproceedings,incollection' | split: ',' %}
     {% assign thesis = 'thesis,mastersthesis,phdthesis' | split: ',' %}
     {% if entry.type == 'article' %}
-      {% capture entrytype %}<em>{{ entry.journal }}</em>{% endcapture %}
+      {% capture entrytype %}{{ entry.journal }}{% endcapture %}
     {% elsif proceedings contains entry.type %}
-      {% capture entrytype %}<em>{{ entry.booktitle }}</em>{% endcapture %}
+      {% capture entrytype %}{{ entry.booktitle }}{% endcapture %}
     {% elsif thesis contains entry.type %}
-      {% capture entrytype %}<em>{{ entry.school }}</em>{% endcapture %}
+      {% capture entrytype %}{{ entry.school }}{% endcapture %}
     {% else %}
       {% capture entrytype %}{% endcapture %}
     {% endif %}
@@ -184,7 +184,7 @@
     {% if entrytype_text == '' %}
       {% capture periodical %}<em>Under Review</em>{% endcapture %}
     {% else %}
-      {% capture periodical %}{{ entrytype }}{% endcapture %}
+      {% capture periodical %}<em>{{ entrytype | strip }}</em>{% endcapture %}
     {% endif %}
     <div class="periodical">
       {{ periodical | strip }}
