@@ -29,6 +29,6 @@ latest_posts:
 
 I study **efficient and reliable reasoning** in foundation models.
 
-I am currently a Visiting Researcher in the Dept. of Machine Learning at MBZUAI, where I work with Dr. [Junpei Komiyama](https://jkomiyama.github.io) on **self-consistency** and **reinforcement learning**. Previously, I worked on **latent reasoning** in vision language models with Dr. [Biwei Huang](https://biweihuang.com/) at UCSD and on **inference-time alignment** with Dr. [Berkay Celik](https://beerkay.github.io/) at Purdue University. 
+I am currently a Visiting Researcher in the Department of Machine Learning at MBZUAI, where I work with Dr. [Junpei Komiyama](https://jkomiyama.github.io) on **self-consistency** and **reinforcement learning**. Previously, I worked on **latent reasoning** in vision language models with Dr. [Biwei Huang](https://biweihuang.com/) at UCSD and **inference-time alignment** with Dr. [Berkay Celik](https://beerkay.github.io/) at Purdue University. 
 
 I like to understand how foundation models reason and how we can make that reasoning more efficient and trustworthy. A lot of what I do spans language and vision, with a focus on keeping these models safe, reliable and aligned with human values.
