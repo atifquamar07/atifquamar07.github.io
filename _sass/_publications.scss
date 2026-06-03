@@ -181,10 +181,12 @@
 
       div.abstract.hidden {
         border: 0;
+        border-radius: 8px;
       }
 
       div.abstract.hidden.open {
         border: dashed 1px var(--global-text-color);
+        border-radius: 8px;
       }
     }
     div.award.hidden {
