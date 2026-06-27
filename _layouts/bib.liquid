@@ -52,6 +52,7 @@
     <!-- Author -->
     <div class="author">
       {% assign author_array_size = entry.author_array | size %}
+      {% assign equal_contribution_authors = entry.equal_contribution | default: '' | downcase | remove_accents %}
 
       {% assign author_array_limit = author_array_size %}
       {% if site.max_author_limit and author_array_size > site.max_author_limit %}
@@ -61,14 +62,24 @@
       {%- for author in entry.author_array limit: author_array_limit -%}
         {% assign author_is_self = false %}
         {%- assign author_last_name = author.last | regex_replace: '[*∗†‡§¶‖&^]', '' -%}
-        {%- assign author_last_html = author.last | regex_replace: '([*∗†‡§¶‖&^]+)', '<sup>\1</sup>' -%}
+        {%- assign author_last_html = author.last | regex_replace: '[*∗]', '' | regex_replace: '([†‡§¶‖&^]+)', '<sup>\1</sup>' -%}
+        {%- assign clean_last_name = author_last_name | downcase | remove_accents -%}
+        {% assign author_has_equal_contribution = false %}
+        {% if author.last contains '*' or author.last contains '∗' %}
+          {% assign author_has_equal_contribution = true %}
+        {% endif %}
+        {% if equal_contribution_authors != '' and equal_contribution_authors contains clean_last_name %}
+          {% assign author_has_equal_contribution = true %}
+        {% endif %}
+        {% capture equal_contribution_marker -%}
+          {%- if author_has_equal_contribution -%}<sup class="equal-contribution-marker">*</sup>{%- endif -%}
+        {%- endcapture %}
         {% if site.scholar.last_name contains author_last_name %}
           {% if site.scholar.first_name contains author.first %}
             {% assign author_is_self = true %}
           {% endif %}
         {%- endif -%}
         {% assign coauthor_url = null %}
-        {%- assign clean_last_name = author_last_name | downcase | remove_accents -%}
         {% if site.data.coauthors[clean_last_name] %}
           {%- for coauthor in site.data.coauthors[clean_last_name] -%}
             {% if coauthor.firstname contains author.first %}
@@ -89,17 +100,20 @@
             ><u>
               {{- author.first }}
               {{ author_last_html -}}
-            </u></strong
-          >
+            </u>
+            {{- equal_contribution_marker -}}
+          </strong>
         {%- else -%}
           {%- if coauthor_url -%}
             <a href="{{ coauthor_url }}">
               {{- author.first }}
               {{ author_last_html -}}
             </a>
+            {{- equal_contribution_marker }}
           {%- else -%}
             {{- author.first }}
             {{ author_last_html -}}
+            {{ equal_contribution_marker }}
           {% endif %}
         {%- endif -%}
       {% endfor %}
@@ -112,12 +126,28 @@
         {%- endif -%}
         {% assign more_authors_show = '' %}
         {%- for author in entry.author_array offset: author_array_limit -%}
-          {% assign more_authors_show = more_authors_show | append: author.first | append: ' ' | append: author.last %}
+          {%- assign more_author_last_name = author.last | regex_replace: '[*∗†‡§¶‖&^]', '' -%}
+          {%- assign more_author_last_html = author.last | regex_replace: '[*∗]', '' | regex_replace: '([†‡§¶‖&^]+)', '<sup>\1</sup>' -%}
+          {%- assign more_author_clean_last_name = more_author_last_name | downcase | remove_accents -%}
+          {% assign more_author_has_equal_contribution = false %}
+          {% if author.last contains '*' or author.last contains '∗' %}
+            {% assign more_author_has_equal_contribution = true %}
+          {% endif %}
+          {% if equal_contribution_authors != '' and equal_contribution_authors contains more_author_clean_last_name %}
+            {% assign more_author_has_equal_contribution = true %}
+          {% endif %}
+          {% capture more_author_equal_contribution_marker -%}
+            {%- if more_author_has_equal_contribution -%}<sup class="equal-contribution-marker">*</sup>{%- endif -%}
+          {%- endcapture %}
+          {% capture more_author_name -%}
+            {{- author.first }}
+            {{ more_author_last_html -}}{{ more_author_equal_contribution_marker }}
+          {%- endcapture %}
+          {% assign more_authors_show = more_authors_show | append: more_author_name %}
           {% unless forloop.last %}
             {% assign more_authors_show = more_authors_show | append: ', ' %}
           {% endunless %}
         {%- endfor -%}
-        {%- assign more_authors_show = more_authors_show | regex_replace: '([*∗†‡§¶‖&^]+)', '<sup>\1</sup>' -%}
         , and
         <span
           class="more-authors"

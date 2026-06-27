@@ -352,6 +352,33 @@ ul.task-list input[type="checkbox"] {
     }
   }
 
+  .section-title-with-note {
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  .section-title-main {
+    display: inline-flex;
+    min-width: 0;
+    align-items: center;
+    gap: 0.65rem;
+  }
+
+  .section-note {
+    margin-left: auto;
+    color: var(--global-text-color-light);
+    font-size: 0.84rem;
+    font-weight: 400;
+    line-height: 1.35;
+    text-align: right;
+    white-space: nowrap;
+
+    sup {
+      color: var(--global-text-color-light);
+      font-weight: 700;
+    }
+  }
+
   .about-copy {
     color: var(--global-text-color);
     font-size: 0.9rem;
@@ -532,8 +559,24 @@ ul.task-list input[type="checkbox"] {
       margin-bottom: 0;
     }
 
+    .profile-heading {
+      align-self: center;
+    }
+
     .profile-block {
       grid-column: 1 / -1;
+    }
+
+    .section-title-with-note {
+      align-items: flex-start;
+      flex-direction: column;
+      gap: 0.35rem;
+    }
+
+    .section-note {
+      margin-left: calc(1.1rem + 0.65rem);
+      text-align: left;
+      white-space: normal;
     }
 
     .news {

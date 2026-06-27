@@ -4,6 +4,32 @@
 
 @use "variables" as v;
 
+.post-header-with-note {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem;
+
+  .post-title {
+    margin-bottom: 0;
+  }
+}
+
+.post-title-note {
+  margin: 0 0 0.35rem;
+  color: var(--global-text-color-light);
+  font-size: 0.9rem;
+  font-weight: 400;
+  line-height: 1.35;
+  text-align: right;
+  white-space: nowrap;
+
+  sup {
+    color: var(--global-text-color-light);
+    font-weight: 700;
+  }
+}
+
 .publications {
   margin-top: 2rem;
 
@@ -29,6 +55,14 @@
     padding-top: 1rem;
     margin-top: 2rem;
     text-align: right;
+  }
+
+  .equal-contribution-marker {
+    margin-left: 0.08rem;
+    color: inherit;
+    font-weight: 700;
+    text-decoration: none;
+    border-bottom: 0;
   }
 
   ol.bibliography {
@@ -263,6 +297,18 @@
 }
 
 @media (max-width: 767px) {
+  .post-header-with-note {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+
+  .post-title-note {
+    margin-bottom: 0;
+    text-align: left;
+    white-space: normal;
+  }
+
   .publications {
     ol.bibliography {
       li {

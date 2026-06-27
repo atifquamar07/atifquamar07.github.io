@@ -9,8 +9,11 @@ layout: default
 {% endif %}
 
 <div class="post">
-  <header class="post-header">
+  <header class="post-header{% if page.equal_contribution_note %} post-header-with-note{% endif %}">
     <h1 class="post-title">{{ page.title }}</h1>
+    {% if page.equal_contribution_note %}
+      <p class="post-title-note"><sup>*</sup> indicates equal contribution.</p>
+    {% endif %}
     {% if page.description %}
       <p class="post-description">{{ page.description }}</p>
     {% endif %}

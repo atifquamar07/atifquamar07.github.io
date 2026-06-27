@@ -123,9 +123,12 @@ layout: default
       <!-- Selected papers -->
       {% if page.selected_papers %}
         <section class="home-section publication-section" id="publications">
-          <h2 class="section-title">
-            <i class="fa-regular fa-rectangle-list" aria-hidden="true"></i>
-            <a href="{{ '/publications/' | relative_url }}">Publications</a>
+          <h2 class="section-title section-title-with-note">
+            <span class="section-title-main">
+              <i class="fa-regular fa-rectangle-list" aria-hidden="true"></i>
+              <a href="{{ '/publications/' | relative_url }}">Publications</a>
+            </span>
+            <span class="section-note"><sup>*</sup> indicates equal contribution.</span>
           </h2>
           {% include selected_papers.liquid %}
         </section>

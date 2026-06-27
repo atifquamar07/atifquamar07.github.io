@@ -11,6 +11,7 @@
   abstract = {LLM alignment remains a critical challenge. Inference-time methods provide a flexible alternative to fine-tuning, but their uniform computational effort often yields suboptimal alignment. We hypothesize that for many alignment tasks, the initial tokens of a response are disproportionately more critical. To leverage this principle, we introduce ADASEARCH, a novel blockwise search strategy. It adaptively allocates a fixed computational budget using a sampling schedule, focusing search effort on these critical tokens. We apply ADASEARCH to sequential decoding and introduce its tree-search counterpart, ADABEAM. Our comprehensive evaluation across eight LLMs demonstrates that ADASEARCH outperforms strong Best-of-N and fine-tuning baselines. Specifically, win-rates improve by over 10\% for harmlessness generation, over 33\% for controlled sentiment generation, and over 24\% for mathematical reasoning tasks relative to Best-of-N.},
   arxiv    = {2510.23334},
   preview  = {adasearch.png},
+  equal_contribution = {Quamar; Areeb},
   selected = {true}
 }
 
@@ -23,6 +24,7 @@
   abstract  = {Aligning large language models (LLMs) with human values is critical for their safe deployment, but existing methods like fine-tuning are computationally expensive, while inference-time approaches like Best-of-N sampling are inefficient. We propose STARS: Segment-level Token Alignment via Rejection Sampling, a decoding-time algorithm that steers model generation by iteratively sampling, scoring, and rejecting/accepting short, fixed-size token segments. This allows for early correction of the generation path, significantly improving computational efficiency and boosting alignment quality. Across a suite of six LLMs, we show that STARS outperforms Supervised Fine-Tuning (SFT) by up to 14.9 percentage points and Direct Preference Optimization (DPO) by up to 4.3 percentage points on win-rates, while remaining highly competitive with strong Best-of-N baselines. Our work establishes granular, reward-guided sampling as a generalizable, powerful and efficient alternative to traditional fine-tuning and full-sequence ranking methods for aligning LLMs.},
   arxiv     = {2511.03827},
   preview   = {stars.png},
+  equal_contribution = {Quamar; Areeb},
   selected  = {true}
 }
 
@@ -37,6 +39,7 @@
   openreview      = {https://openreview.net/forum?id=5UTXI0iNn5},
   additional_info = {NeurIPS 2025 - Efficient Reasoning Workshop},
   preview         = {entropy.png},
+  equal_contribution = {},
   selected        = {true}
 }
 
