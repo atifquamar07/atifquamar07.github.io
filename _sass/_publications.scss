@@ -37,16 +37,50 @@
     margin-top: 0;
 
     li {
-      margin-bottom: 1rem;
-      padding: 1rem;
-      background: var(--global-card-bg-color);
-      border: 1px solid var(--global-divider-color);
-      border-radius: 8px;
-      box-shadow: 0 0.4rem 1.2rem rgba(15, 23, 42, 0.04);
+      margin-bottom: 0;
+      padding: 1.45rem 0;
+      background: transparent;
+      border: 0;
+      border-bottom: 1px solid var(--global-border-light-color);
+      border-radius: 0;
+      box-shadow: none;
+
+      &:first-child {
+        padding-top: 0;
+      }
+
+      &:last-child {
+        border-bottom: 0;
+      }
+
+      > .row {
+        align-items: flex-start;
+        margin-right: 0;
+        margin-left: 0;
+      }
+
+      > .row > .abbr {
+        flex: 0 0 7.3rem;
+        max-width: 7.3rem;
+        padding-right: 0;
+        padding-left: 0;
+        margin-right: 1.35rem;
+      }
+
+      > .row > div[id] {
+        flex: 1 1 0;
+        max-width: none;
+        min-width: 0;
+        padding-right: 0;
+        padding-left: 0;
+      }
 
       .preview {
         display: inline-block;
+        overflow: hidden;
+        border: 1px solid var(--global-divider-color);
         border-radius: 6px;
+        background: var(--global-card-bg-color);
       }
 
       .abbr {
@@ -58,11 +92,11 @@
           margin-bottom: 0.5rem;
           padding-top: 0.36em;
           padding-bottom: 0.36em;
-          color: var(--global-card-bg-color) !important;
+          color: var(--global-theme-text-color) !important;
           border-radius: 6px;
 
           a {
-            color: white;
+            color: var(--global-theme-text-color);
 
             &:hover {
               text-decoration: none;
@@ -77,8 +111,27 @@
       }
 
       .title {
-        font-weight: bolder;
+        margin-bottom: 0.32rem;
+        color: var(--global-text-color);
+        font-size: 0.95rem;
+        font-weight: 700;
+        line-height: 1.45;
         letter-spacing: 0;
+      }
+
+      .author,
+      .periodical {
+        color: var(--global-text-color-light);
+        font-size: 0.84rem;
+        line-height: 1.6;
+      }
+
+      .author {
+        margin-bottom: 0.16rem;
+      }
+
+      .periodical {
+        margin-bottom: 0.12rem;
       }
 
       .author {
@@ -109,6 +162,11 @@
       }
 
       .links {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.35rem 0.45rem;
+        margin-top: 0.55rem;
+
         a.btn {
           color: var(--global-text-color);
           background: transparent;
@@ -119,10 +177,11 @@
           padding-top: 0.25rem;
           padding-bottom: 0.25rem;
           margin-left: 0;
-          margin-top: 0.3rem;
+          margin-top: 0;
+          font-size: 0.72rem;
 
           &:hover {
-            background: rgba(31, 78, 121, 0.08);
+            background: var(--global-subtle-bg-color);
             color: var(--global-theme-color);
             border-color: var(--global-theme-color);
           }
@@ -201,4 +260,26 @@
 .citation,
 .citation-number {
   color: var(--global-theme-color);
+}
+
+@media (max-width: 767px) {
+  .publications {
+    ol.bibliography {
+      li {
+        > .row {
+          display: block;
+        }
+
+        > .row > .abbr {
+          max-width: 8rem;
+          margin-right: 0;
+          margin-bottom: 0.75rem;
+        }
+
+        > .row > div[id] {
+          width: 100%;
+        }
+      }
+    }
+  }
 }

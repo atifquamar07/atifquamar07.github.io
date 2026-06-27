@@ -7,12 +7,12 @@ first_name: Atif
 middle_name:
 last_name: Quamar
 contact_note: >
-  email is the best way to reach me.
+  email is the best way to reach me!
 description: > # the ">" symbol means to ignore newlines until "footer_text:"
   Atif Quamar studies efficient and reliable reasoning in foundation models.
 footer_text: >
   All rights reserved.
-keywords: foundation models, multimodal reasoning, trustworthy AI, AI alignment, reinforcement learning # add your own keywords or leave empty
+keywords: foundation models, multimodal reasoning, efficient training, AI alignment and safety, reinforcement learning # add your own keywords or leave empty
 x_username: atifquamar07
 lang: en # the language of your site (for example: en, fr, cn, ru, etc.)
 icon: atif_quamar_favicon.png # the emoji used as the favicon (alternatively, provide image name in /assets/img/)
@@ -60,7 +60,7 @@ posts_in_search: false
 bib_search: true
 
 # Dimensions
-max_width: 930px
+max_width: 1130px
 
 # -----------------------------------------------------------------------------
 # Open Graph & Schema.org
@@ -402,7 +402,7 @@ enable_cookie_consent: false # enables GDPR-compliant cookie consent dialog (htt
 enable_masonry: true # enables automatic project cards arrangement
 enable_math: true # enables math typesetting (uses MathJax)
 enable_tooltips: false # enables automatic tooltip links generated for each section titles on pages and posts
-enable_darkmode: false # enables switching between light/dark modes
+enable_darkmode: true # enables switching between light/dark modes
 enable_navbar_social: false # enables displaying social links in the navbar on the about page
 enable_project_categories: true # enables categorization of projects into multiple categories
 enable_medium_zoom: true # enables image zoom feature (as on medium.com)
@@ -458,7 +458,7 @@ third_party_libraries:
     version: "5.5.0"
   google_fonts:
     url:
-      fonts: "https://fonts.googleapis.com/css2?family=Material+Icons&family=Nunito:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
+      fonts: "https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap"
   highlightjs:
     integrity:
       css:

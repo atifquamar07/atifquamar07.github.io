@@ -1,5 +1,9 @@
 <!doctype html>
-<html>
+<html
+  {% if site.enable_darkmode %}
+    data-theme="dark" data-theme-setting="dark"
+  {% endif %}
+>
   <head>
     {% include head.liquid %}
 

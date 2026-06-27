@@ -21,7 +21,8 @@ cv:
         location: Abu Dhabi, UAE
         start_date: Feb 2026
         end_date: Present
-        summary: Working on methods to improve reasoning in language models through reinforcement learning, self-consistency, and test-time inference strategies,  to enhance mathematical reasoning and coding performance while reducing unreliable reasoning paths.
+        summary: Developing training and inference-time methods to improve reasoning in language models, including reinforcement learning, self-consistency, and test-time inference strategies, with applications to mathematical reasoning and coding while reducing unreliable reasoning paths.
+
 
       - company: University of Virginia
         position: Research Intern
@@ -30,7 +31,7 @@ cv:
         end_date: Feb 2026
         summary: Developed a drift-resilient memory framework for code-execution agents using KL-constrained adapter updates, mitigating embedding distribution shifts during online learning to reduce unsafe code generation without compromising task success rates.
 
-      - company: University of California - San Diego
+      - company: University of California San Diego
         position: Research Intern
         location: California, United States
         start_date: Jul 2025
@@ -52,7 +53,7 @@ cv:
         summary: Built agentic software for the Supreme Court of India, Mizuho Bank, PNC Bank and Indian High Courts.
 
     Education:
-      - institution: IIIT - Delhi
+      - institution: IIIT Delhi
         area: Computer Science and Biosciences
         location: New Delhi, India
         studyType: Bachelor of Technology
@@ -64,7 +65,7 @@ cv:
         icon: fa-solid fa-tag
         keywords:
           - Multimodal Reasoning
-          - Trustworthy AI
+          - Efficient Training
           - AI Alignment and Safety
           - Reinforcement Learning
 

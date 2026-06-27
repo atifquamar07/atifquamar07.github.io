@@ -8,7 +8,9 @@ body {
   padding-bottom: 70px;
   color: var(--global-text-color);
   background-color: var(--global-bg-color);
-  line-height: 1.65;
+  font-size: 15px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
 
   h1,
   h2,
@@ -22,7 +24,7 @@ body {
 
 body.fixed-top-nav {
   // Add some padding for the nav-bar.
-  padding-top: 57px;
+  padding-top: 52px;
 }
 
 body.sticky-bottom-footer {

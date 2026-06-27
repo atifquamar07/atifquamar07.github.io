@@ -2,7 +2,7 @@
 layout: contact
 permalink: /contact/
 title: contact
-description: email is the best way to reach me.
+description: email is the best way to reach me!
 nav: true
 nav_order: 5
 ---

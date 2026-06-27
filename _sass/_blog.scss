@@ -90,7 +90,7 @@
     }
 
     &.active .page-link {
-      color: #fff;
+      color: var(--global-theme-text-color);
       background-color: var(--global-theme-color);
 
       &:hover {

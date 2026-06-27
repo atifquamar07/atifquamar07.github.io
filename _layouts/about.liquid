@@ -2,115 +2,147 @@
 layout: default
 ---
 <div class="post about-page">
-  <header class="post-header">
-    <h1 class="post-title">
-      {% if site.title == 'blank' %}
-        <span class="font-weight-bold">{{ site.first_name }}</span> {{ site.middle_name }}
-        {{ site.last_name }}
-      {% else %}
-        {{ site.title }}
-      {% endif %}
-    </h1>
-    {% if page.subtitle and page.subtitle != '' %}
-      <p class="desc">{{ page.subtitle }}</p>
-    {% endif %}
-  </header>
-
-  <article>
-    <div class="about-intro">
-      <div class="about-copy clearfix">{{ content }}</div>
-
-      {% if page.profile %}
-        <aside class="profile">
+  <div class="about-shell">
+    {% if page.profile %}
+      <aside class="profile-sidebar" aria-label="Profile">
+        <div class="profile-panel">
           {% if page.profile.image %}
-            {% assign profile_image_path = page.profile.image | prepend: 'assets/img/' %}
-            {% if page.profile.image_circular %}
-              {% assign profile_image_class = 'img-fluid z-depth-1 rounded-circle' %}
-            {% else %}
-              {% assign profile_image_class = 'img-fluid z-depth-1 rounded' %}
-            {% endif %}
-            {% capture sizes %}(min-width: {{ site.max_width }}) 250px, (min-width: 576px) 32vw, 92vw{% endcapture %}
-            {%
-              include figure.liquid loading="eager" path=profile_image_path class=profile_image_class sizes=sizes alt=page.profile.image
-              cache_bust=true avoid_scaling=true
-            %}
-          {% endif %}
-          {% if page.profile.more_info %}
-            <div class="more-info">{{ page.profile.more_info }}</div>
-          {% endif %}
-          {% if page.profile.role or page.profile.location or page.profile.show_social_links %}
-            <div class="profile-info">
-              {% if page.profile.role %}
-                <p class="profile-role">{{ page.profile.role }}</p>
+            <div class="profile-photo">
+              {% assign profile_image_path = page.profile.image | prepend: 'assets/img/' %}
+              {% if page.profile.image_circular %}
+                {% assign profile_image_class = 'img-fluid z-depth-1 rounded-circle' %}
+              {% else %}
+                {% assign profile_image_class = 'img-fluid z-depth-1 rounded' %}
               {% endif %}
-              {% if page.profile.location %}
-                <p class="profile-location">
-                  <span>{{ page.profile.location }}</span>
-                </p>
-              {% endif %}
-              {% if page.profile.show_social_links %}
-                <div class="profile-links">
-                  {% if site.data.socials.email %}
-                    <a href="mailto:{{ site.data.socials.email }}" aria-label="Email">
-                      <i class="fa-solid fa-envelope" aria-hidden="true"></i>
-                    </a>
-                  {% endif %}
-                  {% if site.data.socials.scholar_userid %}
-                    <a href="https://scholar.google.com/citations?user={{ site.data.socials.scholar_userid }}" aria-label="Google Scholar">
-                      <i class="ai ai-google-scholar" aria-hidden="true"></i>
-                    </a>
-                  {% endif %}
-                  {% if site.data.socials.github_username %}
-                    <a href="https://github.com/{{ site.data.socials.github_username }}" aria-label="GitHub">
-                      <i class="fa-brands fa-github" aria-hidden="true"></i>
-                    </a>
-                  {% endif %}
-                  {% if site.data.socials.linkedin_username %}
-                    <a href="https://www.linkedin.com/in/{{ site.data.socials.linkedin_username }}" aria-label="LinkedIn">
-                      <i class="fa-brands fa-linkedin" aria-hidden="true"></i>
-                    </a>
-                  {% endif %}
-                </div>
-              {% endif %}
+              {% capture sizes %}(min-width: {{ site.max_width }}) 220px, (min-width: 576px) 28vw, 78vw{% endcapture %}
+              {%
+                include figure.liquid loading="eager" path=profile_image_path class=profile_image_class sizes=sizes alt=page.profile.image
+                cache_bust=true avoid_scaling=true
+              %}
             </div>
           {% endif %}
-        </aside>
+
+          <div class="profile-heading">
+            <h1>
+              {% if site.title == 'blank' %}
+                {{ site.first_name }}
+                {{ site.middle_name }}
+                {{ site.last_name }}
+              {% else %}
+                {{ site.title }}
+              {% endif %}
+            </h1>
+            {% if page.profile.role %}
+              <p>{{ page.profile.role }}</p>
+            {% endif %}
+            {% if page.profile.location %}
+              <p>{{ page.profile.location }}</p>
+            {% endif %}
+          </div>
+
+          {% if page.profile.more_info %}
+            <div class="profile-block">
+              <h2>Details</h2>
+              <div class="more-info">{{ page.profile.more_info }}</div>
+            </div>
+          {% endif %}
+
+          {% if site.data.socials.email %}
+            <div class="profile-block">
+              <h2>Contact</h2>
+              <a class="profile-contact" href="mailto:{{ site.data.socials.email }}">{{ site.data.socials.email }}</a>
+            </div>
+          {% endif %}
+
+          {% if page.profile.show_social_links %}
+            <div class="profile-block">
+              <h2>Profiles</h2>
+              <ul class="profile-list">
+                {% if site.data.socials.scholar_userid %}
+                  <li>
+                    <a href="https://scholar.google.com/citations?user={{ site.data.socials.scholar_userid }}">
+                      <i class="ai ai-google-scholar" aria-hidden="true"></i>
+                      <span>Google Scholar</span>
+                    </a>
+                  </li>
+                {% endif %}
+                {% if site.data.socials.github_username %}
+                  <li>
+                    <a href="https://github.com/{{ site.data.socials.github_username }}">
+                      <i class="fa-brands fa-github" aria-hidden="true"></i>
+                      <span>GitHub</span>
+                    </a>
+                  </li>
+                {% endif %}
+                {% if site.data.socials.linkedin_username %}
+                  <li>
+                    <a href="https://www.linkedin.com/in/{{ site.data.socials.linkedin_username }}">
+                      <i class="fa-brands fa-linkedin" aria-hidden="true"></i>
+                      <span>LinkedIn</span>
+                    </a>
+                  </li>
+                {% endif %}
+              </ul>
+            </div>
+          {% endif %}
+        </div>
+      </aside>
+    {% endif %}
+
+    <article class="about-content">
+      <section class="home-section research-section" id="research">
+        <h2 class="section-title">
+          <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+          <span>Research</span>
+        </h2>
+        <div class="section-body about-copy clearfix">{{ content }}</div>
+      </section>
+
+      <!-- News -->
+      {% if page.announcements and page.announcements.enabled %}
+        <section class="home-section news-section" id="news">
+          <h2 class="section-title">
+            <i class="fa-regular fa-newspaper" aria-hidden="true"></i>
+            <span>News</span>
+          </h2>
+          {% include news.liquid limit=true %}
+        </section>
       {% endif %}
-    </div>
 
-    <!-- News -->
-    {% if page.announcements and page.announcements.enabled %}
-      <h2>news</h2>
-      {% include news.liquid limit=true %}
-    {% endif %}
+      <!-- Latest posts -->
+      {% if page.latest_posts and page.latest_posts.enabled %}
+        <section class="home-section posts-section" id="latest-posts">
+          <h2 class="section-title">
+            <i class="fa-regular fa-file-lines" aria-hidden="true"></i>
+            <a href="{{ '/blog/' | relative_url }}">Latest Posts</a>
+          </h2>
+          {% include latest_posts.liquid %}
+        </section>
+      {% endif %}
 
-    <!-- Latest posts -->
-    {% if page.latest_posts and page.latest_posts.enabled %}
-      <h2>
-        <a href="{{ '/blog/' | relative_url }}" style="color: inherit">latest posts</a>
-      </h2>
-      {% include latest_posts.liquid %}
-    {% endif %}
+      <!-- Selected papers -->
+      {% if page.selected_papers %}
+        <section class="home-section publication-section" id="publications">
+          <h2 class="section-title">
+            <i class="fa-regular fa-rectangle-list" aria-hidden="true"></i>
+            <a href="{{ '/publications/' | relative_url }}">Publications</a>
+          </h2>
+          {% include selected_papers.liquid %}
+        </section>
+      {% endif %}
 
-    <!-- Selected papers -->
-    {% if page.selected_papers %}
-      <h2>
-        <a href="{{ '/publications/' | relative_url }}">selected publications</a>
-      </h2>
-      {% include selected_papers.liquid %}
-    {% endif %}
+      <!-- Social -->
+      {% if page.social %}
+        <div class="social">
+          <div class="contact-icons">{% social_links %}</div>
 
-    <!-- Social -->
-    {% if page.social %}
-      <div class="social">
-        <div class="contact-icons">{% social_links %}</div>
+          <div class="contact-note">{{ site.contact_note }}</div>
+        </div>
+      {% endif %}
 
-        <div class="contact-note">{{ site.contact_note }}</div>
-      </div>
-    {% endif %}
-
-    {% if site.newsletter and site.newsletter.enabled and site.footer_fixed %}
-      {% include newsletter.liquid center=true %}
-    {% endif %}
-  </article>
+      {% if site.newsletter and site.newsletter.enabled and site.footer_fixed %}
+        {% include newsletter.liquid center=true %}
+      {% endif %}
+    </article>
+  </div>
 </div>
