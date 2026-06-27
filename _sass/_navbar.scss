@@ -209,6 +209,13 @@ html[data-theme="dark"] {
 }
 
 @media (max-width: 575px) {
+  .navbar {
+    .container {
+      padding-right: 1rem;
+      padding-left: 1rem;
+    }
+  }
+
   .navbar.navbar-light {
     .navbar-brand.title {
       margin-left: 0;
