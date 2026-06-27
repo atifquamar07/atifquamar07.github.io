@@ -25,7 +25,7 @@ ninja.data = [{
           },
         },{id: "nav-contact",
           title: "contact",
-          description: "email is the best way to reach me.",
+          description: "email is the best way to reach me!",
           section: "Navigation",
           handler: () => {
             window.location.href = "/contact/";
@@ -60,4 +60,30 @@ ninja.data = [{
           description: "Decoding method that aligns large language models with human preferences at inference time by accepting only high-reward text segments, boosting quality without retraining.",
           section: "Projects",handler: () => {
               window.location.href = "/projects/stars/";
-            },},];
+            },},{
+      id: 'light-theme',
+      title: 'Change theme to light',
+      description: 'Change the theme of the site to Light',
+      section: 'Theme',
+      handler: () => {
+        setThemeSetting("light");
+      },
+    },
+    {
+      id: 'dark-theme',
+      title: 'Change theme to dark',
+      description: 'Change the theme of the site to Dark',
+      section: 'Theme',
+      handler: () => {
+        setThemeSetting("dark");
+      },
+    },
+    {
+      id: 'system-theme',
+      title: 'Use system default theme',
+      description: 'Change the theme of the site to System Default',
+      section: 'Theme',
+      handler: () => {
+        setThemeSetting("system");
+      },
+    },];
