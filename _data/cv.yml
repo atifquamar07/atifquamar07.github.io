@@ -23,7 +23,6 @@ cv:
         end_date: Present
         summary: Developing training and inference-time methods to improve reasoning in language models, including reinforcement learning, self-consistency, and test-time inference strategies, with applications to mathematical reasoning and coding while reducing unreliable reasoning paths.
 
-
       - company: University of Virginia
         position: Research Intern
         location: Virginia, United States
@@ -43,7 +42,7 @@ cv:
         location: Indiana, United States
         start_date: Feb 2025
         end_date: Jul 2025
-        summary: Studied Bayesian sampling and inference-time alignment methods for language models, improving response quality and steering outputs toward harmlessness and positive sentiment. 
+        summary: Studied Bayesian sampling and inference-time alignment methods for language models, improving response quality and steering outputs toward harmlessness and positive sentiment.
 
       - company: Insituate
         position: Co-Founder
