@@ -4,7 +4,7 @@ cv:
   email: mohammad.atif@mbzuai.ac.ae
   website: https://www.atifquamar.com
   image: assets/img/atif_quamar_profile.jpg
-  summary: I study efficient and reliable reasoning in foundation models. I like to understand how foundation models reason and how we can make that reasoning more efficient and trustworthy. A lot of what I do spans language and vision, with a focus on keeping these models safe, reliable and aligned with human values.
+  summary: I like to understand how foundation models reason, how their reasoning abilities emerge through training, and how we can make that reasoning more efficient and trustworthy. Much of my work spans language and vision, with a focus on training and aligning models to be safe and aligned with human values.
 
   social_networks:
     - network: Google Scholar
