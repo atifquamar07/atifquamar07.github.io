@@ -49,7 +49,7 @@ cv:
         location: New Delhi, India
         start_date: Sep 2023
         end_date: Feb 2025
-        summary: Built agentic software for the Supreme Court of India, Mizuho Bank, PNC Bank and Indian High Courts.
+        summary: Founded Insituate and grew it to $250K ARR, building on-premise AI agents using open-source LLMs and RAG systems for enterprise use cases; deployments included Singapore Judiciary, Indian High Courts, Mizuho Bank, and PNC Bank.
 
     Education:
       - studyType: MSc in Machine Learning
@@ -90,6 +90,7 @@ cv:
         publisher: Under Review
         releaseDate: 2025-10-05
         url: https://arxiv.org/abs/2510.23334
+        equal_contribution: "Quamar; Areeb"
 
       - title: "STARS: Synchronous Token Alignment for Robust Supervision in Large Language Models"
         authors:
@@ -101,6 +102,7 @@ cv:
         publisher: ICML 2026 - Structured Probabilistic Inference & Generative Modeling Workshop
         releaseDate: 2026-05-30
         url: https://arxiv.org/abs/2511.03827
+        equal_contribution: "Quamar; Areeb"
 
       - title: "Logit-Entropy Adaptive Stopping Heuristic for Efficient Chain-of-Thought Reasoning"
         authors:

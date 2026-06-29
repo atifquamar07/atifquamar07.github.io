@@ -11,8 +11,46 @@
         {% endcapture %}
         {% assign pub_date = pub_date | strip %}
 
+        {% assign equal_contribution_authors = entry.equal_contribution | default: '' | downcase | remove_accents %}
+
         {% capture pub_authors %}
-          {% if entry.authors %}{{ entry.authors | join: ', ' }}{% elsif entry.author %}{{ entry.author }}{% endif %}
+          {% if entry.authors %}
+            {%- for author in entry.authors -%}
+              {%- assign author_name = author | strip -%}
+              {%- assign author_name_html = author_name | regex_replace: '[*∗]', '' -%}
+              {%- assign author_name_html = author_name_html | regex_replace: '([†‡§¶‖&^]+)', '<sup>\1</sup>' -%}
+              {%- assign author_last_name = author_name | split: ' ' | last | regex_replace: '[*∗†‡§¶‖&^]', '' -%}
+              {%- assign clean_author = author_name | downcase | remove_accents -%}
+              {%- assign clean_last_name = author_last_name | downcase | remove_accents -%}
+              {%- assign author_is_self = false -%}
+              {%- if clean_author contains 'atif' and clean_author contains 'quamar' -%}
+                {%- assign author_is_self = true -%}
+              {%- endif -%}
+              {%- assign author_has_equal_contribution = false -%}
+              {%- if author_name contains '*' or author_name contains '∗' -%}
+                {%- assign author_has_equal_contribution = true -%}
+              {%- endif -%}
+              {%- if equal_contribution_authors != '' and equal_contribution_authors contains clean_last_name -%}
+                {%- assign author_has_equal_contribution = true -%}
+              {%- endif -%}
+              {%- capture equal_contribution_marker -%}
+                {%- if author_has_equal_contribution -%}<sup class="equal-contribution-marker">*</sup>{%- endif -%}
+              {%- endcapture -%}
+              {%- if forloop.length > 1 -%}
+                {%- if forloop.first == false -%}
+                  {%- if forloop.length > 2 -%}, {% elsif forloop.length == 2 %} {% endif -%}
+                {%- endif -%}
+                {%- if forloop.last -%}and {% endif -%}
+              {%- endif -%}
+              {%- if author_is_self -%}
+                <strong><u>{{ author_name_html }}</u>{{ equal_contribution_marker }}</strong>
+              {%- else -%}
+                {{- author_name_html -}}{{ equal_contribution_marker }}
+              {%- endif -%}
+            {%- endfor -%}
+          {% elsif entry.author %}
+            {{ entry.author }}
+          {% endif %}
         {% endcapture %}
         {% assign pub_authors = pub_authors | strip %}
 
@@ -40,7 +78,7 @@
             {% endif %}
 
             {% if pub_authors != '' %}
-              <p class="cv-publication-authors ml-1 ml-md-4">{{ pub_authors }}</p>
+              <div class="cv-publication-authors ml-1 ml-md-4">{{ pub_authors }}</div>
             {% endif %}
 
             {% if entry.publisher %}
@@ -64,7 +102,7 @@
             {% endif %}
 
             {% if pub_authors != '' %}
-              <p class="cv-publication-authors ml-1 ml-md-4">{{ pub_authors }}</p>
+              <div class="cv-publication-authors ml-1 ml-md-4">{{ pub_authors }}</div>
             {% endif %}
 
             {% if entry.publisher %}
