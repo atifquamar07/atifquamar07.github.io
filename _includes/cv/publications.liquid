@@ -9,6 +9,12 @@
         {% capture pub_date %}
           {% if entry.releaseDate %}{{ entry.releaseDate }}{% elsif entry.date %}{{ entry.date }}{% endif %}
         {% endcapture %}
+        {% assign pub_date = pub_date | strip %}
+
+        {% capture pub_authors %}
+          {% if entry.authors %}{{ entry.authors | join: ', ' }}{% elsif entry.author %}{{ entry.author }}{% endif %}
+        {% endcapture %}
+        {% assign pub_authors = pub_authors | strip %}
 
         {% if pub_date != '' %}
           <div class="col-xs-2 col-sm-2 col-md-2 text-center">
@@ -33,6 +39,10 @@
               <h6 class="title font-weight-bold ml-1 ml-md-4">{{ entry.title }}</h6>
             {% endif %}
 
+            {% if pub_authors != '' %}
+              <p class="cv-publication-authors ml-1 ml-md-4">{{ pub_authors }}</p>
+            {% endif %}
+
             {% if entry.publisher %}
               <h6 class="ml-1 ml-md-4" style="font-size: 0.95rem">
                 <em>{{ entry.publisher }}</em>
@@ -51,6 +61,10 @@
               </h6>
             {% elsif entry.title %}
               <h6 class="title font-weight-bold ml-1 ml-md-4">{{ entry.title }}</h6>
+            {% endif %}
+
+            {% if pub_authors != '' %}
+              <p class="cv-publication-authors ml-1 ml-md-4">{{ pub_authors }}</p>
             {% endif %}
 
             {% if entry.publisher %}

@@ -52,10 +52,18 @@ cv:
         summary: Built agentic software for the Supreme Court of India, Mizuho Bank, PNC Bank and Indian High Courts.
 
     Education:
-      - institution: IIIT Delhi
+      - studyType: MSc in Machine Learning
+        institution: Mohamed bin Zayed University of Artificial Intelligence (MBZUAI), Abu Dhabi, UAE
+        location: Abu Dhabi, UAE
+        area: Machine Learning
+        start_date: 2026
+        end_date: 2028
+
+      - studyType: B.Tech in Computer Science and Biosciences
+        institution: Indraprastha Institute of Information Technology (IIIT), Delhi, India
         area: Computer Science and Biosciences
         location: New Delhi, India
-        studyType: Bachelor of Technology
+        area: Computer Science and Computational Biology
         start_date: 2020
         end_date: 2024
 
@@ -69,16 +77,6 @@ cv:
           - Reinforcement Learning
 
     Publications:
-      - title: "Reliable Chain-of-Thought via Prefix Consistency"
-        authors:
-          - N. Iwase
-          - Y. Ichihara
-          - M. Atif Quamar
-          - J. Komiyama
-        publisher: Under Review
-        releaseDate: 2026-05-11
-        url: https://arxiv.org/abs/2605.07654
-
       - title: "Adaptive Blockwise Search: Inference-Time Alignment for Large Language Models"
         authors:
           - M. Atif Quamar
@@ -93,6 +91,35 @@ cv:
         releaseDate: 2025-10-05
         url: https://arxiv.org/abs/2510.23334
 
+      - title: "STARS: Synchronous Token Alignment for Robust Supervision in Large Language Models"
+        authors:
+          - M. Atif Quamar
+          - M. Areeb
+          - M. Kuznetsov
+          - M. Ozgur Ozmen
+          - Z. Berkay Celik
+        publisher: ICML 2026 - Structured Probabilistic Inference & Generative Modeling Workshop
+        releaseDate: 2026-05-30
+        url: https://arxiv.org/abs/2511.03827
+
+      - title: "Logit-Entropy Adaptive Stopping Heuristic for Efficient Chain-of-Thought Reasoning"
+        authors:
+          - M. Atif Quamar
+          - M. Areeb
+        publisher: NeurIPS 2025 - Efficient Reasoning Workshop
+        releaseDate: 2025-09-28
+        url: https://arxiv.org/abs/2511.04654
+
+      - title: "Reliable Chain-of-Thought via Prefix Consistency"
+        authors:
+          - N. Iwase
+          - Y. Ichihara
+          - M. Atif Quamar
+          - J. Komiyama
+        publisher: Under Review
+        releaseDate: 2026-05-11
+        url: https://arxiv.org/abs/2605.07654
+
       - title: "Learning Modal-Mixed Chain-of-Thought Reasoning with Latent Embeddings"
         authors:
           - Y. Shao
@@ -106,25 +133,6 @@ cv:
         publisher: Under Review
         releaseDate: 2025-09-30
         url: https://www.arxiv.org/abs/2602.00574
-
-      - title: "STARS: Synchronous Token Alignment for Robust Supervision in Large Language Models"
-        authors:
-          - M. Atif Quamar
-          - M. Areeb
-          - M. Kuznetsov
-          - M. Ozgur Ozmen
-          - Z. Berkay Celik
-        publisher: ICML 2026 - Structured Probabilistic Inference & Generative Modeling Workshop
-        releaseDate: 2025-09-29
-        url: https://arxiv.org/abs/2511.03827
-
-      - title: "Logit-Entropy Adaptive Stopping Heuristic for Efficient Chain-of-Thought Reasoning"
-        authors:
-          - M. Atif Quamar
-          - M. Areeb
-        publisher: NeurIPS 2025 - Efficient Reasoning Workshop
-        releaseDate: 2025-09-28
-        url: https://arxiv.org/abs/2511.04654
 
       - title: "Decoding Histone Modification Signatures of Non-Coding RNAs via Foundation Models"
         authors:

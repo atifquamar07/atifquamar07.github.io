@@ -179,26 +179,24 @@ html[data-theme="dark"] {
 
 #light-toggle {
   padding: 0;
-  border: 1px solid var(--global-divider-color);
+  border: 0;
   border-radius: 6px;
   background-color: transparent;
   color: var(--global-text-color-light);
   /* Fix footprint to prevent navbar shifting when icon changes */
-  width: 1.5rem;
-  height: 1.5rem;
+  width: 1.75rem;
+  height: 1.75rem;
   font-size: 0.72rem;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   transition:
-    border-color 0.15s ease,
     color 0.15s ease,
     background-color 0.15s ease;
 
   &:hover {
     color: var(--global-text-color);
     background-color: var(--global-subtle-bg-color);
-    border-color: var(--global-text-color-light);
   }
 }
 

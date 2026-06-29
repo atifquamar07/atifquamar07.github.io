@@ -707,10 +707,20 @@ ul.task-list input[type="checkbox"] {
     border: 1px solid var(--global-divider-color);
     border-radius: 6px;
     box-shadow: none;
+    font-family: inherit;
+    font-size: 0.92rem;
+    font-weight: 400;
+    letter-spacing: 0;
+    line-height: 1.5;
 
     &:focus {
       border-color: var(--global-theme-color);
       box-shadow: 0 0 0 0.15rem var(--global-focus-color);
+    }
+
+    &::placeholder {
+      color: var(--global-text-color-light);
+      opacity: 1;
     }
   }
 
