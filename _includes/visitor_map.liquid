@@ -1,32 +1,21 @@
 <div class="visitor-map-card" aria-label="visitor map">
-  <div class="visitor-map-widget">
-    <script
-      type="text/javascript"
-      id="mapmyvisitors"
-      src="https://mapmyvisitors.com/map.js?d=jXbSyu9yHiqrIMG4S_wgh10OvbCo0cw11tLcV38Qv30&cl=ffffff&w=a&t=tt"
-    ></script>
-    <script>
-      (function () {
-        function updateVisitorMapWidget() {
-          var mapLink = document.querySelector('.visitor-map-widget #mapmyvisitors-widget');
-          if (mapLink) {
-            mapLink.setAttribute('target', '_blank');
-            mapLink.setAttribute('rel', 'external nofollow noopener');
-          }
-
-          var counter = document.querySelector('.visitor-map-widget .mapmyvisitors-visitors');
-          if (!counter || counter.querySelector('.visitor-map-pageviews')) return;
-
-          var match = counter.textContent.trim().match(/^([\d,]+)\s+Total Pageviews$/i);
-          if (!match) return;
-
-          counter.innerHTML = '<span class="visitor-map-pageviews">' + match[1] + ' Pageviews</span>';
-        }
-
-        var observer = new MutationObserver(updateVisitorMapWidget);
-        observer.observe(document.body, { childList: true, subtree: true, characterData: true });
-        updateVisitorMapWidget();
-      })();
-    </script>
-  </div>
+  <svg class="visitor-map" viewBox="0 0 240 132" role="img" aria-labelledby="visitor-map-title" focusable="false">
+    <title id="visitor-map-title">visitor map</title>
+    <rect class="visitor-map__ocean" width="240" height="132" rx="6"></rect>
+    <path
+      class="visitor-map__grid"
+      d="M0 33.5h240M0 66.5h240M0 99.5h240M40 .5v131M80 .5v131M120 .5v131M160 .5v131M200 .5v131"
+    ></path>
+    <path
+      class="visitor-map__land"
+      d="M30.9 32.8c8.3-6.2 22.5-6.4 31.3-2.2 3.9 1.9 4.1 6.4.5 8.8-5.5 3.7-3.8 8.4-8.5 11.6-4.5 3-10.5 1.6-14.9 4.7-6.6 4.6-5.5 13.7-12.2 16.5-6.2 2.6-14.6-2.5-14.4-9.2.2-5.3 6.1-8.4 6.4-13.4.4-6-5.1-9.6-1.8-14.1 2.3-3.1 8.7-2.9 13.6-2.7Zm38.9 38.6c6.4 1.4 13.2 4.8 14.7 10.7 1.6 6-3.1 12.5-8.3 14.7-7.8 3.4-18.3-2-19.9-9.6-1.3-6.5 4.2-14 13.5-15.8Zm38-50.6c13.6-5 29-2.9 39.4 5.3 5.5 4.3 11.9 4.5 17.7 7.3 7.3 3.6 8.4 10.2 2.9 14.8-4.7 4-13.3 3.3-17.4 7.2-3.6 3.4-1.2 8.9-5.4 11.6-4.3 2.8-10.7-.2-15.8 1.5-7.3 2.5-7.6 12.5-15.2 14.9-8.2 2.6-19.4-5.1-20.4-13.3-.8-6.5 4.8-10.3 2.7-16.3-1.7-5-7.6-6.4-8.2-11.5-.8-7.3 10.6-18.5 19.7-21.5Zm74.8 53.5c10.5-4.5 24.7-.3 31.8 7.8 5.6 6.3 4.8 15.7-1.5 19.3-6.4 3.7-13.8-2.6-20.7.7-7.1 3.4-7.5 13.3-15.3 13.3-8.2 0-14.4-10.9-12.3-20.4 1.6-7 8.1-16.4 18-20.7Zm9.5-45.3c8.8-4.8 24.3-3.4 28.9 3.3 3.3 4.8.4 11.5-5.9 14.6-7.1 3.6-15.8.6-19.2 5.9-2.9 4.5.9 9.8-2.6 12.4-4.1 3.1-15.9-1.1-19.1-8.2-4.5-9.8 5.3-21.2 17.9-28Z"
+    ></path>
+    <g class="visitor-map__pins">
+      <circle cx="55" cy="49" r="3.8"></circle>
+      <circle cx="120" cy="42" r="3.8"></circle>
+      <circle cx="145" cy="65" r="3.8"></circle>
+      <circle cx="190" cy="55" r="3.8"></circle>
+      <circle cx="201" cy="93" r="3.8"></circle>
+    </g>
+  </svg>
 </div>

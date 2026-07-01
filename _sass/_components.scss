@@ -826,41 +826,34 @@ ul.task-list input[type="checkbox"] {
     text-align: center;
   }
 
-  .visitor-map-widget {
-    display: flex;
-    justify-content: center;
+  .visitor-map {
+    display: block;
     width: 240px;
     max-width: 100%;
+    height: auto;
     overflow: hidden;
+    border-radius: 6px;
+  }
 
-    #mapmyvisitors-widget {
-      max-width: 100% !important;
-      min-height: 0 !important;
-      border-radius: 6px;
-      overflow: hidden;
-    }
+  .visitor-map__ocean {
+    fill: var(--global-card-bg-color);
+  }
 
-    .mapmyvisitors-visitors {
-      padding-top: 0.3rem;
-    }
+  .visitor-map__grid {
+    fill: none;
+    stroke: var(--global-divider-color);
+    stroke-width: 1;
+    opacity: 0.55;
+  }
 
-    .visitor-map-pageviews {
-      display: block;
-      color: #fff !important;
-      font-weight: 400 !important;
-      letter-spacing: 0;
-      line-height: 1.15;
-      text-transform: none;
-    }
+  .visitor-map__land {
+    fill: var(--global-text-color-light);
+    opacity: 0.34;
+  }
 
-    iframe,
-    img,
-    canvas,
-    object,
-    embed {
-      max-width: 100%;
-      border-radius: 6px;
-    }
+  .visitor-map__pins {
+    fill: var(--global-theme-color);
+    filter: drop-shadow(0 0 0.35rem var(--global-focus-color));
   }
 }
 
