@@ -23,13 +23,6 @@ ninja.data = [{
           handler: () => {
             window.location.href = "/cv/";
           },
-        },{id: "nav-contact",
-          title: "contact",
-          description: "email is the best way to reach me!",
-          section: "Navigation",
-          handler: () => {
-            window.location.href = "/contact/";
-          },
         },{id: "news-served-on-the-program-committee-for-aaai-2026-conference",
           title: '📝 Served on the Program Committee for AAAI 2026 conference.',
           description: "",
