@@ -1,10 +1,6 @@
 metadata:
-  last_updated: '2026-06-03'
+  last_updated: '2026-07-06'
 papers:
-  6T8mnw0AAAAJ:2osOgNQ5qMEC:
-    citations: 1
-    title: 'STARS: Segment-level Token Alignment with Rejection Sampling in Large Language Models'
-    year: '2026'
   6T8mnw0AAAAJ:9yKSN-GCB0IC:
     citations: 1
     title: 'Adaptive Blockwise Search: Inference-Time Alignment for Large Language Models'
@@ -13,6 +9,10 @@ papers:
     citations: 1
     title: Learning Modal-Mixed Chain-of-Thought Reasoning with Latent Embeddings
     year: '2026'
+  6T8mnw0AAAAJ:WF5omc3nYNoC:
+    citations: 1
+    title: 'STARS: Synchronous Token Alignment for Robust Supervision in Large Language Models'
+    year: Unknown Year
   6T8mnw0AAAAJ:Y0pCki6q_DkC:
     citations: 0
     title: Reliable Chain-of-Thought via Prefix Consistency
