@@ -1,6 +1,6 @@
 cv:
   name: Atif Quamar
-  label: Visiting Researcher at MBZUAI
+  label: MSc Student in Machine Learning at MBZUAI
   email: mohammad.atif@mbzuai.ac.ae
   website: https://www.atifquamar.com
   image: assets/img/atif_quamar_profile.jpg
@@ -17,10 +17,17 @@ cv:
   sections:
     Experience:
       - company: Mohamed bin Zayed University of Artificial Intelligence
+        position: Graduate Student Researcher
+        location: Abu Dhabi, UAE
+        start_date: Aug 2026
+        end_date: Present
+        summary: Continuing my research on efficient reasoning and training of language models.
+
+      - company: Mohamed bin Zayed University of Artificial Intelligence
         position: Visiting Researcher
         location: Abu Dhabi, UAE
         start_date: Feb 2026
-        end_date: Present
+        end_date: Jul 2026
         summary: Developing training and inference-time methods to improve reasoning in language models, including reinforcement learning, self-consistency, and test-time inference strategies, with applications to mathematical reasoning and coding while reducing unreliable reasoning paths.
 
       - company: University of Virginia
@@ -121,6 +128,16 @@ cv:
         publisher: Under Review
         releaseDate: 2026-05-11
         url: https://arxiv.org/abs/2605.07654
+
+      - title: "Privileged Solutions or Context-Induced Teacher Behavior? Dissecting On-Policy Self-Distillation"
+        authors:
+          - Y. Ichihara
+          - N. Iwase
+          - M. Atif Quamar
+          - J. Komiyama
+        publisher: Under Review
+        releaseDate: 2026-08-10
+        url: https://arxiv.org/abs/2608.09228
 
       - title: "Learning Modal-Mixed Chain-of-Thought Reasoning with Latent Embeddings"
         authors:

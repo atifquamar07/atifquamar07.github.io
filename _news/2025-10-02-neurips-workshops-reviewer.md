@@ -5,4 +5,4 @@ inline: true
 related_posts: false
 ---
 
-📝 Served on the Program Committee for NeurIPS 2025 Workshops.
+Served on the Program Committee for NeurIPS 2025 Workshops!

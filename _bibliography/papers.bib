@@ -1,7 +1,6 @@
 ---
 ---
 
-
 @misc{quamar2025adaptive,
   abbr     = {arXiv},
   title    = {Adaptive Blockwise Search: Inference-Time Alignment for Large Language Models},
@@ -55,6 +54,17 @@
   selected = {true}
 }
 
+@misc{ichihara2026privileged,
+  abbr     = {arXiv},
+  title    = {Privileged Solutions or Context-Induced Teacher Behavior? Dissecting On-Policy Self-Distillation},
+  author   = {Ichihara, Y. and Iwase, N. and Quamar, M. Atif and Komiyama, J.},
+  year     = {2026},
+  month    = {August},
+  abstract = {On-Policy Self-Distillation (OPSD) is commonly interpreted as the transfer of privileged information: a teacher observes the verified solution to the target problem and supervises the student's trajectory. However, this interpretation conflates two effects. The reference solution not only reveals the answer to the current instance but also changes the context under which the teacher provides token-level supervision. We investigate the role of target-specific privilege with OP²SD (On-Policy Self-Distillation from Other Problems), which replaces the paired reference with a problem and solution from a different example, while preserving the student rollout, teacher, and distillation objective. Across three models and three mathematics benchmarks, OP²SD improves over the base model and remains competitive with OPSD. The success of OP²SD implies that OPSD gains do not necessarily come from access to the reference solution, and that the teacher's context-induced behavior is an important factor.},
+  arxiv    = {2608.09228},
+  preview  = {op2sd.png},
+  selected = {true}
+}
 
 @misc{shao2025modalmixed,
   abbr     = {arXiv},
