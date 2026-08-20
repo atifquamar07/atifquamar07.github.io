@@ -484,8 +484,8 @@ ul.task-list input[type="checkbox"] {
       }
 
       > .row > .abbr {
-        flex: 0 0 7.3rem;
-        max-width: 7.3rem;
+        flex: 0 0 9.5rem;
+        max-width: 9.5rem;
         padding-right: 0;
         padding-left: 0;
         margin-right: 1.35rem;
@@ -503,7 +503,7 @@ ul.task-list input[type="checkbox"] {
         overflow: hidden;
         border: 1px solid var(--global-divider-color);
         border-radius: 6px;
-        background: var(--global-card-bg-color);
+        background: #fff;
       }
 
       .title {
@@ -616,7 +616,7 @@ ul.task-list input[type="checkbox"] {
         }
 
         > .row > .abbr {
-          max-width: 8rem;
+          max-width: 9.5rem;
           margin-right: 0;
           margin-bottom: 0.75rem;
         }

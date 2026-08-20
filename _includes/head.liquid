@@ -101,7 +101,7 @@
         storedTheme = null;
       }
 
-      const initialTheme = storedTheme === 'light' || storedTheme === 'dark' ? storedTheme : 'dark';
+      const initialTheme = storedTheme === 'light' || storedTheme === 'dark' ? storedTheme : 'light';
       document.documentElement.setAttribute('data-theme', initialTheme);
       document.documentElement.setAttribute('data-theme-setting', initialTheme);
     })();

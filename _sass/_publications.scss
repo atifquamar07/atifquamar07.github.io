@@ -94,8 +94,8 @@
       }
 
       > .row > .abbr {
-        flex: 0 0 7.3rem;
-        max-width: 7.3rem;
+        flex: 0 0 9.5rem;
+        max-width: 9.5rem;
         padding-right: 0;
         padding-left: 0;
         margin-right: 1.35rem;
@@ -117,11 +117,18 @@
         overflow: hidden;
         border: 1px solid var(--global-divider-color);
         border-radius: 6px;
-        background: var(--global-card-bg-color);
+        background: #fff;
       }
 
       .abbr {
         margin-bottom: 0.5rem;
+
+        figure,
+        picture {
+          display: block;
+          width: 100%;
+          margin: 0;
+        }
 
         abbr {
           display: inline-block;
@@ -320,7 +327,7 @@
         }
 
         > .row > .abbr {
-          max-width: 8rem;
+          max-width: 9.5rem;
           margin-right: 0;
           margin-bottom: 0.75rem;
         }

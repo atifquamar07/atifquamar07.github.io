@@ -578,7 +578,7 @@ figure.cover {
 // Calendar
 
 .calendar-toggle-btn {
-  background-color: #007acc;
+  background-color: var(--global-theme-color);
   color: white;
   padding: 0.5em 1em;
   border: none;
@@ -589,7 +589,7 @@ figure.cover {
 }
 
 .calendar-toggle-btn:hover {
-  background-color: #005fa3;
+  background-color: var(--global-hover-color);
 }
 
 .google-calendar-embed {
