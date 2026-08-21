@@ -423,6 +423,20 @@ ul.task-list input[type="checkbox"] {
       overflow-y: auto;
       overscroll-behavior: contain;
       scrollbar-gutter: stable;
+      scrollbar-width: thin;
+
+      &::-webkit-scrollbar {
+        width: 5px;
+      }
+
+      &::-webkit-scrollbar-track {
+        background: transparent;
+      }
+
+      &::-webkit-scrollbar-thumb {
+        background-color: var(--global-divider-color);
+        border-radius: 999px;
+      }
     }
 
     .table {
