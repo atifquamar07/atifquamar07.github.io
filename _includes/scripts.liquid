@@ -376,3 +376,7 @@
 {% if site.newsletter.enabled %}
   <script defer src="{{ '/assets/js/newsletter.js' | relative_url | bust_file_cache }}"></script>
 {% endif %}
+
+{% if page.announcements and page.announcements.scrollable %}
+  <script defer src="{{ '/assets/js/news-scroll.js' | relative_url }}"></script>
+{% endif %}

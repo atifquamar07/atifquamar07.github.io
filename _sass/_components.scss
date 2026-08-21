@@ -419,6 +419,12 @@ ul.task-list input[type="checkbox"] {
       box-shadow: none;
     }
 
+    .news-scrollable {
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      scrollbar-gutter: stable;
+    }
+
     .table {
       margin-bottom: 0;
     }
