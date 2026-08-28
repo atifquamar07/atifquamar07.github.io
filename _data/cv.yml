@@ -139,6 +139,16 @@ cv:
         releaseDate: 2026-08-10
         url: https://arxiv.org/abs/2608.09228
 
+      - title: "Prefix-Denoising Consistency: Test-Time Verification for Diffusion Language Models"
+        authors:
+          - Y. Ichihara
+          - N. Iwase
+          - M. Atif Quamar
+          - J. Komiyama
+        publisher: Under Review
+        releaseDate: 2026-08-26
+        url: https://arxiv.org/abs/2608.25311
+
       - title: "Learning Modal-Mixed Chain-of-Thought Reasoning with Latent Embeddings"
         authors:
           - Y. Shao
