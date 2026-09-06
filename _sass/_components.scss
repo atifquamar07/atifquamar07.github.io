@@ -326,6 +326,15 @@ ul.task-list input[type="checkbox"] {
     }
   }
 
+  .profile-visitors {
+    .visitor-map-card,
+    #mapmyvisitors-widget {
+      max-width: 100%;
+      overflow: hidden;
+      border-radius: 8px;
+    }
+  }
+
   .about-content {
     min-width: 0;
     overflow-wrap: break-word;
@@ -844,36 +853,6 @@ ul.task-list input[type="checkbox"] {
     border-radius: 8px;
     box-shadow: none;
     text-align: center;
-  }
-
-  .visitor-map {
-    display: block;
-    width: 240px;
-    max-width: 100%;
-    height: auto;
-    overflow: hidden;
-    border-radius: 6px;
-  }
-
-  .visitor-map__ocean {
-    fill: var(--global-card-bg-color);
-  }
-
-  .visitor-map__grid {
-    fill: none;
-    stroke: var(--global-divider-color);
-    stroke-width: 1;
-    opacity: 0.55;
-  }
-
-  .visitor-map__land {
-    fill: var(--global-text-color-light);
-    opacity: 0.34;
-  }
-
-  .visitor-map__pins {
-    fill: var(--global-theme-color);
-    filter: drop-shadow(0 0 0.35rem var(--global-focus-color));
   }
 }
 
