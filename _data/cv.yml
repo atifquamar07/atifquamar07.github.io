@@ -4,7 +4,7 @@ cv:
   email: mohammad.atif@mbzuai.ac.ae
   website: https://www.atifquamar.com
   image: assets/img/atif_quamar_profile.jpg
-  summary: I like to understand how foundation models reason, how their reasoning abilities emerge through training, and how we can make that reasoning more efficient and trustworthy. Much of my work spans language and vision, with a focus on training and aligning models to be safe and aligned with human values.
+  summary: I’m interested in reasoning and training in foundation models, particularly in understanding how reasoning abilities emerge and evolve through training. My interests span pretraining and post-training dynamics, test-time reasoning, multi-agent systems, and alignment, with a broader focus on making foundation models more capable, robust, and trustworthy.
 
   social_networks:
     - network: Google Scholar
