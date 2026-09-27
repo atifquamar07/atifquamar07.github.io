@@ -10,7 +10,7 @@ profile:
   image_circular: false
   role: MSc in Machine Learning at
   affiliation: MBZUAI
-  research_focus: Reasoning, model training, and mechanistic interpretability.
+  research_focus: Reasoning, Model Training and Mechanistic Interpretability.
   location:
   show_social_links: true
   more_info:

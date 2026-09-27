@@ -644,7 +644,7 @@ ul.task-list input[type="checkbox"] {
       display: grid;
       grid-template-columns: 5.5rem minmax(0, 1fr);
       gap: 1.25rem 1rem;
-      align-items: start;
+      align-items: center;
     }
 
     .profile-photo {
@@ -652,18 +652,17 @@ ul.task-list input[type="checkbox"] {
       margin-bottom: 0;
     }
 
-    .profile-heading {
-      align-self: center;
+    .profile-details {
+      min-width: 0;
     }
 
-    .profile-block,
-    .profile-socials,
+    .profile-socials {
+      margin-top: 0.65rem;
+    }
+
     .profile-focus {
       grid-column: 1 / -1;
       margin-top: 0;
-    }
-
-    .profile-focus {
       max-width: none;
     }
 
