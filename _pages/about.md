@@ -8,7 +8,9 @@ profile:
   align: right
   image: atif_quamar_profile.jpg
   image_circular: false
-  role: MSc Student in Machine Learning
+  role: MSc in Machine Learning at
+  affiliation: MBZUAI
+  research_focus: Reasoning, model training, and mechanistic interpretability.
   location:
   show_social_links: true
   more_info:

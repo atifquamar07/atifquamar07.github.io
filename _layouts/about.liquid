@@ -32,8 +32,17 @@ layout: default
                 {{ site.title }}
               {% endif %}
             </h1>
-            {% if page.profile.role %}
-              <p>{{ page.profile.role }}</p>
+            {% if page.profile.role or page.profile.affiliation %}
+              <p class="profile-role">
+                {{ page.profile.role }}
+                {% if page.profile.affiliation %}
+                  {% if page.profile.affiliation_url %}
+                    <a class="profile-affiliation" href="{{ page.profile.affiliation_url }}">{{ page.profile.affiliation }}</a>
+                  {% else %}
+                    <strong class="profile-affiliation">{{ page.profile.affiliation }}</strong>
+                  {% endif %}
+                {% endif %}
+              </p>
             {% endif %}
             {% if page.profile.location %}
               <p>{{ page.profile.location }}</p>
@@ -47,43 +56,50 @@ layout: default
             </div>
           {% endif %}
 
-          {% if site.data.socials.email %}
-            <div class="profile-block">
-              <h2>Contact</h2>
-              <a class="profile-contact" href="mailto:{{ site.data.socials.email }}">{{ site.data.socials.email }}</a>
-            </div>
-          {% endif %}
-
-          {% if page.profile.show_social_links %}
-            <div class="profile-block">
-              <h2>Profiles</h2>
+          {% if site.data.socials.email or page.profile.show_social_links %}
+            <nav class="profile-socials" aria-label="Contact and profiles">
               <ul class="profile-list">
-                {% if site.data.socials.scholar_userid %}
+                {% if site.data.socials.email %}
                   <li>
-                    <a href="https://scholar.google.com/citations?user={{ site.data.socials.scholar_userid }}">
+                    <a href="mailto:{{ site.data.socials.email }}" title="Email">
+                      <i class="fa-solid fa-envelope" aria-hidden="true"></i>
+                      <span class="sr-only">Email</span>
+                    </a>
+                  </li>
+                {% endif %}
+                {% if page.profile.show_social_links and site.data.socials.scholar_userid %}
+                  <li>
+                    <a href="https://scholar.google.com/citations?user={{ site.data.socials.scholar_userid }}" title="Google Scholar">
                       <i class="ai ai-google-scholar" aria-hidden="true"></i>
-                      <span>Google Scholar</span>
+                      <span class="sr-only">Google Scholar</span>
                     </a>
                   </li>
                 {% endif %}
-                {% if site.data.socials.github_username %}
+                {% if page.profile.show_social_links and site.data.socials.github_username %}
                   <li>
-                    <a href="https://github.com/{{ site.data.socials.github_username }}">
+                    <a href="https://github.com/{{ site.data.socials.github_username }}" title="GitHub">
                       <i class="fa-brands fa-github" aria-hidden="true"></i>
-                      <span>GitHub</span>
+                      <span class="sr-only">GitHub</span>
                     </a>
                   </li>
                 {% endif %}
-                {% if site.data.socials.linkedin_username %}
+                {% if page.profile.show_social_links and site.data.socials.linkedin_username %}
                   <li>
-                    <a href="https://www.linkedin.com/in/{{ site.data.socials.linkedin_username }}">
+                    <a href="https://www.linkedin.com/in/{{ site.data.socials.linkedin_username }}" title="LinkedIn">
                       <i class="fa-brands fa-linkedin" aria-hidden="true"></i>
-                      <span>LinkedIn</span>
+                      <span class="sr-only">LinkedIn</span>
                     </a>
                   </li>
                 {% endif %}
               </ul>
-            </div>
+            </nav>
+          {% endif %}
+
+          {% if page.profile.research_focus %}
+            <section class="profile-focus" aria-label="Research focus">
+              <h2>Research focus</h2>
+              <p>{{ page.profile.research_focus }}</p>
+            </section>
           {% endif %}
         </div>
       </aside>

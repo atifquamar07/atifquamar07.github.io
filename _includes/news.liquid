@@ -12,12 +12,12 @@
       {% endif %}
     {% endif %}
     <div
-      class="table-responsive{% if include.limit and page.announcements.scrollable and news_size > news_visible_count %} news-scrollable{% endif %}"
+      class="table-responsive{% if include.limit and page.announcements.scrollable and news_size > news_visible_count %} news-scrollable has-more-news{% endif %}"
       {% if include.limit and page.announcements.scrollable and news_size > news_visible_count %}
         data-visible-items="{{ news_visible_count }}"
         aria-label="News announcements"
         tabindex="0"
-        style="max-height: 60vw"
+        style="--news-visible-items: {{ news_visible_count }}"
       {% endif %}
     >
       <table class="table table-sm table-borderless">
