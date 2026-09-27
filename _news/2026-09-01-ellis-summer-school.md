@@ -6,4 +6,4 @@ inline: true
 related_posts: false
 ---
 
-Attended the [ELLIS Summer School](https://www.ellismunich.ai/summer-school/index.html) at TUM in Munich, Germany!
+Attended the [ELLIS Summer School](https://www.ellismunich.ai/summer-school/index.html) at **TU Munich, Germany**!

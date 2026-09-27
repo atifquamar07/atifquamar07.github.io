@@ -5,4 +5,4 @@ inline: true
 related_posts: false
 ---
 
-Joined MBZUAI as a Visiting Researcher to work on reasoning in language models!
+Joined [MBZUAI](www.mbzuai.ac.ae) as a **Visiting Researcher** to work on reasoning in language models!

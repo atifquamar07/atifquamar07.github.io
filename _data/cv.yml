@@ -68,7 +68,6 @@ cv:
 
       - studyType: B.Tech in Computer Science and Biosciences
         institution: Indraprastha Institute of Information Technology (IIIT), Delhi, India
-        area: Computer Science and Biosciences
         location: New Delhi, India
         area: Computer Science and Computational Biology
         start_date: 2020
@@ -84,6 +83,16 @@ cv:
           - Reinforcement Learning
 
     Publications:
+      - title: "Reliable Chain-of-Thought via Prefix Consistency"
+        authors:
+          - N. Iwase
+          - Y. Ichihara
+          - M. Atif Quamar
+          - J. Komiyama
+        publisher: Advances in Neural Information Processing Systems (NeurIPS) 2026
+        releaseDate: 2026-05-11
+        url: https://arxiv.org/abs/2605.07654
+
       - title: "Adaptive Blockwise Search: Inference-Time Alignment for Large Language Models"
         authors:
           - M. Atif Quamar
@@ -118,16 +127,6 @@ cv:
         publisher: NeurIPS 2025 - Efficient Reasoning Workshop
         releaseDate: 2025-09-28
         url: https://arxiv.org/abs/2511.04654
-
-      - title: "Reliable Chain-of-Thought via Prefix Consistency"
-        authors:
-          - N. Iwase
-          - Y. Ichihara
-          - M. Atif Quamar
-          - J. Komiyama
-        publisher: Under Review
-        releaseDate: 2026-05-11
-        url: https://arxiv.org/abs/2605.07654
 
       - title: "Privileged Solutions or Context-Induced Teacher Behavior? Dissecting On-Policy Self-Distillation"
         authors:
