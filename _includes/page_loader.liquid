@@ -1,0 +1,148 @@
+<!-- Page loader: full-screen percentage counter shown until the page (stylesheets, scripts, images, fonts) has loaded. -->
+<!-- Must be the first thing in <body> and stay inline so it paints before any content. Styles live in _sass/_layout.scss. -->
+<script>
+  document.documentElement.classList.add('site-loading');
+</script>
+<div id="site-loader" class="site-loader" aria-hidden="true">
+  <div class="site-loader__inner">
+    <div class="site-loader__count"><span id="site-loader-value">0</span><span class="site-loader__pct">%</span></div>
+    <div class="site-loader__track"><div id="site-loader-bar" class="site-loader__bar"></div></div>
+  </div>
+</div>
+<script>
+  (function () {
+    'use strict';
+
+    var root = document.documentElement;
+    var loader = document.getElementById('site-loader');
+    var valueEl = document.getElementById('site-loader-value');
+    var barEl = document.getElementById('site-loader-bar');
+    var MAX_WAIT = 12000; // never keep the site hidden longer than this
+    var FAST_LOAD = 250; // loads quicker than this skip the count-up entirely
+    var PARSE_WEIGHT = 3; // the HTML document itself counts as a few resources
+
+    var start = Date.now();
+    var domReady = false;
+    var pageLoaded = false;
+    var fontsReady = !(document.fonts && document.fonts.ready);
+    var target = 0;
+    var shown = 0;
+    var finished = false;
+
+    function fetched(url) {
+      try {
+        return !!(url && window.performance && performance.getEntriesByName(url).length);
+      } catch (e) {
+        return false;
+      }
+    }
+
+    // Fraction of the page's resources discovered so far that have finished loading.
+    function measure() {
+      var total = PARSE_WEIGHT + 2;
+      var loaded = (domReady ? PARSE_WEIGHT : 0) + (fontsReady ? 1 : 0) + (pageLoaded ? 1 : 0);
+      var i, el;
+
+      var sheets = document.querySelectorAll('link[rel="stylesheet"]');
+      for (i = 0; i < sheets.length; i++) {
+        el = sheets[i];
+        if (el.media === 'none') continue;
+        total++;
+        if (el.sheet || fetched(el.href)) loaded++;
+      }
+
+      var scripts = document.querySelectorAll('script[src]:not([async])');
+      for (i = 0; i < scripts.length; i++) {
+        total++;
+        if (domReady || fetched(scripts[i].src)) loaded++;
+      }
+
+      var images = document.images;
+      for (i = 0; i < images.length; i++) {
+        el = images[i];
+        if (el.loading === 'lazy' && !el.complete) continue; // off-screen images don't hold up the page
+        total++;
+        if (el.complete) loaded++;
+      }
+
+      return loaded / total;
+    }
+
+    function render(value) {
+      valueEl.textContent = Math.round(value);
+      if (barEl) barEl.style.transform = 'scaleX(' + (value / 100).toFixed(3) + ')';
+    }
+
+    function reveal() {
+      if (finished) return;
+      finished = true;
+      render(100);
+      root.classList.add('site-revealing');
+      root.classList.remove('site-loading');
+      setTimeout(function () {
+        root.classList.remove('site-revealing', 'site-loader-ready');
+        if (loader.parentNode) loader.parentNode.removeChild(loader);
+      }, 700);
+    }
+
+    function tick() {
+      if (finished) return;
+      var complete = pageLoaded && fontsReady;
+
+      if (complete && (Date.now() - start < FAST_LOAD || document.hidden)) {
+        reveal();
+        return;
+      }
+
+      // Never let the target move backwards when newly discovered resources grow the total.
+      target = complete ? 100 : Math.max(target, Math.min(measure() * 100, 97));
+
+      // Ease toward the target, faster once everything is in so the finish doesn't drag.
+      var step = (target - shown) * (complete ? 0.2 : 0.08);
+      shown = Math.min(target, shown + Math.max(step, complete ? 1 : 0.15));
+      render(shown);
+
+      if (complete && shown >= 100) {
+        setTimeout(reveal, 160);
+        return;
+      }
+      requestAnimationFrame(tick);
+    }
+
+    // Hold the digits back until the site font is available so they don't swap typeface mid-count.
+    function showCounter() {
+      root.classList.add('site-loader-ready');
+    }
+    if (document.fonts && document.fonts.load) {
+      document.fonts.load('400 1em "IBM Plex Sans"', '0123456789%').then(showCounter, showCounter);
+      setTimeout(showCounter, 1500);
+    } else {
+      showCounter();
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+      domReady = true;
+    });
+    window.addEventListener('load', function () {
+      pageLoaded = true;
+      domReady = true;
+    });
+    if (!fontsReady) {
+      document.fonts.ready.then(
+        function () {
+          fontsReady = true;
+        },
+        function () {
+          fontsReady = true;
+        }
+      );
+    }
+    // Restored from the back/forward cache: the page is already there.
+    window.addEventListener('pageshow', function (event) {
+      if (event.persisted) reveal();
+    });
+
+    setTimeout(reveal, MAX_WAIT);
+    requestAnimationFrame(tick);
+  })();
+</script>

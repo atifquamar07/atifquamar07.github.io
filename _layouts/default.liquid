@@ -22,6 +22,7 @@
 
   <!-- Body -->
   <body class="{% if site.navbar_fixed %}fixed-top-nav{% endif %} {% unless site.footer_fixed %}sticky-bottom-footer{% endunless %}">
+    {% include page_loader.liquid %}
     <canvas id="ambient-field" class="ambient-field" aria-hidden="true"></canvas>
     <!-- Header -->
     {% include header.liquid %}

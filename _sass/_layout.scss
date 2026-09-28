@@ -40,6 +40,119 @@ body {
   }
 }
 
+// Full-screen percentage counter from _includes/page_loader.liquid. It only
+// exists while <html> carries .site-loading (set by inline JS), so visitors
+// without JavaScript never see it.
+.site-loader {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--global-bg-color);
+  color: var(--global-text-color);
+  transition:
+    opacity 0.5s ease,
+    visibility 0.5s;
+}
+
+html.site-loading .site-loader,
+html.site-revealing .site-loader {
+  display: flex;
+}
+
+html.site-revealing .site-loader {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.site-loader__inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+  opacity: 0;
+}
+
+html.site-loader-ready .site-loader__inner {
+  // Short delay so quick (cached) page loads don't flash the counter.
+  animation: site-loader-in 0.35s ease 0.15s forwards;
+}
+
+.site-loader__count {
+  display: flex;
+  align-items: flex-start;
+  font-size: clamp(5.5rem, 24vw, 11rem);
+  font-weight: 400;
+  line-height: 1;
+  letter-spacing: -0.05em;
+  font-variant-numeric: tabular-nums;
+}
+
+.site-loader__pct {
+  margin: 0.12em 0 0 0.08em;
+  font-size: 0.32em;
+  letter-spacing: 0;
+  color: var(--global-theme-color);
+}
+
+.site-loader__track {
+  width: min(220px, 60vw);
+  height: 2px;
+  overflow: hidden;
+  border-radius: 2px;
+  background-color: var(--global-divider-color);
+}
+
+.site-loader__bar {
+  height: 100%;
+  background-color: var(--global-theme-color);
+  transform: scaleX(0);
+  transform-origin: left center;
+}
+
+html.site-revealing [role="main"] {
+  animation: site-content-in 0.6s ease both;
+}
+
+@keyframes site-loader-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes site-content-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html.site-loader-ready .site-loader__inner,
+  html.site-revealing [role="main"] {
+    animation-duration: 0.01s;
+    transform: none;
+  }
+}
+
+@media print {
+  .site-loader {
+    display: none !important;
+  }
+}
+
 body.fixed-top-nav {
   // Add some padding for the nav-bar.
   padding-top: 52px;
