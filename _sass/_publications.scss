@@ -71,20 +71,51 @@
     margin-top: 0;
 
     li {
-      margin-bottom: 0;
-      padding: 1.45rem 0;
-      background: transparent;
-      border: 0;
-      border-bottom: 1px solid var(--global-border-light-color);
-      border-radius: 0;
+      position: relative;
+      margin-bottom: 1rem;
+      padding: 1.35rem 1.5rem;
+      background: var(--publication-bg);
+      border: 1px solid var(--publication-border);
+      border-radius: 14px;
       box-shadow: none;
+      transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
 
-      &:first-child {
-        padding-top: 0;
+      &::before {
+        content: "";
+        position: absolute;
+        top: 12px;
+        bottom: 12px;
+        left: 0;
+        width: 3px;
+        border-radius: 3px;
+        background: var(--publication-accent);
+        opacity: 0;
+        transition: opacity 0.2s ease;
       }
 
-      &:last-child {
-        border-bottom: 0;
+      &:hover,
+      &:focus-within {
+        border-color: var(--publication-hover-border);
+        box-shadow: 0 6px 20px var(--global-shadow-color);
+
+        &::before {
+          opacity: 1;
+        }
+      }
+
+      .publication-venue {
+        display: inline-block;
+        margin-bottom: 0.75rem;
+        padding: 0.2rem 0.7rem;
+        border: 1px solid var(--publication-border);
+        border-radius: 999px;
+        background: var(--publication-pill-bg);
+        color: var(--publication-accent);
+        font-size: 0.78rem;
+        font-weight: 500;
+        line-height: 1.5;
       }
 
       > .row {
@@ -155,9 +186,9 @@
       }
 
       .title {
-        margin-bottom: 0.32rem;
-        color: var(--global-text-color);
-        font-size: 0.95rem;
+        margin-bottom: 0.5rem;
+        color: var(--publication-title);
+        font-size: 1rem;
         font-weight: 700;
         line-height: 1.45;
         letter-spacing: 0;
@@ -165,17 +196,35 @@
 
       .author,
       .periodical {
-        color: var(--global-text-color-light);
-        font-size: 0.84rem;
+        color: var(--publication-author);
+        font-size: 0.88rem;
         line-height: 1.6;
       }
 
       .author {
-        margin-bottom: 0.16rem;
+        margin-bottom: 0.4rem;
+
+        strong {
+          color: var(--publication-title);
+          font-weight: 600;
+
+          u {
+            text-decoration: none;
+          }
+        }
       }
 
       .periodical {
         margin-bottom: 0.12rem;
+        color: var(--publication-muted);
+
+        em {
+          color: inherit;
+        }
+
+        &:empty {
+          display: none;
+        }
       }
 
       .author {
@@ -208,26 +257,32 @@
       .links {
         display: flex;
         flex-wrap: wrap;
-        gap: 0.35rem 0.45rem;
-        margin-top: 0.55rem;
+        gap: 0.4rem 0.45rem;
+        margin-top: 0.85rem;
 
         a.btn {
-          color: var(--global-text-color);
-          background: transparent;
-          border: 1px solid var(--global-divider-color);
+          display: inline-flex;
+          align-items: center;
+          gap: 0.35rem;
+          color: var(--publication-muted);
+          background: var(--publication-pill-bg);
+          border: 1px solid var(--publication-border);
           border-radius: 6px;
-          padding-left: 0.85rem;
-          padding-right: 0.85rem;
-          padding-top: 0.25rem;
-          padding-bottom: 0.25rem;
+          padding-left: 0.7rem;
+          padding-right: 0.7rem;
+          padding-top: 0.28rem;
+          padding-bottom: 0.28rem;
           margin-left: 0;
           margin-top: 0;
-          font-size: 0.72rem;
+          font-size: 0.76rem;
+          font-weight: 500;
+          text-transform: none;
 
-          &:hover {
-            background: var(--global-subtle-bg-color);
-            color: var(--global-theme-color);
-            border-color: var(--global-theme-color);
+          &:hover,
+          &:focus-visible {
+            background: var(--publication-bg);
+            color: var(--publication-accent);
+            border-color: var(--publication-accent);
           }
         }
         a.award.btn {
@@ -322,6 +377,13 @@
   .publications {
     ol.bibliography {
       li {
+        padding: 1.1rem;
+        border-radius: 12px;
+
+        .title {
+          font-size: 0.95rem;
+        }
+
         > .row {
           display: block;
         }
@@ -337,5 +399,88 @@
         }
       }
     }
+  }
+}
+
+// BibTeX drop-down: match the card's warm palette instead of the code theme.
+.publications .bibtex.hidden {
+  text-align: left;
+
+  &.open {
+    margin-top: 0.75rem;
+  }
+
+  figure.highlight,
+  div.highlight {
+    margin: 0;
+  }
+
+  pre {
+    margin: 0;
+    padding: 0.85rem 1rem !important;
+    font-size: 0.78rem !important;
+    line-height: 1.6 !important;
+    white-space: pre-wrap;
+    word-break: break-word;
+    color: var(--publication-muted) !important;
+    background: var(--publication-pill-bg) !important;
+    border: 1px solid var(--publication-border);
+    border-radius: 10px;
+  }
+
+  pre,
+  pre code,
+  pre span {
+    background: transparent;
+    font-style: normal;
+    font-weight: 400;
+    color: var(--publication-muted) !important;
+  }
+
+  // Entry type and field names pick up the accent; everything else stays muted.
+  pre .k,
+  pre .nc,
+  pre .na,
+  pre .nv {
+    color: var(--publication-accent) !important;
+  }
+
+  pre .nl {
+    color: var(--publication-title) !important;
+    font-weight: 500;
+  }
+}
+
+// Copy button inside the BibTeX box: quiet outline icon that appears on hover.
+.publications .bibtex.hidden .code-display-wrapper {
+  position: relative;
+
+  .copy {
+    top: 0.5rem;
+    right: 0.5rem;
+    width: 2rem;
+    height: 2rem;
+    display: grid;
+    place-items: center;
+    padding: 0;
+    font-size: 0.85rem;
+    color: var(--publication-muted);
+    background: var(--publication-bg);
+    border: 1px solid var(--publication-border);
+    border-radius: 8px;
+    transition:
+      opacity 0.15s ease,
+      color 0.15s ease,
+      border-color 0.15s ease;
+  }
+
+  &:hover .copy,
+  .copy:focus-visible {
+    opacity: 1;
+  }
+
+  .copy:hover {
+    color: var(--publication-accent);
+    border-color: var(--publication-hover-border);
   }
 }

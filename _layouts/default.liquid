@@ -22,6 +22,7 @@
 
   <!-- Body -->
   <body class="{% if site.navbar_fixed %}fixed-top-nav{% endif %} {% unless site.footer_fixed %}sticky-bottom-footer{% endunless %}">
+    <canvas id="ambient-field" class="ambient-field" aria-hidden="true"></canvas>
     <!-- Header -->
     {% include header.liquid %}
 
@@ -57,5 +58,6 @@
 
     <!-- JavaScripts -->
     {% include scripts.liquid %}
+    <script defer src="{{ '/assets/js/ambient-field.js' | relative_url | bust_file_cache }}" type="text/javascript"></script>
   </body>
 </html>

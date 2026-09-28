@@ -5,6 +5,7 @@
 @use "variables" as v;
 
 body {
+  isolation: isolate;
   padding-bottom: 70px;
   color: var(--global-text-color);
   background-color: var(--global-bg-color);
@@ -19,6 +20,23 @@ body {
   h5,
   h6 {
     scroll-margin-top: 66px;
+  }
+}
+
+// Canvas backdrop drawn by assets/js/ambient-field.js: a faint lattice of dots
+// with slow activation waves, dimmed behind the text column.
+.ambient-field {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  pointer-events: none;
+}
+
+@media print {
+  .ambient-field {
+    display: none;
   }
 }
 

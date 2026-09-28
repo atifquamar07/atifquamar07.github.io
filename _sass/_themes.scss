@@ -6,7 +6,7 @@
 
 :root {
   color-scheme: light;
-  --global-bg-color: #ffffff;
+  --global-bg-color: #faf9f5;
   --global-code-bg-color: #{v.$code-bg-color-light};
   --global-text-color: #1f2328;
   --global-text-color-light: #656d76;
@@ -14,7 +14,7 @@
   --global-theme-text-color: #{v.$white-color};
   --global-hover-color: #8f570f;
   --global-hover-text-color: #{v.$white-color};
-  --global-header-bg-color: rgba(255, 255, 255, 0.95);
+  --global-header-bg-color: rgba(250, 249, 245, 0.95);
   --global-footer-bg-color: #{v.$grey-color-dark};
   --global-footer-text-color: #{v.$grey-color-light};
   --global-footer-link-color: #{v.$white-color};
@@ -28,6 +28,16 @@
   --global-shadow-color: rgba(31, 35, 40, 0.04);
   --global-shadow-color-strong: rgba(31, 35, 40, 0.12);
   --global-highlight-color: #{v.$red-color-dark};
+
+  --publication-bg: #ffffff;
+  --publication-border: #e6d8cf;
+  --publication-title: #211a15;
+  --publication-muted: #826b5e;
+  --publication-author: #8a7568;
+  --publication-pill-bg: #f8f4f1;
+  --publication-accent: #79432f;
+  --publication-hover-border: #d8b8a9;
+
   --global-back-to-top-bg-color: rgba(
     #{color.channel(v.$black-color, "red", v.$space: rgb)},
     #{color.channel(v.$black-color, "green", v.$space: rgb)},
@@ -102,6 +112,16 @@ html[data-theme="dark"] {
   --global-shadow-color: rgba(0, 0, 0, 0.2);
   --global-shadow-color-strong: rgba(0, 0, 0, 0.28);
   --global-highlight-color: #f85149;
+
+  --publication-bg: #161b22;
+  --publication-border: #3d3936;
+  --publication-title: #e6edf3;
+  --publication-muted: #c1afa2;
+  --publication-author: #b5a79d;
+  --publication-pill-bg: #252321;
+  --publication-accent: #ddb393;
+  --publication-hover-border: #826b5e;
+
   --global-back-to-top-bg-color: rgba(
     #{color.channel(v.$white-color, "red", v.$space: rgb)},
     #{color.channel(v.$white-color, "green", v.$space: rgb)},

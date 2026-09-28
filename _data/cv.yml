@@ -77,10 +77,10 @@ cv:
       - name: Research
         icon: fa-solid fa-tag
         keywords:
-          - Multimodal Reasoning
-          - Efficient Training
-          - AI Alignment and Safety
-          - Reinforcement Learning
+          - Machine Reasoning
+          - Training Dynamics
+          - Mechanistic Interpretability
+          - AI Safety
 
     Publications:
       - title: "Reliable Chain-of-Thought via Prefix Consistency"
