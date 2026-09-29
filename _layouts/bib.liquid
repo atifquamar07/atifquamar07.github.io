@@ -241,7 +241,9 @@
         </a>
       {% endif %}
       {% if entry.website %}
-        <a href="{{ entry.website }}" class="btn btn-sm z-depth-0" role="button"><i class="fa-solid fa-globe" aria-hidden="true"></i> Project</a>
+        <a href="{{ entry.website }}" class="btn btn-sm z-depth-0" role="button" rel="external nofollow noopener" target="_blank"
+          ><i class="fa-solid fa-globe" aria-hidden="true"></i> Project</a
+        >
       {% endif %}
       {% if entry.doi %}
         <a href="https://doi.org/{{ entry.doi }}" class="btn btn-sm z-depth-0" role="button">DOI</a>
