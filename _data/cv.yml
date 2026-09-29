@@ -93,6 +93,16 @@ cv:
         releaseDate: 2026-05-11
         url: https://arxiv.org/abs/2605.07654
 
+      - title: "Self-Adapting Group of Experts for Multi-Agent Reasoning"
+        authors:
+          - M. Atif Quamar
+          - N. Tastan
+          - K. Nandakumar
+          - J. Komiyama
+        publisher: Under Review
+        releaseDate: 2026-09-29
+        url: https://arxiv.org/abs/2609.35412
+
       - title: "Adaptive Blockwise Search: Inference-Time Alignment for Large Language Models"
         authors:
           - M. Atif Quamar
