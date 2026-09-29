@@ -127,7 +127,7 @@ cv:
           - Z. Berkay Celik
         publisher: ICML 2026 - Structured Probabilistic Inference & Generative Modeling Workshop
         releaseDate: 2026-05-30
-        url: https://arxiv.org/abs/2511.03827
+        url: https://openreview.net/pdf?id=M3BAEZGcnu
         equal_contribution: "Quamar; Areeb"
 
       - title: "Logit-Entropy Adaptive Stopping Heuristic for Efficient Chain-of-Thought Reasoning"
