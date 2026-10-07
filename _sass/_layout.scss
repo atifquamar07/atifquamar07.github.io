@@ -23,8 +23,8 @@ body {
   }
 }
 
-// Canvas backdrop drawn by assets/js/ambient-field.js: a faint lattice of dots
-// with slow activation waves, dimmed behind the text column.
+// Canvas backdrop drawn by assets/js/ambient-field.js: a faint node mesh with
+// signals flooding outward along its edges, dimmed behind the text column.
 .ambient-field {
   position: fixed;
   inset: 0;

@@ -56,13 +56,19 @@
 
         {% if pub_date != '' %}
           <div class="col-xs-2 col-sm-2 col-md-2 text-center">
-            <table class="table-cv">
+            <table class="table-cv{% if entry.venue %} table-cv-venue{% endif %}">
               <tbody>
                 <tr>
                   <td>
-                    <span class="badge font-weight-bold danger-color-dark text-uppercase align-middle" style="min-width: 75px">
-                      {{- pub_date | split: '-' | slice: 0, 1 | join: '' -}}
-                    </span>
+                    {% if entry.venue %}
+                      <span class="badge font-weight-bold danger-color-dark align-middle">
+                        {{- entry.venue -}}
+                      </span>
+                    {% else %}
+                      <span class="badge font-weight-bold danger-color-dark text-uppercase align-middle" style="min-width: 75px">
+                        {{- pub_date | split: '-' | slice: 0, 1 | join: '' -}}
+                      </span>
+                    {% endif %}
                   </td>
                 </tr>
               </tbody>

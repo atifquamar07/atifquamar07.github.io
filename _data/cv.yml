@@ -4,7 +4,7 @@ cv:
   email: mohammad.atif@mbzuai.ac.ae
   website: https://www.atifquamar.com
   image: assets/img/atif_quamar_profile.jpg
-  summary: I’m interested in reasoning and training in foundation models, particularly in understanding how reasoning abilities emerge and evolve through training. My interests span pretraining and post-training dynamics, test-time reasoning, multi-agent systems, and alignment, with a broader focus on making foundation models more capable, robust, and trustworthy.
+  summary: My research spans pretraining and post-training dynamics, test-time reasoning, multi-agent systems, and alignment. I'm particularly interested in understanding how reasoning abilities emerge and evolve through training, with the broader goal of building models that are more capable, robust, and trustworthy.
 
   social_networks:
     - network: Google Scholar
@@ -89,7 +89,8 @@ cv:
           - Y. Ichihara
           - M. Atif Quamar
           - J. Komiyama
-        publisher: Advances in Neural Information Processing Systems (NeurIPS) 2026
+        publisher: NeurIPS 2026 - Main Track
+        venue: NeurIPS 2026
         releaseDate: 2026-05-11
         url: https://arxiv.org/abs/2605.07654
 
@@ -100,6 +101,7 @@ cv:
           - K. Nandakumar
           - J. Komiyama
         publisher: Under Review
+        venue: Preprint
         releaseDate: 2026-09-29
         url: https://arxiv.org/abs/2609.35412
 
@@ -114,6 +116,7 @@ cv:
           - M. Ozgur Ozmen
           - Z. Berkay Celik
         publisher: Under Review
+        venue: Preprint
         releaseDate: 2025-10-05
         url: https://arxiv.org/abs/2510.23334
         equal_contribution: "Quamar; Areeb"
@@ -126,6 +129,7 @@ cv:
           - M. Ozgur Ozmen
           - Z. Berkay Celik
         publisher: ICML 2026 - Structured Probabilistic Inference & Generative Modeling Workshop
+        venue: ICML-W 2026
         releaseDate: 2026-05-30
         url: https://openreview.net/pdf?id=M3BAEZGcnu
         equal_contribution: "Quamar; Areeb"
@@ -135,6 +139,7 @@ cv:
           - M. Atif Quamar
           - M. Areeb
         publisher: NeurIPS 2025 - Efficient Reasoning Workshop
+        venue: NeurIPS-W 2025
         releaseDate: 2025-09-28
         url: https://arxiv.org/abs/2511.04654
 
@@ -145,6 +150,7 @@ cv:
           - M. Atif Quamar
           - J. Komiyama
         publisher: Under Review
+        venue: Preprint
         releaseDate: 2026-08-10
         url: https://arxiv.org/abs/2608.09228
 
@@ -155,6 +161,7 @@ cv:
           - M. Atif Quamar
           - J. Komiyama
         publisher: Under Review
+        venue: Preprint
         releaseDate: 2026-08-26
         url: https://arxiv.org/abs/2608.25311
 
@@ -169,6 +176,7 @@ cv:
           - Z. Hu
           - B. Huang
         publisher: Under Review
+        venue: Preprint
         releaseDate: 2025-09-30
         url: https://www.arxiv.org/abs/2602.00574
 
@@ -178,5 +186,6 @@ cv:
           - M. Atif Quamar
           - P. Xie
         publisher: NeurIPS 2025 - FM4LS Workshop
+        venue: NeurIPS-W 2025
         releaseDate: 2025-09-27
         url: https://openreview.net/forum?id=SIVkGvPDuM

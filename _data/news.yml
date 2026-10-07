@@ -1,0 +1,39 @@
+# News shown on the homepage, newest first. To add news, put a new entry at the
+# top. `text` is Markdown: **bold**, [link](https://...), emoji like :tada:.
+# Quote the text if it starts with [ or contains ": ".
+
+- date: 2026-09-29
+  text: Our new work on [Self-Adaptive Multi Agent Systems](https://arxiv.org/abs/2609.35412) is now up on arXiv!
+
+- date: 2026-09-27
+  text: Our work on [Prefix-Consistency](https://arxiv.org/abs/2605.07654) was accepted to **NeurIPS 2026**!
+
+- date: 2026-09-01
+  text: Attended the [ELLIS Summer School](https://www.ellismunich.ai/summer-school/index.html) at **TU Munich, Germany**!
+
+- date: 2026-08-29
+  text: Our new work on [Prefix-Denoising Consistency](https://arxiv.org/abs/2608.25311) is now up on arXiv!
+
+- date: 2026-08-01
+  text: Started **MSc in Machine Learning** at [MBZUAI](https://mbzuai.ac.ae)!
+
+- date: 2026-08-01
+  text: Our new work on [On-Policy Self-Distillation](https://arxiv.org/abs/2608.09228) is now up on arXiv!
+
+- date: 2026-05-23
+  text: "[STARS](https://openreview.net/forum?id=M3BAEZGcnu) was accepted at the SPIGM Workshop at **ICML 2026**!"
+
+- date: 2026-05-01
+  text: Our new work on [Prefix-Consistency](https://arxiv.org/abs/2605.07654) is now up on arXiv!
+
+- date: 2026-02-01
+  text: Joined [MBZUAI](https://mbzuai.ac.ae) as a **Visiting Researcher** to work on reasoning in language models!
+
+- date: 2025-10-02
+  text: Served on the **Program Committee** for **NeurIPS 2025** Workshops!
+
+- date: 2025-10-01
+  text: Two papers accepted at **NeurIPS** workshops — [Efficient Reasoning](https://efficient-reasoning.github.io/) and [FM4LS](https://nips2025fm4ls.github.io/index.html)!
+
+- date: 2025-08-01
+  text: Served on the **Program Committee** for **AAAI 2026**!

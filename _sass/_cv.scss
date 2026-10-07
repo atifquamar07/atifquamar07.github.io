@@ -250,6 +250,15 @@ table.table-cv {
     border-color: var(--global-divider-color);
     padding: 1px;
   }
+
+  // Publication venue badges share one width and sit centred in their column.
+  &.table-cv-venue {
+    margin: 0 auto;
+
+    .badge {
+      min-width: 7.5rem;
+    }
+  }
 }
 
 a.btncv {
