@@ -92,6 +92,14 @@ layout: default
                       </a>
                     </li>
                   {% endif %}
+                  {% if page.profile.show_social_links and site.data.socials.orcid_id %}
+                    <li>
+                      <a href="https://orcid.org/{{ site.data.socials.orcid_id }}" title="ORCID">
+                        <i class="fa-brands fa-orcid" aria-hidden="true"></i>
+                        <span class="sr-only">ORCID</span>
+                      </a>
+                    </li>
+                  {% endif %}
                 </ul>
               </nav>
             {% endif %}
