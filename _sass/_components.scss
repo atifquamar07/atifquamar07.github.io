@@ -276,7 +276,13 @@ ul.task-list input[type="checkbox"] {
   }
 
   .profile-socials {
+    max-width: 13.5rem;
     margin-top: 1.4rem;
+
+    .profile-list {
+      justify-content: space-between;
+      gap: 0.5rem 0;
+    }
   }
 
   .profile-focus {
@@ -576,7 +582,13 @@ ul.task-list input[type="checkbox"] {
     }
 
     .profile-socials {
+      max-width: none;
       margin-top: 0.8rem;
+
+      .profile-list {
+        justify-content: flex-start;
+        gap: 0.5rem;
+      }
     }
 
     .profile-focus {
