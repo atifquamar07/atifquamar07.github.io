@@ -1,7 +1,9 @@
 // Ambient "message passing" backdrop: a faint proximity mesh laid over the whole
 // page. Every so often a node fires and its signal floods outward along a random
 // spanning tree of edges, hop by hop, fading with distance (think BFS / message
-// passing on a graph). Clicking empty space fires the nearest node.
+// passing on a graph). Clicking empty space fires the nearest node. A few
+// faint "comets" glide at all times in long straight lines between distant
+// nodes, trailing a fading tail; they stay in the side gutters, off the text.
 // The mesh scrolls with the page at a slower rate, is dimmed behind the main text
 // column, respects prefers-reduced-motion, pauses when the tab is hidden, and
 // follows the site's light/dark theme.
@@ -17,8 +19,8 @@
   var reduce = motion ? motion.matches : false;
 
   var PALETTE = {
-    light: { rgb: "168, 100, 21", edge: 0.035, node: 0.075, lit: 0.16, head: 0.24 },
-    dark: { rgb: "221, 179, 147", edge: 0.028, node: 0.06, lit: 0.13, head: 0.2 },
+    light: { rgb: "168, 100, 21", edge: 0.035, node: 0.075, lit: 0.16, head: 0.24, comet: 0.34 },
+    dark: { rgb: "221, 179, 147", edge: 0.028, node: 0.06, lit: 0.13, head: 0.2, comet: 0.3 },
   };
   var TEXT_DIM = 0.3; // opacity multiplier for marks behind the text column
   var FRAME_MS = 1000 / 30; // ~30fps is plenty for motion this slow
@@ -30,6 +32,12 @@
   var BRANCH = 0.45; // chance a signal forwards along each outgoing edge
   var DECAY = 0.7; // per-hop strength falloff
   var MAX_NODES = 520;
+  var COMET_SPEED = 30; // px per second
+  var COMET_TAIL = 170; // tail length in px
+  var COMET_MIN_LEN = 260; // length range of a comet's straight path
+  var COMET_MAX_LEN = 460;
+  var COMET_FADE_IN = 1500;
+  var GUTTER_MIN = 140; // narrower side gutters than this get no comets
 
   var W = 0,
     VH = 0,
@@ -38,12 +46,14 @@
   var nodes = []; // { bx, by, ph, x, y, adj: [node index] }
   var edges = []; // [a, b]
   var waves = []; // { t0, src, lit: [{ a, b, d }] }
+  var comets = []; // { a, b, born, x, len, d } — flies from node a to node b
   var colLeft = 0,
     colRight = 0;
   var colors = PALETTE.light;
   var raf = null,
     lastDraw = 0,
-    lastWave = 0;
+    lastWave = 0,
+    nextComet = 0;
 
   function theme() {
     colors = root.getAttribute("data-theme") === "dark" ? PALETTE.dark : PALETTE.light;
@@ -98,6 +108,7 @@
     nodes = [];
     edges = [];
     waves = [];
+    comets = [];
     var grid = [];
     for (var j = 0; j < rows; j++) {
       grid.push([]);
@@ -201,6 +212,132 @@
     return -1;
   }
 
+  function gutters() {
+    var g = [];
+    if (colLeft >= GUTTER_MIN) g.push([0, colLeft]);
+    if (W - colRight >= GUTTER_MIN) g.push([colRight, W]);
+    return g;
+  }
+
+  // Two per gutter on wide screens; a single one roaming the page otherwise.
+  function maxComets() {
+    var g = gutters().length;
+    return g ? g * 2 : 1;
+  }
+
+  function inSpan(p, span, off) {
+    return p.bx > span[0] + 20 && p.bx < span[1] - 30 && p.by > off - 40 && p.by < off + VH + 40;
+  }
+
+  // A comet flies in a straight line between two distant nodes of the same gutter
+  // (the gutter with the fewest comets), so it reads as a long streak, not a hop.
+  function spawnComet(ts) {
+    var off = scrollOffset();
+    var g = gutters();
+    var span = [0, W];
+    if (g.length) {
+      var count = g.map(function () {
+        return 0;
+      });
+      for (var i = 0; i < comets.length; i++) {
+        for (var j = 0; j < g.length; j++) if (comets[i].x >= g[j][0] && comets[i].x < g[j][1]) count[j]++;
+      }
+      span = g[count.indexOf(Math.min.apply(null, count))];
+    }
+    var src = -1;
+    for (var tries = 0; tries < 40 && src < 0; tries++) {
+      var n = Math.floor(Math.random() * nodes.length);
+      if (nodes[n] && inSpan(nodes[n], span, off)) src = n;
+    }
+    if (src < 0) return;
+    var S = nodes[src],
+      far = [];
+    for (var m = 0; m < nodes.length; m++) {
+      var dx = nodes[m].bx - S.bx,
+        dy = nodes[m].by - S.by;
+      var d = Math.sqrt(dx * dx + dy * dy);
+      if (d >= COMET_MIN_LEN && d <= COMET_MAX_LEN && inSpan(nodes[m], span, off)) far.push(m);
+    }
+    if (!far.length) return;
+    comets.push({ a: src, b: far[Math.floor(Math.random() * far.length)], born: ts, x: S.bx });
+  }
+
+  // Head position along each comet's line; a comet retires once its tail has
+  // caught up with the far node.
+  function updateComets(ts, flash) {
+    for (var i = comets.length - 1; i >= 0; i--) {
+      var cm = comets[i];
+      var A = nodes[cm.a],
+        B = nodes[cm.b];
+      var dx = B.x - A.x,
+        dy = B.y - A.y;
+      cm.len = Math.sqrt(dx * dx + dy * dy) || 1;
+      cm.d = ((ts - cm.born) / 1000) * COMET_SPEED;
+      if (cm.d > cm.len + COMET_TAIL) {
+        comets.splice(i, 1);
+        continue;
+      }
+      cm.x = A.x + (dx * Math.min(cm.d, cm.len)) / cm.len;
+      if (cm.d > cm.len) flash[cm.b] = Math.max(flash[cm.b] || 0, 0.6 * (1 - (cm.d - cm.len) / COMET_TAIL));
+    }
+  }
+
+  // Each comet: a faint full-length track, a tapering gradient tail, a soft head.
+  function drawComets(ts) {
+    var c = colors;
+    ctx.lineCap = "round";
+    for (var i = 0; i < comets.length; i++) {
+      var cm = comets[i];
+      var A = nodes[cm.a],
+        B = nodes[cm.b];
+      var ux = (B.x - A.x) / cm.len,
+        uy = (B.y - A.y) / cm.len;
+      var env = Math.min(1, (ts - cm.born) / COMET_FADE_IN, (cm.len + COMET_TAIL - cm.d) / COMET_TAIL);
+      var dim = dimAt((A.x + B.x) / 2);
+      var head = Math.min(cm.d, cm.len),
+        tail = Math.max(0, cm.d - COMET_TAIL);
+      var hx = A.x + ux * head,
+        hy = A.y + uy * head;
+
+      ctx.globalAlpha = c.edge * 2.2 * env * dim;
+      ctx.strokeStyle = "rgb(" + c.rgb + ")";
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(A.x, A.y);
+      ctx.lineTo(B.x, B.y);
+      ctx.stroke();
+
+      if (head - tail > 1) {
+        var tx = A.x + ux * tail,
+          ty = A.y + uy * tail;
+        // Fade toward the tail end in proportion to how much of a full tail is drawn.
+        var g = ctx.createLinearGradient(hx - ux * COMET_TAIL, hy - uy * COMET_TAIL, hx, hy);
+        g.addColorStop(0, "rgba(" + c.rgb + ",0)");
+        g.addColorStop(1, "rgba(" + c.rgb + "," + c.comet * env * dim + ")");
+        ctx.globalAlpha = 1;
+        ctx.strokeStyle = g;
+        ctx.lineWidth = 1.3;
+        ctx.beginPath();
+        ctx.moveTo(tx, ty);
+        ctx.lineTo(hx, hy);
+        ctx.stroke();
+      }
+
+      if (cm.d < cm.len) {
+        var rg = ctx.createRadialGradient(hx, hy, 0, hx, hy, 5);
+        rg.addColorStop(0, "rgba(" + c.rgb + "," + c.comet * 1.2 * env * dim + ")");
+        rg.addColorStop(1, "rgba(" + c.rgb + ",0)");
+        ctx.globalAlpha = 1;
+        ctx.fillStyle = rg;
+        ctx.beginPath();
+        ctx.arc(hx, hy, 5, 0, 6.2832);
+        ctx.fill();
+      }
+    }
+    ctx.lineCap = "butt";
+    ctx.globalAlpha = 1;
+  }
+
   function draw(ts) {
     var s = ts / 1000;
     var c = colors;
@@ -265,7 +402,9 @@
       }
     }
 
-    // Nodes, swelling briefly when a signal reaches them.
+    if (!reduce) updateComets(ts, flash);
+
+    // Nodes, swelling briefly when a signal or comet reaches them.
     for (n = 0; n < nodes.length; n++) {
       p = nodes[n];
       if (p.by < top || p.by > bot) continue;
@@ -290,6 +429,8 @@
       ctx.fill();
     }
     ctx.globalAlpha = 1;
+
+    if (!reduce) drawComets(ts);
   }
 
   function frame(ts) {
@@ -304,6 +445,10 @@
     if (ts - lastWave > 4000 && waves.length < 1) {
       lastWave = ts;
       if (Math.random() < 0.6) fire(randomVisibleNode(scrollOffset()), ts, MAX_HOPS);
+    }
+    if (comets.length < maxComets() && ts >= nextComet) {
+      spawnComet(ts);
+      nextComet = ts + 1200 + Math.random() * 2400; // stagger so they never move in lockstep
     }
     draw(ts);
   }
