@@ -1,9 +1,13 @@
-// Ambient "message passing" backdrop: a faint proximity mesh laid over the whole
-// page. Every so often a node fires and its signal floods outward along a random
-// spanning tree of edges, hop by hop, fading with distance (think BFS / message
-// passing on a graph). Clicking empty space fires the nearest node. A few
-// faint "comets" glide at all times in long straight lines between distant
-// nodes, trailing a fading tail; they stay in the side gutters, off the text.
+// Ambient "message passing" backdrop: a faint planar mesh laid over the whole
+// page (a Delaunay triangulation of evenly spread points, with some triangle
+// pairs merged into quads so the polygons vary in size without edges crossing).
+// Every so often a node fires and its signal floods outward along a random
+// spanning tree of edges at a steady speed, fading with distance (think BFS /
+// message passing on a graph). Clicking empty space fires the nearest node
+// through the same flood, easing in and out so it blends with the ambient
+// motion instead of interrupting it. Now and then a faint "comet" glides in a
+// long straight line between two nodes, trailing a fading tail; where it
+// starts, which way it heads, how far, how fast and how bright are all random.
 // The mesh scrolls with the page at a slower rate, is dimmed behind the main text
 // column, respects prefers-reduced-motion, pauses when the tab is hidden, and
 // follows the site's light/dark theme.
@@ -19,41 +23,48 @@
   var reduce = motion ? motion.matches : false;
 
   var PALETTE = {
-    light: { rgb: "168, 100, 21", edge: 0.035, node: 0.075, lit: 0.16, head: 0.24, comet: 0.34 },
-    dark: { rgb: "221, 179, 147", edge: 0.028, node: 0.06, lit: 0.13, head: 0.2, comet: 0.3 },
+    light: { rgb: "168, 100, 21", edge: 0.035, node: 0.075, lit: 0.16, head: 0.24, comet: 0.24 },
+    dark: { rgb: "221, 179, 147", edge: 0.028, node: 0.06, lit: 0.13, head: 0.2, comet: 0.2 },
   };
   var TEXT_DIM = 0.3; // opacity multiplier for marks behind the text column
-  var FRAME_MS = 1000 / 30; // ~30fps is plenty for motion this slow
+  var FRAME_MS = 1000 / 30; // ~30fps is plenty while only the slow drift runs
+  var FRAME_MS_ACTIVE = 1000 / 60; // full rate while a signal is travelling
   var PARALLAX = 0.35; // mesh scrolls at 35% of page speed
-  var HOP_MS = 700; // time for a signal to cross one edge
-  var FADE_MS = 1300; // how long a traversed edge keeps glowing
+  var SPACING = 96; // minimum distance between mesh nodes, px
+  var MERGE = 0.6; // chance a triangle pair sharing a longest edge becomes a quad
+  var SIGNAL_SPEED = 130; // px per second a signal travels along an edge
+  var ATTACK_MS = 320; // floods ease in rather than popping on
+  var FADE_MS = 1600; // how long a traversed edge / reached node keeps glowing
+  var RETIRE_MS = 700; // a flood cut short by newer clicks fades out over this
   var MAX_HOPS = 4;
-  var CLICK_HOPS = 2;
+  var CLICK_HOPS = 3;
+  var MAX_WAVES = 3; // live floods at once; the oldest retires beyond this
   var BRANCH = 0.45; // chance a signal forwards along each outgoing edge
   var DECAY = 0.7; // per-hop strength falloff
   var MAX_NODES = 520;
-  var COMET_SPEED = 30; // px per second
-  var COMET_TAIL = 170; // tail length in px
-  var COMET_MIN_LEN = 260; // length range of a comet's straight path
-  var COMET_MAX_LEN = 460;
+  var COMET_SPEED = 38; // typical px per second; each comet varies around these
+  var COMET_TAIL = 380; // typical tail length in px
+  var COMET_MIN_LEN = 320; // length range of a comet's straight path
+  var COMET_MAX_LEN = 820;
   var COMET_FADE_IN = 1500;
-  var GUTTER_MIN = 140; // narrower side gutters than this get no comets
+  var COMET_REST_MS = 7000; // typical pause before the next comet
 
   var W = 0,
     VH = 0,
     DOC = 0,
-    DPR = 1;
+    DPR = 1,
+    reach = SPACING;
   var nodes = []; // { bx, by, ph, x, y, adj: [node index] }
   var edges = []; // [a, b]
-  var waves = []; // { t0, src, lit: [{ a, b, d }] }
-  var comets = []; // { a, b, born, x, len, d } — flies from node a to node b
+  var waves = []; // { t0, src, lit: [{ a, b, at, dur, s }], kill, life }
+  var comets = []; // { a, b, born, speed, tail, glow, len, d } — flies from node a to node b
   var colLeft = 0,
     colRight = 0;
   var colors = PALETTE.light;
   var raf = null,
     lastDraw = 0,
     lastWave = 0,
-    nextComet = 0;
+    nextComet = 2500; // let the page settle before the first comet
 
   function theme() {
     colors = root.getAttribute("data-theme") === "dark" ? PALETTE.dark : PALETTE.light;
@@ -66,6 +77,12 @@
 
   function scrollOffset() {
     return (window.pageYOffset || root.scrollTop || 0) * PARALLAX;
+  }
+
+  // Smoothstep on [0, 1], clamped.
+  function ease(t) {
+    t = t < 0 ? 0 : t > 1 ? 1 : t;
+    return t * t * (3 - 2 * t);
   }
 
   // Opacity multiplier for an x position: smoothly lower inside the text column.
@@ -92,85 +109,203 @@
     if (reduce || !raf) draw(performance.now());
   }
 
-  // Jittered grid of nodes covering the span the mesh needs under parallax, each
-  // linked to its (up to) three nearest neighbours.
-  function build() {
-    var span = VH + PARALLAX * Math.max(0, DOC - VH);
-    var gap = W < 768 ? 78 : 64;
-    var cols = Math.ceil(W / gap) + 1;
-    var rows = Math.ceil(span / gap) + 1;
-    if (cols * rows > MAX_NODES) {
-      gap *= Math.sqrt((cols * rows) / MAX_NODES);
-      cols = Math.ceil(W / gap) + 1;
-      rows = Math.ceil(span / gap) + 1;
+  // Bridson's Poisson-disc sampling: evenly spread points, none closer than r.
+  function poisson(x0, y0, w, h, r) {
+    var cell = r / Math.SQRT2,
+      gw = Math.ceil(w / cell),
+      gh = Math.ceil(h / cell);
+    var grid = new Array(gw * gh),
+      pts = [],
+      active = [];
+
+    function place(x, y) {
+      grid[Math.floor((y - y0) / cell) * gw + Math.floor((x - x0) / cell)] = pts.length;
+      active.push(pts.length);
+      pts.push({ x: x, y: y });
     }
 
+    function free(x, y) {
+      var gx = Math.floor((x - x0) / cell),
+        gy = Math.floor((y - y0) / cell);
+      for (var j = Math.max(0, gy - 2); j <= Math.min(gh - 1, gy + 2); j++) {
+        for (var i = Math.max(0, gx - 2); i <= Math.min(gw - 1, gx + 2); i++) {
+          var q = grid[j * gw + i];
+          if (q === undefined) continue;
+          var dx = pts[q].x - x,
+            dy = pts[q].y - y;
+          if (dx * dx + dy * dy < r * r) return false;
+        }
+      }
+      return true;
+    }
+
+    place(x0 + Math.random() * w, y0 + Math.random() * h);
+    while (active.length) {
+      var ai = Math.floor(Math.random() * active.length),
+        p = pts[active[ai]],
+        ok = false;
+      for (var t = 0; t < 30 && !ok; t++) {
+        var ang = Math.random() * 6.2832,
+          rad = r * (1 + Math.random());
+        var x = p.x + Math.cos(ang) * rad,
+          y = p.y + Math.sin(ang) * rad;
+        if (x >= x0 && x < x0 + w && y >= y0 && y < y0 + h && free(x, y)) {
+          place(x, y);
+          ok = true;
+        }
+      }
+      if (!ok) {
+        active[ai] = active[active.length - 1];
+        active.pop();
+      }
+    }
+    return pts;
+  }
+
+  // Bowyer–Watson Delaunay triangulation; returns [i, j, k] index triples.
+  function triangulate(pts) {
+    var n = pts.length;
+    if (n < 3) return [];
+    var minX = Infinity,
+      minY = Infinity,
+      maxX = -Infinity,
+      maxY = -Infinity;
+    for (var i = 0; i < n; i++) {
+      minX = Math.min(minX, pts[i].x);
+      minY = Math.min(minY, pts[i].y);
+      maxX = Math.max(maxX, pts[i].x);
+      maxY = Math.max(maxY, pts[i].y);
+    }
+    var d = Math.max(maxX - minX, maxY - minY),
+      mx = (minX + maxX) / 2,
+      my = (minY + maxY) / 2;
+    var P = pts.concat([
+      { x: mx - 20 * d, y: my - d },
+      { x: mx, y: my + 20 * d },
+      { x: mx + 20 * d, y: my - d },
+    ]);
+
+    function tri(a, b, c) {
+      var A = P[a];
+      var bx = P[b].x - A.x,
+        by = P[b].y - A.y,
+        cx = P[c].x - A.x,
+        cy = P[c].y - A.y;
+      var D = 2 * (bx * cy - by * cx) || 1e-9;
+      var b2 = bx * bx + by * by,
+        c2 = cx * cx + cy * cy;
+      var ux = (cy * b2 - by * c2) / D,
+        uy = (bx * c2 - cx * b2) / D;
+      return { v: [a, b, c], x: A.x + ux, y: A.y + uy, r2: ux * ux + uy * uy };
+    }
+
+    var tris = [tri(n, n + 1, n + 2)];
+    for (i = 0; i < n; i++) {
+      var p = P[i],
+        keep = [],
+        open = {};
+      for (var t = 0; t < tris.length; t++) {
+        var T = tris[t],
+          dx = p.x - T.x,
+          dy = p.y - T.y;
+        if (dx * dx + dy * dy >= T.r2) {
+          keep.push(T);
+          continue;
+        }
+        // Edges of the cavity's triangles; shared ones cancel out.
+        for (var s = 0; s < 3; s++) {
+          var a = T.v[s],
+            b = T.v[(s + 1) % 3];
+          var k = a < b ? a + "," + b : b + "," + a;
+          open[k] = open[k] ? 0 : [a, b];
+        }
+      }
+      for (k in open) if (open[k]) keep.push(tri(open[k][0], open[k][1], i));
+      tris = keep;
+    }
+
+    var out = [];
+    for (t = 0; t < tris.length; t++) {
+      var v = tris[t].v;
+      if (v[0] < n && v[1] < n && v[2] < n) out.push(v);
+    }
+    return out;
+  }
+
+  // Evenly spread nodes covering the span the mesh needs under parallax, joined
+  // by a Delaunay triangulation (planar: no crossing edges, no slivers). Some
+  // triangle pairs lose their shared long edge and become quads, which thins
+  // the line work and mixes polygon sizes.
+  function build() {
+    var span = VH + PARALLAX * Math.max(0, DOC - VH);
+    var r = W < 768 ? SPACING * 0.85 : SPACING;
+    // Poisson-disc packing lands ~0.7 points per r²; widen r on very long pages.
+    r = Math.max(r, Math.sqrt((0.7 * (W + 2 * r) * (span + 2 * r)) / MAX_NODES));
+    reach = r * 2;
+
+    var pts = poisson(-r, -r, W + 2 * r, span + 2 * r, r);
     nodes = [];
     edges = [];
     waves = [];
     comets = [];
-    var grid = [];
-    for (var j = 0; j < rows; j++) {
-      grid.push([]);
-      for (var i = 0; i < cols; i++) {
-        if (Math.random() < 0.1) {
-          grid[j].push(-1); // leave a few holes so the mesh looks organic
-          continue;
-        }
-        grid[j].push(nodes.length);
-        nodes.push({
-          bx: (i + 0.5 * (j % 2) - 0.25 + (Math.random() - 0.5) * 0.6) * gap,
-          by: (j + (Math.random() - 0.5) * 0.6) * gap,
-          ph: Math.random() * 6.2832,
-          x: 0,
-          y: 0,
-          adj: [],
-        });
-      }
+    for (var i = 0; i < pts.length; i++) {
+      nodes.push({ bx: pts[i].x, by: pts[i].y, ph: Math.random() * 6.2832, x: 0, y: 0, adj: [] });
     }
 
-    var seen = {};
-    var reach = gap * 1.75;
-    for (j = 0; j < rows; j++) {
-      for (i = 0; i < cols; i++) {
-        var a = grid[j][i];
-        if (a < 0) continue;
-        var near = [];
-        for (var dj = -2; dj <= 2; dj++) {
-          for (var di = -2; di <= 2; di++) {
-            var row = grid[j + dj];
-            var b = row ? row[i + di] : undefined;
-            if (b === undefined || b < 0 || b === a) continue;
-            var dx = nodes[a].bx - nodes[b].bx,
-              dy = nodes[a].by - nodes[b].by;
-            var d = Math.sqrt(dx * dx + dy * dy);
-            if (d < reach) near.push({ b: b, d: d });
-          }
+    var tris = triangulate(pts);
+    var byKey = {},
+      list = [],
+      deg = [];
+    for (var t = 0; t < tris.length; t++) {
+      var longest = null;
+      for (var s = 0; s < 3; s++) {
+        var a = Math.min(tris[t][s], tris[t][(s + 1) % 3]),
+          b = Math.max(tris[t][s], tris[t][(s + 1) % 3]);
+        var e = byKey[a + "," + b];
+        if (!e) {
+          var dx = pts[a].x - pts[b].x,
+            dy = pts[a].y - pts[b].y;
+          e = byKey[a + "," + b] = { a: a, b: b, len: Math.sqrt(dx * dx + dy * dy), tris: 0, longest: 0 };
+          list.push(e);
+          deg[a] = (deg[a] || 0) + 1;
+          deg[b] = (deg[b] || 0) + 1;
         }
-        near.sort(function (p, q) {
-          return p.d - q.d;
-        });
-        for (var n = 0; n < Math.min(3, near.length); n++) {
-          var lo = Math.min(a, near[n].b),
-            hi = Math.max(a, near[n].b);
-          if (seen[lo + "," + hi]) continue;
-          seen[lo + "," + hi] = true;
-          edges.push([lo, hi]);
-          nodes[lo].adj.push(hi);
-          nodes[hi].adj.push(lo);
-        }
+        e.tris++;
+        if (!longest || e.len > longest.len) longest = e;
       }
+      longest.longest++;
+    }
+
+    for (i = 0; i < list.length; i++) {
+      e = list[i];
+      // Long edges only occur along the hull, which sits just off-screen.
+      if (e.len > r * 2.5) continue;
+      // An edge that is the longest side of both its triangles is the diagonal
+      // of a well-shaped quad; each triangle has one longest side, so merges
+      // never chain into large concave shapes.
+      if (e.tris === 2 && e.longest === 2 && deg[e.a] > 3 && deg[e.b] > 3 && Math.random() < MERGE) {
+        deg[e.a]--;
+        deg[e.b]--;
+        continue;
+      }
+      edges.push([e.a, e.b]);
+      nodes[e.a].adj.push(e.b);
+      nodes[e.b].adj.push(e.a);
     }
   }
 
   // Randomised breadth-first flood from `src`: each reached node forwards the
   // signal along a random subset of its untouched edges, up to `maxHops` away.
+  // Signals move at a constant speed, so each edge's timing follows its length.
   function fire(src, ts, maxHops) {
     if (src < 0 || !nodes[src]) return;
-    var depth = {};
+    var depth = {},
+      at = {};
     depth[src] = 0;
+    at[src] = 0;
     var queue = [src],
-      lit = [];
+      lit = [],
+      end = 0;
     while (queue.length) {
       var n = queue.shift();
       if (depth[n] >= maxHops) continue;
@@ -181,12 +316,30 @@
         var m = adj[k];
         if (depth[m] !== undefined) continue;
         if (depth[n] > 0 && Math.random() > BRANCH) continue;
+        var dx = nodes[m].bx - nodes[n].bx,
+          dy = nodes[m].by - nodes[n].by;
+        var dur = (Math.sqrt(dx * dx + dy * dy) / SIGNAL_SPEED) * 1000;
         depth[m] = depth[n] + 1;
-        lit.push({ a: n, b: m, d: depth[n] });
+        at[m] = at[n] + dur;
+        end = Math.max(end, at[m]);
+        lit.push({ a: n, b: m, at: at[n], dur: dur, s: Math.pow(DECAY, depth[n]) });
         queue.push(m);
       }
     }
-    waves.push({ t0: ts, src: src, lit: lit });
+    waves.push({
+      t0: ts,
+      src: src,
+      lit: lit,
+      kill: 0,
+      life: end + FADE_MS,
+    });
+  }
+
+  // Overall opacity of a flood: eases in at birth, eases out once retired.
+  function waveEnv(wave, ts) {
+    var e = ease((ts - wave.t0) / ATTACK_MS);
+    if (wave.kill) e *= 1 - ease((ts - wave.kill) / RETIRE_MS);
+    return e;
   }
 
   function nearestNode(x, y, maxD) {
@@ -212,58 +365,53 @@
     return -1;
   }
 
-  function gutters() {
-    var g = [];
-    if (colLeft >= GUTTER_MIN) g.push([0, colLeft]);
-    if (W - colRight >= GUTTER_MIN) g.push([colRight, W]);
-    return g;
-  }
-
-  // Two per gutter on wide screens; a single one roaming the page otherwise.
+  // Two at most on wide screens, one on narrow ones.
   function maxComets() {
-    var g = gutters().length;
-    return g ? g * 2 : 1;
+    return W >= 1000 ? 2 : 1;
   }
 
-  function inSpan(p, span, off) {
-    return p.bx > span[0] + 20 && p.bx < span[1] - 30 && p.by > off - 40 && p.by < off + VH + 40;
+  // Wait a random while after a comet launches or retires, so they appear only
+  // now and then, never on a beat.
+  function restComets(ts) {
+    nextComet = Math.max(nextComet, ts + COMET_REST_MS * (0.6 + Math.random() * 1.4));
   }
 
-  // A comet flies in a straight line between two distant nodes of the same gutter
-  // (the gutter with the fewest comets), so it reads as a long streak, not a hop.
+  // A comet starts at a random node (in a side margin when there is room, so
+  // it is not born behind the text) and heads off at a random angle for a
+  // random distance, landing on whichever node lies there. Each one also gets
+  // its own speed, tail length and brightness, so no two look alike.
   function spawnComet(ts) {
     var off = scrollOffset();
-    var g = gutters();
-    var span = [0, W];
-    if (g.length) {
-      var count = g.map(function () {
-        return 0;
-      });
-      for (var i = 0; i < comets.length; i++) {
-        for (var j = 0; j < g.length; j++) if (comets[i].x >= g[j][0] && comets[i].x < g[j][1]) count[j]++;
-      }
-      span = g[count.indexOf(Math.min.apply(null, count))];
+    var margins = colLeft > 140 || W - colRight > 140;
+    function onScreen(p) {
+      return p.bx > -60 && p.bx < W + 60 && p.by > off - 60 && p.by < off + VH + 60;
     }
     var src = -1;
     for (var tries = 0; tries < 40 && src < 0; tries++) {
       var n = Math.floor(Math.random() * nodes.length);
-      if (nodes[n] && inSpan(nodes[n], span, off)) src = n;
+      if (nodes[n] && onScreen(nodes[n]) && (!margins || dimAt(nodes[n].bx) > 0.95)) src = n;
     }
     if (src < 0) return;
-    var S = nodes[src],
-      far = [];
-    for (var m = 0; m < nodes.length; m++) {
-      var dx = nodes[m].bx - S.bx,
-        dy = nodes[m].by - S.by;
-      var d = Math.sqrt(dx * dx + dy * dy);
-      if (d >= COMET_MIN_LEN && d <= COMET_MAX_LEN && inSpan(nodes[m], span, off)) far.push(m);
+    var S = nodes[src];
+    for (tries = 0; tries < 16; tries++) {
+      var ang = Math.random() * 6.2832,
+        len = COMET_MIN_LEN + Math.random() * (COMET_MAX_LEN - COMET_MIN_LEN);
+      var dst = nearestNode(S.bx + Math.cos(ang) * len, S.by + Math.sin(ang) * len, reach);
+      if (dst < 0 || dst === src || !onScreen(nodes[dst])) continue;
+      comets.push({
+        a: src,
+        b: dst,
+        born: ts,
+        speed: COMET_SPEED * (0.75 + Math.random() * 0.55),
+        tail: COMET_TAIL * (0.65 + Math.random() * 0.45),
+        glow: 0.65 + Math.random() * 0.35,
+      });
+      return;
     }
-    if (!far.length) return;
-    comets.push({ a: src, b: far[Math.floor(Math.random() * far.length)], born: ts, x: S.bx });
   }
 
   // Head position along each comet's line; a comet retires once its tail has
-  // caught up with the far node.
+  // caught up with the far node, which glows as the head arrives.
   function updateComets(ts, flash) {
     for (var i = comets.length - 1; i >= 0; i--) {
       var cm = comets[i];
@@ -272,17 +420,20 @@
       var dx = B.x - A.x,
         dy = B.y - A.y;
       cm.len = Math.sqrt(dx * dx + dy * dy) || 1;
-      cm.d = ((ts - cm.born) / 1000) * COMET_SPEED;
-      if (cm.d > cm.len + COMET_TAIL) {
+      cm.d = ((ts - cm.born) / 1000) * cm.speed;
+      if (cm.d > cm.len + cm.tail) {
         comets.splice(i, 1);
+        restComets(ts);
         continue;
       }
-      cm.x = A.x + (dx * Math.min(cm.d, cm.len)) / cm.len;
-      if (cm.d > cm.len) flash[cm.b] = Math.max(flash[cm.b] || 0, 0.6 * (1 - (cm.d - cm.len) / COMET_TAIL));
+      var past = cm.d - cm.len; // < 0 while approaching B
+      var f = past < 0 ? ease(1 + past / 40) : 1 - ease(past / (cm.speed * 1.8));
+      if (f > 0) flash[cm.b] = Math.max(flash[cm.b] || 0, 0.4 * cm.glow * f);
     }
   }
 
-  // Each comet: a faint full-length track, a tapering gradient tail, a soft head.
+  // Each comet: a faint track ahead of the tail, a long gradient tail with a
+  // brighter core near the head so it tapers, and a soft head.
   function drawComets(ts) {
     var c = colors;
     ctx.lineCap = "round";
@@ -292,42 +443,60 @@
         B = nodes[cm.b];
       var ux = (B.x - A.x) / cm.len,
         uy = (B.y - A.y) / cm.len;
-      var env = Math.min(1, (ts - cm.born) / COMET_FADE_IN, (cm.len + COMET_TAIL - cm.d) / COMET_TAIL);
-      var dim = dimAt((A.x + B.x) / 2);
+      var T = cm.tail;
+      var env = Math.min(1, (ts - cm.born) / COMET_FADE_IN, (cm.len + T - cm.d) / T);
       var head = Math.min(cm.d, cm.len),
-        tail = Math.max(0, cm.d - COMET_TAIL);
+        tail = Math.max(0, cm.d - T);
       var hx = A.x + ux * head,
-        hy = A.y + uy * head;
+        hy = A.y + uy * head,
+        tx = A.x + ux * tail,
+        ty = A.y + uy * tail;
+      // Dims smoothly as the head passes behind the text column.
+      var dim = dimAt(hx);
+      var alpha = c.comet * cm.glow * env * dim;
 
-      ctx.globalAlpha = c.edge * 2.2 * env * dim;
+      ctx.globalAlpha = c.edge * env * dim;
       ctx.strokeStyle = "rgb(" + c.rgb + ")";
       ctx.lineWidth = 1;
       ctx.beginPath();
-      ctx.moveTo(A.x, A.y);
+      ctx.moveTo(tx, ty);
       ctx.lineTo(B.x, B.y);
       ctx.stroke();
 
+      ctx.globalAlpha = 1;
       if (head - tail > 1) {
-        var tx = A.x + ux * tail,
-          ty = A.y + uy * tail;
-        // Fade toward the tail end in proportion to how much of a full tail is drawn.
-        var g = ctx.createLinearGradient(hx - ux * COMET_TAIL, hy - uy * COMET_TAIL, hx, hy);
+        // Fade toward the tail end in proportion to how much of a full tail is
+        // drawn; the extra stops keep it visible for most of its length.
+        var g = ctx.createLinearGradient(hx - ux * T, hy - uy * T, hx, hy);
         g.addColorStop(0, "rgba(" + c.rgb + ",0)");
-        g.addColorStop(1, "rgba(" + c.rgb + "," + c.comet * env * dim + ")");
-        ctx.globalAlpha = 1;
+        g.addColorStop(0.3, "rgba(" + c.rgb + "," + alpha * 0.3 + ")");
+        g.addColorStop(0.7, "rgba(" + c.rgb + "," + alpha * 0.65 + ")");
+        g.addColorStop(1, "rgba(" + c.rgb + "," + alpha + ")");
         ctx.strokeStyle = g;
-        ctx.lineWidth = 1.3;
+        ctx.lineWidth = 1.1;
         ctx.beginPath();
         ctx.moveTo(tx, ty);
         ctx.lineTo(hx, hy);
         ctx.stroke();
+
+        var core = Math.min(head - tail, T * 0.3);
+        var g2 = ctx.createLinearGradient(hx - ux * T * 0.3, hy - uy * T * 0.3, hx, hy);
+        g2.addColorStop(0, "rgba(" + c.rgb + ",0)");
+        g2.addColorStop(1, "rgba(" + c.rgb + "," + alpha * 0.6 + ")");
+        ctx.strokeStyle = g2;
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.moveTo(hx - ux * core, hy - uy * core);
+        ctx.lineTo(hx, hy);
+        ctx.stroke();
       }
 
-      if (cm.d < cm.len) {
+      // The head dims out after arriving while the node glow takes over.
+      var glow = 1 - ease((cm.d - cm.len) / (cm.speed * 0.8));
+      if (glow > 0) {
         var rg = ctx.createRadialGradient(hx, hy, 0, hx, hy, 5);
-        rg.addColorStop(0, "rgba(" + c.rgb + "," + c.comet * 1.2 * env * dim + ")");
+        rg.addColorStop(0, "rgba(" + c.rgb + "," + alpha * 1.2 * glow + ")");
         rg.addColorStop(1, "rgba(" + c.rgb + ",0)");
-        ctx.globalAlpha = 1;
         ctx.fillStyle = rg;
         ctx.beginPath();
         ctx.arc(hx, hy, 5, 0, 6.2832);
@@ -372,33 +541,41 @@
       ctx.stroke();
     }
 
-    // Signal floods: per-node flash amount, then traversed edges and moving heads.
+    // Signal floods: per-node flash amount, then traversed edges and moving
+    // heads. Everything ramps up and fades out smoothly; nothing pops.
     var flash = {};
     var heads = [];
-    ctx.lineWidth = 1.4;
     for (var w = 0; w < waves.length; w++) {
       var wave = waves[w];
-      var hops = (ts - wave.t0) / HOP_MS;
-      flash[wave.src] = Math.max(flash[wave.src] || 0, Math.exp(-hops * 1.2));
+      var age = ts - wave.t0;
+      var env = waveEnv(wave, ts);
+      var srcFade = 1 - age / FADE_MS;
+      if (srcFade > 0) flash[wave.src] = Math.max(flash[wave.src] || 0, env * srcFade * srcFade);
+
+      ctx.lineWidth = 1.4;
       for (var k = 0; k < wave.lit.length; k++) {
         var l = wave.lit[k];
-        var local = hops - l.d; // 0..1 while the signal is on this edge
-        if (local <= 0) continue;
-        var strength = Math.pow(DECAY, l.d);
-        var prog = Math.min(1, local);
-        var fade = local <= 1 ? 1 : Math.max(0, 1 - ((local - 1) * HOP_MS) / FADE_MS);
+        var lt = age - l.at; // time since the signal left node a
+        if (lt <= 0) continue;
+        var prog = Math.min(1, lt / l.dur);
+        var after = lt - l.dur; // time since it reached node b
+        var fade = after <= 0 ? 1 : 1 - after / FADE_MS;
         if (fade <= 0) continue;
+        fade *= fade;
+        var str = l.s * env;
         var a = nodes[l.a],
           b = nodes[l.b];
         var hx = a.x + (b.x - a.x) * prog,
           hy = a.y + (b.y - a.y) * prog;
-        ctx.globalAlpha = c.lit * strength * fade * dimAt((a.x + hx) / 2);
+        ctx.globalAlpha = c.lit * str * fade * dimAt((a.x + hx) / 2);
         ctx.beginPath();
         ctx.moveTo(a.x, a.y);
         ctx.lineTo(hx, hy);
         ctx.stroke();
-        if (local < 1) heads.push(hx, hy, strength);
-        else flash[l.b] = Math.max(flash[l.b] || 0, strength * Math.exp(-(local - 1) * 1.2));
+        // Node b starts to glow as the signal closes in, then fades with the edge.
+        var f = prog < 1 ? ease((prog - 0.75) / 0.25) : fade;
+        flash[l.b] = Math.max(flash[l.b] || 0, str * f);
+        if (prog < 1) heads.push(hx, hy, str);
       }
     }
 
@@ -408,10 +585,10 @@
     for (n = 0; n < nodes.length; n++) {
       p = nodes[n];
       if (p.by < top || p.by > bot) continue;
-      var f = flash[n] || 0;
-      ctx.globalAlpha = (c.node + (c.head - c.node) * f) * dimAt(p.x);
+      var fl = flash[n] || 0;
+      ctx.globalAlpha = (c.node + (c.head - c.node) * fl) * dimAt(p.x);
       ctx.beginPath();
-      ctx.arc(p.x, p.y, 1.3 + 0.8 * f, 0, 6.2832);
+      ctx.arc(p.x, p.y, 1.3 + 0.8 * fl, 0, 6.2832);
       ctx.fill();
     }
 
@@ -435,12 +612,13 @@
 
   function frame(ts) {
     raf = requestAnimationFrame(frame);
-    if (ts - lastDraw < FRAME_MS) return;
+    // A few ms of slack so display jitter never skips a whole frame.
+    if (ts - lastDraw < (waves.length ? FRAME_MS_ACTIVE : FRAME_MS) - 4) return;
     lastDraw = ts;
 
-    var life = (MAX_HOPS + 1) * HOP_MS + FADE_MS;
     for (var w = waves.length - 1; w >= 0; w--) {
-      if (ts - waves[w].t0 > life) waves.splice(w, 1);
+      var wave = waves[w];
+      if (ts - wave.t0 > wave.life || (wave.kill && ts - wave.kill > RETIRE_MS)) waves.splice(w, 1);
     }
     if (ts - lastWave > 4000 && waves.length < 1) {
       lastWave = ts;
@@ -448,7 +626,7 @@
     }
     if (comets.length < maxComets() && ts >= nextComet) {
       spawnComet(ts);
-      nextComet = ts + 1200 + Math.random() * 2400; // stagger so they never move in lockstep
+      restComets(ts);
     }
     draw(ts);
   }
@@ -492,8 +670,16 @@
     if (ev.target.closest && ev.target.closest("a, button, input, textarea, select, label, summary, [role='button']")) return;
     var sel = window.getSelection && window.getSelection();
     if (sel && !sel.isCollapsed) return;
-    if (waves.length >= 2) waves.shift();
-    fire(nearestNode(ev.clientX, ev.clientY + scrollOffset(), 140), performance.now(), CLICK_HOPS);
+    var now = performance.now();
+    var src = nearestNode(ev.clientX, ev.clientY + scrollOffset(), reach);
+    if (src < 0) return;
+    // Too many floods at once: let the oldest fade out instead of vanishing.
+    var live = waves.filter(function (wave) {
+      return !wave.kill;
+    });
+    if (live.length >= MAX_WAVES) live[0].kill = now;
+    fire(src, now, CLICK_HOPS);
+    lastWave = now; // hold off the next ambient flood so the two don't pile up
   });
   document.addEventListener("visibilitychange", function () {
     if (document.hidden) stop();
