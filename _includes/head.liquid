@@ -9,6 +9,11 @@
   content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https:; style-src 'self' 'unsafe-inline' https:; img-src 'self' data: https:; font-src 'self' data: https:; media-src 'self' https:; frame-src 'self' https:; connect-src 'self' https:;"
 >
 
+{% if site.enable_visit_tracker and site.visit_tracker_url %}
+  <!-- Self-hosted visit tracker (see visit-tracker/README.md). Placed early so even very short visits are recorded. -->
+  {% include visit_tracker.liquid %}
+{% endif %}
+
 <!-- Microsoft Clarity -->
 <script type="text/javascript">
   (function (c, l, a, r, i, t, y) {

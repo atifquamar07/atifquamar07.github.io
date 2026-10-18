@@ -10,10 +10,11 @@ const PV_ID = /^[\w-]{8,64}$/;
 const FILTER_FIELDS = ["org", "kind", "country", "region", "city", "postal", "path", "ref_host", "host_domain", "device", "os", "browser", "visitor"];
 const SEARCH_FIELDS = ["org", "isp", "hostname", "city", "region", "postal", "country", "path", "title", "referrer", "ip"];
 const VISIT_COLUMNS =
-  "id, ts, visitor, ip, org, isp, asn, kind, hostname, host_domain, city, region, region_code, postal, country, continent, lat, lon, tz, path, title, referrer, ref_host, utm_source, device, os, browser, screen, lang, user_agent, duration_s";
+  "id, ts, visitor, ip, org, isp, asn, kind, hostname, host_domain, city, region, region_code, postal, country, continent, lat, lon, tz, path, title, referrer, ref_host, utm_source, device, os, browser, screen, lang, user_agent, duration_s, reloads, last_ts";
 const LABEL_KINDS = ["academic", "other"];
 const LABEL_CACHE_MS = 60 * 1000;
 const SESSION_MS = 30 * 86400000;
+const RELOAD_WINDOW_MS = 30 * 60000;
 
 export default {
   async fetch(request, env, ctx) {
@@ -66,6 +67,34 @@ async function recordHit(request, env, ctx) {
 
   const cf = request.cf || {};
   const ip = request.headers.get("CF-Connecting-IP") || "";
+  const now = new Date();
+  const path = str(body.path, 300) || "/";
+  const screen = str(body.screen, 20);
+  const lang = str(body.lang, 20) || str((request.headers.get("Accept-Language") || "").split(",")[0], 20);
+  // One "visitor" = same network + same browser + same screen and language. Screen and language help tell apart
+  // people with identical phones behind one shared address (e.g. campus Wi-Fi). Width × height is sorted so
+  // turning the phone doesn't make a new visitor.
+  const screenKey = (screen || "")
+    .split("x")
+    .map(Number)
+    .sort((a, b) => a - b)
+    .join("x");
+  const visitor = (await sha256Hex(`${ip}|${userAgent}|${screenKey}|${lang || ""}`)).slice(0, 16);
+
+  // A reload (same visitor, same page, within 30 minutes of their last view of it) updates that visit instead.
+  const recent = await env.DB.prepare(
+    `SELECT id FROM visits WHERE visitor = ?1 AND path = ?2 AND ts >= ?3 AND COALESCE(last_ts, ts) >= ?4
+     ORDER BY id DESC LIMIT 1`
+  )
+    .bind(visitor, path, new Date(now - 86400000).toISOString(), new Date(now - RELOAD_WINDOW_MS).toISOString())
+    .first();
+  if (recent) {
+    await env.DB.prepare("UPDATE visits SET reloads = reloads + 1, last_ts = ?1, last_pv_id = ?2 WHERE id = ?3")
+      .bind(now.toISOString(), body.id, recent.id)
+      .run();
+    return empty(204);
+  }
+
   const isp = str(cf.asOrganization, 200);
   const label = labelFor(await loadLabels(env), ip);
   const { device, os, browser } = parseUserAgent(userAgent);
@@ -80,8 +109,8 @@ async function recordHit(request, env, ctx) {
   )
     .bind(
       body.id,
-      new Date().toISOString(),
-      (await sha256Hex(`${ip}|${userAgent}`)).slice(0, 16),
+      now.toISOString(),
+      visitor,
       ip || null,
       label ? label.name : isp,
       isp,
@@ -96,7 +125,7 @@ async function recordHit(request, env, ctx) {
       coordinate(cf.latitude),
       coordinate(cf.longitude),
       str(cf.timezone, 64),
-      str(body.path, 300) || "/",
+      path,
       str(body.title, 200),
       referrer,
       referrerHost(referrer, siteHosts),
@@ -104,8 +133,8 @@ async function recordHit(request, env, ctx) {
       device,
       os,
       browser,
-      str(body.screen, 20),
-      str(body.lang, 20) || str((request.headers.get("Accept-Language") || "").split(",")[0], 20),
+      screen,
+      lang,
       userAgent.slice(0, 400)
     )
     .run();
@@ -123,7 +152,8 @@ async function recordLeave(request, env) {
   const seconds = Math.round(Number(body?.seconds));
   if (!PV_ID.test(body?.id || "") || !Number.isFinite(seconds) || seconds < 0) return empty(400);
 
-  await env.DB.prepare("UPDATE visits SET duration_s = MAX(COALESCE(duration_s, 0), ?1) WHERE pv_id = ?2")
+  // The id may belong to the visit itself or to its latest reload.
+  await env.DB.prepare("UPDATE visits SET duration_s = MAX(COALESCE(duration_s, 0), ?1) WHERE pv_id = ?2 OR last_pv_id = ?2")
     .bind(Math.min(seconds, MAX_DURATION_S), body.id)
     .run();
   return empty(204);
@@ -439,8 +469,10 @@ async function visitList(env, params) {
 
 async function live(env) {
   const since = new Date(Date.now() - 5 * 60000).toISOString();
+  const dayAgo = new Date(Date.now() - 86400000).toISOString();
   const [now, last] = await env.DB.batch([
-    env.DB.prepare("SELECT COUNT(DISTINCT visitor) AS visitors FROM visits WHERE ts >= ?1").bind(since),
+    // A reload only updates last_ts, so count visits opened *or reloaded* in the last 5 minutes.
+    env.DB.prepare("SELECT COUNT(DISTINCT visitor) AS visitors FROM visits WHERE ts >= ?2 AND COALESCE(last_ts, ts) >= ?1").bind(since, dayAgo),
     env.DB.prepare("SELECT MAX(id) AS last_id FROM visits"),
   ]);
   return { visitors: now.results[0].visitors, last_id: last.results[0].last_id };

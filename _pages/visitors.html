@@ -2424,7 +2424,14 @@ sitemap: false
             { class: "num", "data-label": "when" },
             h("div", {}, dateTimeFmt.format(when)),
             h("div", { class: "muted" }, ago(when)),
-            theirTime ? h("div", { class: "muted", title: v.tz }, `their time: ${theirTime}`) : null
+            theirTime ? h("div", { class: "muted", title: v.tz }, `their time: ${theirTime}`) : null,
+            v.reloads
+              ? h(
+                  "div",
+                  { class: "muted", title: "Reloads within 30 minutes count as one visit" },
+                  `reloaded ${plural(v.reloads, "time")}, last at ${new Date(v.last_ts).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" })}`
+                )
+              : null
           ),
           h(
             "td",
