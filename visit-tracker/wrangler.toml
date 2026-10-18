@@ -15,7 +15,7 @@ IP_RETENTION_DAYS = "365"
 [[d1_databases]]
 binding = "DB"
 database_name = "visits"
-database_id = "00000000-0000-0000-0000-000000000000" # filled in by setup.sh
+database_id = "7a11ea7b-246c-40a8-916a-c4c4304b17c9" # filled in by setup.sh
 migrations_dir = "migrations"
 
 # Per-IP limit on incoming visit events.

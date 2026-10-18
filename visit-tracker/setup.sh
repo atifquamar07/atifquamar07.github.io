@@ -39,15 +39,21 @@ step "4/6  Creating the tables…"
 npx wrangler d1 migrations apply visits --remote
 
 step "5/6  Deploying the Worker…"
+echo "A new Cloudflare account is asked to pick a workers.dev subdomain once (e.g. your name); answer yes."
 DEPLOY_LOG="$(mktemp)"
-npx wrangler deploy 2>&1 | tee "$DEPLOY_LOG"
-URL="$(grep -oE 'https://[A-Za-z0-9.-]+\.workers\.dev' "$DEPLOY_LOG" | head -1 || true)"
+# `script` keeps the terminal interactive (so wrangler can ask questions) while saving its output.
+if [ "$(uname)" = "Darwin" ]; then
+  script -q "$DEPLOY_LOG" npx wrangler deploy || true
+else
+  script -q -c "npx wrangler deploy" "$DEPLOY_LOG" || true
+fi
+URL="$(grep -oE 'https://[A-Za-z0-9.-]+\.workers\.dev' "$DEPLOY_LOG" | grep -v 'dash\.cloudflare' | head -1 || true)"
 rm -f "$DEPLOY_LOG"
 if [ -z "$URL" ]; then
   echo
-  echo "If the deploy asked you to register a workers.dev subdomain, do that at"
-  echo "https://dash.cloudflare.com → Workers & Pages, then run this script again."
-  read -r -p "Otherwise paste your Worker URL (https://visit-tracker.<something>.workers.dev): " URL
+  echo "The Worker was not deployed. If it asked for a workers.dev subdomain and you said no, run this"
+  echo "script again and answer yes (or register one at https://dash.cloudflare.com → Workers & Pages)."
+  exit 1
 fi
 URL="${URL%/}"
 
