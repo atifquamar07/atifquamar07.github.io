@@ -30,7 +30,7 @@ The script installs Cloudflare's CLI, logs you in, creates the database, deploys
 git add -A && git commit -m "Enable visit tracker" && git push
 ```
 
-Finally, open `https://www.atifquamar.com/?notrack` once in every browser you use, so your own visits are not counted (`?track` undoes it).
+Finally, sign in to the dashboard once in every browser you use (laptop, phone, …). Browsers that have signed in are remembered and their visits are not counted, even after you log out.
 
 ## The dashboard
 
@@ -71,7 +71,7 @@ IP addresses are personal data under GDPR (EU visitors) and the UAE's PDPL. Add 
 
 > This site keeps a basic visit log (time, page, approximate location and network, from your IP address) to understand its audience. No cookies are used and nothing is shared with third parties.
 
-The tracker sets no cookies. The `?notrack` opt-out uses the browser's local storage, only in your own browser. IP addresses are erased after `IP_RETENTION_DAYS` (in `wrangler.toml`); everything else is kept.
+The tracker sets no cookies. To leave out your own visits, the dashboard stores a flag in the local storage of browsers that have signed in. IP addresses are erased after `IP_RETENTION_DAYS` (in `wrangler.toml`); everything else is kept.
 
 The map on the contact page reads `/map`, which is public but only contains city-level counts. It has no organizations, IP addresses or timestamps, and leaves out cloud/VPN traffic.
 

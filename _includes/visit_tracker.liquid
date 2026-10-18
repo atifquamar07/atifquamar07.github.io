@@ -3,9 +3,7 @@
     var endpoint = {{ site.visit_tracker_url | jsonify }}.replace(/\/+$/, "");
     var params = new URLSearchParams(location.search);
     try {
-      /* Open any page once with ?notrack to stop counting your own visits in that browser (?track undoes it). */
-      if (params.has("notrack")) localStorage.setItem("visit-tracker-ignore", "1");
-      if (params.has("track")) localStorage.removeItem("visit-tracker-ignore");
+      /* Browsers that have signed in to the /visitors dashboard (yours) are not counted. */
       if (localStorage.getItem("visit-tracker-ignore") === "1") return;
     } catch (e) {}
     if (!navigator.sendBeacon || navigator.webdriver) return;

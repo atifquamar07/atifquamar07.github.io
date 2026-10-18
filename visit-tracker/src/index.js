@@ -260,7 +260,14 @@ async function dashboardApi(request, env, url) {
         Vary: "Origin",
       }
     : { Vary: "Origin" };
-  const response = request.method === "OPTIONS" ? new Response(null, { status: 204 }) : await dashboardResponse(request, env, url);
+  let response;
+  try {
+    response = request.method === "OPTIONS" ? new Response(null, { status: 204 }) : await dashboardResponse(request, env, url);
+  } catch (err) {
+    // Errors also need the CORS headers, or the browser hides them behind a generic "CORS" failure.
+    console.error(err);
+    response = json({ error: "Server error" }, 500);
+  }
   for (const [name, value] of Object.entries(cors)) response.headers.set(name, value);
   return response;
 }

@@ -81,7 +81,7 @@ google_analytics: # your Google Analytics measurement ID (format: G-XXXXXXXXXX)
 cronitor_analytics: # cronitor RUM analytics site ID (format: XXXXXXXXX)
 pirsch_analytics: # your Pirsch analytics site ID (length 32 characters)
 openpanel_analytics: # your Openpanel analytics client ID (format: XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX)
-visit_tracker_url: https://atifquamar.workers.dev # your visit-tracker Worker URL (see visit-tracker/README.md)
+visit_tracker_url: https://visit-tracker.atifquamar.workers.dev # your visit-tracker Worker URL (see visit-tracker/README.md)
 
 # For Google Search Console, see https://support.google.com/webmasters/answer/9008080?hl=en#meta_tag_verification&zippy=%2Chtml-tag
 google_site_verification: # your google-site-verification ID (Google Search Console)

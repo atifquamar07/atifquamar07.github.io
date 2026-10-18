@@ -254,6 +254,9 @@ sitemap: false
         margin: 0.45rem 0 0;
         color: var(--text-light);
       }
+      #self-tracking {
+        margin: 0.3rem 0 0;
+      }
       .actions {
         display: flex;
         gap: 8px;
@@ -914,6 +917,46 @@ sitemap: false
         margin-top: 1.1rem;
         padding: 0.55rem;
       }
+      .password-wrap {
+        position: relative;
+        display: block;
+        margin-top: 0.3rem;
+      }
+      .field .password-wrap input {
+        margin-top: 0;
+        padding-right: 2.6rem;
+      }
+      .reveal {
+        position: absolute;
+        top: 50%;
+        right: 0.35rem;
+        transform: translateY(-50%);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 2rem;
+        height: 2rem;
+        padding: 0;
+        border: 0;
+        border-radius: 6px;
+        background: none;
+        color: var(--text-light);
+        cursor: pointer;
+      }
+      .reveal:hover {
+        color: var(--hover);
+      }
+      .reveal svg {
+        width: 18px;
+        height: 18px;
+      }
+      .reveal .icon-eye-off,
+      .reveal[aria-pressed="true"] .icon-eye {
+        display: none;
+      }
+      .reveal[aria-pressed="true"] .icon-eye-off {
+        display: block;
+      }
       .nav-links .nav-button {
         padding: 0;
         border: 0;
@@ -932,6 +975,112 @@ sitemap: false
         font-size: 0.8rem;
         text-align: center;
         padding: 0.9rem 16px;
+      }
+
+      /* ---------- phones and tablets: the visit table becomes one card per visit ---------- */
+      @media (max-width: 900px) {
+        .visits-table {
+          min-width: 0;
+        }
+        .visits-table thead {
+          display: none;
+        }
+        .visits-table,
+        .visits-table tbody,
+        .visits-table tr {
+          display: block;
+        }
+        .visits-table tr {
+          padding: 0.7rem 0.75rem;
+          border-top: 1px solid var(--border-light);
+          border-radius: 10px;
+        }
+        .visits-table tbody tr:first-child,
+        .visits-table tbody tr:hover,
+        .visits-table tbody tr:hover + tr {
+          border-top-color: transparent;
+        }
+        .visits-table tbody tr:hover {
+          background: var(--row-hover);
+        }
+        .visits-table td,
+        .visits-table tbody tr:hover td {
+          display: grid;
+          grid-template-columns: 6.2rem minmax(0, 1fr);
+          column-gap: 0.75rem;
+          row-gap: 0;
+          max-width: none;
+          padding: 0.22rem 0;
+          border: 0;
+          border-radius: 0;
+          background: none;
+        }
+        /* Label in the left column, every line of the value stacked in the right one. */
+        .visits-table td > * {
+          grid-column: 2;
+        }
+        .visits-table td::before {
+          grid-column: 1;
+          grid-row: 1;
+          content: attr(data-label);
+          padding-top: 0.12rem;
+          color: var(--text-light);
+          font-size: 0.78rem;
+          font-weight: 600;
+        }
+        .visits-table td.empty {
+          display: block;
+        }
+        .visits-table td.empty::before {
+          content: none;
+        }
+      }
+
+      /* ---------- phones ---------- */
+      @media (max-width: 700px) {
+        main {
+          padding-top: 1.5rem;
+        }
+        /* 16px text stops iPhones from zooming in when a field is tapped. */
+        input,
+        select,
+        input[type="search"],
+        .field input,
+        .field select {
+          font-size: 16px;
+        }
+        .seg {
+          display: flex;
+          width: 100%;
+        }
+        .seg button {
+          flex: 1 1 auto;
+          padding: 0.45rem 0.35rem;
+        }
+        #network,
+        input[type="search"] {
+          flex: 1 1 100%;
+          max-width: none;
+        }
+        .kpis {
+          gap: 10px;
+        }
+        .tile {
+          padding: 0.7rem 0.85rem;
+        }
+        .tile-value {
+          font-size: 1.45rem;
+        }
+        .card {
+          padding: 1rem;
+        }
+        .table-wrap {
+          margin: 0 -1rem;
+          padding: 0 0.25rem;
+        }
+        #map {
+          height: 340px;
+        }
       }
     </style>
   </head>
@@ -980,12 +1129,45 @@ sitemap: false
         <p class="muted small" id="login-note" hidden></p>
         <label class="field"
           >password
-          <input type="password" id="login-password" required autocomplete="current-password" />
+          <span class="password-wrap">
+            <input type="password" id="login-password" required autocomplete="current-password" />
+            <button type="button" class="reveal" id="reveal-password" aria-pressed="false" aria-label="Show password" title="Show password">
+              <svg
+                class="icon-eye"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z" />
+                <circle cx="12" cy="12" r="3" />
+              </svg>
+              <svg
+                class="icon-eye-off"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <path
+                  d="M10.6 5.1A10.4 10.4 0 0 1 12 5c6.4 0 10 7 10 7a17.6 17.6 0 0 1-2.9 3.9M6.6 6.6C3.8 8.4 2 12 2 12s3.6 7 10 7a9.7 9.7 0 0 0 5.4-1.6"
+                />
+                <path d="M9.9 9.9a3 3 0 0 0 4.2 4.2" />
+                <path d="M2 2l20 20" />
+              </svg>
+            </button>
+          </span>
           <!-- Lets password managers save the password under a recognisable name. -->
           <input type="text" autocomplete="username" value="atifquamar.com/visitors" hidden tabindex="-1" aria-hidden="true" />
         </label>
         <p class="form-error" id="login-error" hidden></p>
-        <button type="submit" class="btn btn-primary">unlock</button>
+        <button type="submit" class="btn btn-primary">enter</button>
       </form>
     </section>
 
@@ -994,6 +1176,7 @@ sitemap: false
         <div>
           <h1 class="post-title">visitors</h1>
           <p class="post-description" id="subtitle">loading…</p>
+          <p class="small muted" id="self-tracking"></p>
         </div>
         <div class="actions">
           <button type="button" class="btn" id="refresh">refresh</button>
@@ -1086,7 +1269,7 @@ sitemap: false
           <span class="card-sub">newest first · click an organization, page or IP to filter</span>
         </div>
         <div class="table-wrap">
-          <table>
+          <table class="visits-table">
             <thead>
               <tr>
                 <th>when (your time)</th>
@@ -1984,7 +2167,7 @@ sitemap: false
             style: mapStyle(),
             center: [20, 25],
             zoom: 1.2,
-            minZoom: 0.6,
+            minZoom: -2, // below world level, so narrow (phone) maps can still fit every location
             maxZoom: 14,
             attributionControl: { compact: true },
             cooperativeGestures: true,
@@ -2108,6 +2291,8 @@ sitemap: false
           mapReady = true;
           applyMapTheme();
           fitMap();
+          // Keep the credits behind their (i) button on small maps; they are also in the page footer.
+          if (map.getContainer().clientWidth < 640) document.querySelector(".maplibregl-ctrl-attrib")?.classList.remove("maplibregl-compact-show");
         });
       }
 
@@ -2202,7 +2387,9 @@ sitemap: false
         mapFitted = true;
         const bounds = new maplibregl.LngLatBounds();
         for (const p of mapPoints) bounds.extend([p.lon, p.lat]);
-        map.fitBounds(bounds, { padding: 60, maxZoom: 7, duration: 600 });
+        // Less padding on narrow (phone) maps, so all locations still fit.
+        const padding = Math.min(60, map.getContainer().clientWidth / 10);
+        map.fitBounds(bounds, { padding, maxZoom: 7, duration: 600 });
       }
 
       // ---------- visits table ----------
@@ -2234,14 +2421,14 @@ sitemap: false
           {},
           h(
             "td",
-            { class: "num" },
+            { class: "num", "data-label": "when" },
             h("div", {}, dateTimeFmt.format(when)),
             h("div", { class: "muted" }, ago(when)),
             theirTime ? h("div", { class: "muted", title: v.tz }, `their time: ${theirTime}`) : null
           ),
           h(
             "td",
-            {},
+            { "data-label": "organization" },
             h(
               "div",
               {},
@@ -2257,28 +2444,28 @@ sitemap: false
           ),
           h(
             "td",
-            {},
+            { "data-label": "location" },
             h("div", {}, [place(v.city, v.region) || "Unknown city", v.postal ? ` ${v.postal}` : ""].join("")),
             h("div", { class: "muted" }, `${flag(v.country)}${countryName(v.country)}`),
             v.lat != null ? h("div", { class: "muted mono" }, `${v.lat.toFixed(2)}, ${v.lon.toFixed(2)}`) : null
           ),
           h(
             "td",
-            {},
+            { "data-label": "page" },
             h("div", {}, h("button", { type: "button", class: "link", onclick: () => applyFilter({ path: v.path }) }, v.title || v.path)),
             h("div", { class: "muted" }, v.path)
           ),
-          h("td", {}, h("div", {}, source), v.utm_source ? h("div", { class: "muted" }, `utm: ${v.utm_source}`) : null),
+          h("td", { "data-label": "came from" }, h("div", {}, source), v.utm_source ? h("div", { class: "muted" }, `utm: ${v.utm_source}`) : null),
           h(
             "td",
-            {},
+            { "data-label": "device" },
             h("div", {}, `${cap(v.device)} · ${v.os}`),
             h("div", { class: "muted" }, [v.browser, v.screen, v.lang].filter(Boolean).join(" · "))
           ),
-          h("td", { class: "num" }, duration(v.duration_s)),
+          h("td", { class: "num", "data-label": "time on page" }, duration(v.duration_s)),
           h(
             "td",
-            {},
+            { "data-label": "IP address" },
             v.ip ? h("div", { class: "mono" }, v.ip) : h("div", { class: "muted" }, "erased"),
             v.visitor
               ? h("button", { type: "button", class: "link small", onclick: () => applyFilter({ visitor: v.visitor }) }, "all pages by this visitor")
@@ -2438,11 +2625,49 @@ sitemap: false
         } else if (map) map.resize();
         load();
         loadLabels();
+        renderSelfTracking();
+      }
+
+      // Your own visits: the tracking snippet skips any browser with this flag, which is set when you sign in here.
+      const IGNORE_KEY = "visit-tracker-ignore";
+      function selfTrackingIgnored() {
+        try {
+          return localStorage.getItem(IGNORE_KEY) === "1";
+        } catch {
+          return false;
+        }
+      }
+      function setSelfTracking(ignore) {
+        try {
+          if (ignore) localStorage.setItem(IGNORE_KEY, "1");
+          else localStorage.removeItem(IGNORE_KEY);
+        } catch {}
+        renderSelfTracking();
+      }
+      function renderSelfTracking() {
+        const ignored = selfTrackingIgnored();
+        $("#self-tracking").replaceChildren(
+          ignored ? "✓ Your visits from this browser are not counted. " : "Your visits from this browser are counted. ",
+          h(
+            "button",
+            { type: "button", class: "link small", onclick: () => setSelfTracking(!ignored) },
+            ignored ? "count them" : "stop counting them"
+          )
+        );
       }
 
       function signOut(note) {
         saveToken(null);
         showLogin(note);
+      }
+
+      function setPasswordVisible(visible) {
+        $("#login-password").type = visible ? "text" : "password";
+        const button = $("#reveal-password");
+        const label = visible ? "Hide password" : "Show password";
+        button.setAttribute("aria-pressed", String(visible));
+        button.setAttribute("aria-label", label);
+        button.title = label;
       }
 
       async function signIn(e) {
@@ -2459,7 +2684,10 @@ sitemap: false
           const data = await res.json().catch(() => ({}));
           if (!res.ok || !data.token) throw new Error(data.error || `Sign-in failed (${res.status})`);
           $("#login-password").value = "";
+          setPasswordVisible(false);
           saveToken(data.token);
+          // Signing in marks this browser as yours, so your own browsing isn't counted.
+          setSelfTracking(true);
           showDashboard();
         } catch (err) {
           $("#login-error").textContent = err instanceof TypeError ? "Can't reach the visit tracker right now. Try again in a moment." : err.message;
@@ -2522,6 +2750,10 @@ sitemap: false
       $("#label-form").addEventListener("submit", saveLabel);
       $("#label-cancel").addEventListener("click", () => $("#label-dialog").close());
       $("#login-form").addEventListener("submit", signIn);
+      $("#reveal-password").addEventListener("click", () => {
+        setPasswordVisible($("#login-password").type === "password");
+        $("#login-password").focus();
+      });
       $("#logout").addEventListener("click", () => signOut());
       $("#export").addEventListener("click", exportCsv);
 

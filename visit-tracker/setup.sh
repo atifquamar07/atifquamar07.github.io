@@ -47,7 +47,10 @@ if [ "$(uname)" = "Darwin" ]; then
 else
   script -q -c "npx wrangler deploy" "$DEPLOY_LOG" || true
 fi
-URL="$(grep -oE 'https://[A-Za-z0-9.-]+\.workers\.dev' "$DEPLOY_LOG" | grep -v 'dash\.cloudflare' | head -1 || true)"
+# Match this Worker's own address (https://<name>.<subdomain>.workers.dev), not the bare subdomain
+# that wrangler also prints when a new subdomain is registered.
+WORKER_NAME="$(grep -m1 '^name' wrangler.toml | sed -E 's/^[^"]*"([^"]+)".*/\1/')"
+URL="$(grep -oE "https://${WORKER_NAME}\.[A-Za-z0-9-]+\.workers\.dev" "$DEPLOY_LOG" | head -1 || true)"
 rm -f "$DEPLOY_LOG"
 if [ -z "$URL" ]; then
   echo
@@ -86,5 +89,5 @@ Next:
   1. Commit and push the website so GitHub Pages rebuilds it (takes a few minutes):
        git add -A && git commit -m "Enable visit tracker" && git push
   2. Your dashboard will be at  $SITE/visitors/  (sign in with the password you just chose).
-  3. Open $SITE/?notrack once in every browser you use, so your own visits are not counted.
+  3. Sign in there once in every browser you use (laptop, phone, …); signed-in browsers are not counted.
 EOF
