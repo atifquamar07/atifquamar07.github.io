@@ -1,0 +1,38 @@
+name = "visit-tracker"
+main = "src/index.js"
+compatibility_date = "2026-09-15"
+workers_dev = true
+preview_urls = false
+
+[vars]
+# Your website (comma-separated origins, no trailing slash): pages here may report visits,
+# and the dashboard at <first origin>/visitors/ may read the data.
+ALLOWED_ORIGINS = "https://www.atifquamar.com,https://atifquamar.com"
+# Stored IP addresses are erased after this many days (0 keeps them forever).
+# Location, organization and hostname are kept.
+IP_RETENTION_DAYS = "365"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "visits"
+database_id = "00000000-0000-0000-0000-000000000000" # filled in by setup.sh
+migrations_dir = "migrations"
+
+# Per-IP limit on incoming visit events.
+[[ratelimits]]
+name = "LIMITER"
+namespace_id = "4207"
+simple = { limit = 60, period = 60 }
+
+# Per-IP limit on dashboard sign-in attempts.
+[[ratelimits]]
+name = "LOGIN_LIMITER"
+namespace_id = "4208"
+simple = { limit = 5, period = 60 }
+
+# Hourly: refresh the public map data and erase expired IP addresses.
+[triggers]
+crons = ["17 * * * *"]
+
+[observability]
+enabled = true

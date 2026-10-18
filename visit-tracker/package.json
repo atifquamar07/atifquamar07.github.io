@@ -1,0 +1,16 @@
+{
+  "name": "visit-tracker",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "setup": "bash setup.sh",
+    "dev": "wrangler d1 migrations apply visits --local && wrangler dev",
+    "deploy": "wrangler d1 migrations apply visits --remote && wrangler deploy",
+    "password": "node scripts/set-password.mjs",
+    "password:local": "node scripts/set-password.mjs --local",
+    "logs": "wrangler tail"
+  },
+  "devDependencies": {
+    "wrangler": "4.143.1"
+  }
+}

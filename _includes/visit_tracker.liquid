@@ -1,0 +1,44 @@
+<script>
+  (function () {
+    var endpoint = {{ site.visit_tracker_url | jsonify }}.replace(/\/+$/, "");
+    var params = new URLSearchParams(location.search);
+    try {
+      /* Open any page once with ?notrack to stop counting your own visits in that browser (?track undoes it). */
+      if (params.has("notrack")) localStorage.setItem("visit-tracker-ignore", "1");
+      if (params.has("track")) localStorage.removeItem("visit-tracker-ignore");
+      if (localStorage.getItem("visit-tracker-ignore") === "1") return;
+    } catch (e) {}
+    if (!navigator.sendBeacon || navigator.webdriver) return;
+
+    var id = window.crypto && crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(36) + Math.random().toString(36).slice(2);
+    function send(path, data) {
+      try {
+        navigator.sendBeacon(endpoint + path, JSON.stringify(data));
+      } catch (e) {}
+    }
+
+    send("/hit", {
+      id: id,
+      path: location.pathname,
+      title: document.title,
+      ref: document.referrer,
+      utm: params.get("utm_source"),
+      screen: screen.width + "x" + screen.height,
+      lang: navigator.language,
+    });
+
+
+    /* Report how long the page was actually on screen whenever the visitor switches away or leaves. */
+    var visibleMs = 0;
+    var shownAt = document.visibilityState === "visible" ? Date.now() : 0;
+    document.addEventListener("visibilitychange", function () {
+      if (document.visibilityState === "hidden") {
+        if (shownAt) visibleMs += Date.now() - shownAt;
+        shownAt = 0;
+        send("/leave", { id: id, seconds: Math.round(visibleMs / 1000) });
+      } else {
+        shownAt = Date.now();
+      }
+    });
+  })();
+</script>

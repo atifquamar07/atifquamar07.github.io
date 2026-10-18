@@ -876,6 +876,17 @@ ul.task-list input[type="checkbox"] {
   .visitor-map__pins {
     fill: var(--global-theme-color);
     filter: drop-shadow(0 0 0.35rem var(--global-focus-color));
+
+    circle {
+      stroke: var(--global-card-bg-color);
+      stroke-width: 1;
+    }
+  }
+
+  .visitor-map__caption {
+    margin: 0.3rem 0 0.1rem;
+    font-size: 0.75rem;
+    color: var(--global-text-color-light);
   }
 }
 

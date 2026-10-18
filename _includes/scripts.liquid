@@ -299,6 +299,11 @@
   ></script>
 {% endif %}
 
+{% if site.enable_visit_tracker and site.visit_tracker_url %}
+  <!-- Self-hosted visit tracker (see visit-tracker/README.md) -->
+  {% include visit_tracker.liquid %}
+{% endif %}
+
 {% if site.enable_progressbar %}
   <!-- Scrolling Progress Bar -->
   <script defer src="{{ '/assets/js/progress-bar.js' | relative_url | bust_file_cache }}" type="text/javascript"></script>
