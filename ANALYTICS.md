@@ -35,6 +35,7 @@ Currently implemented in al-folio:
 - **Pirsch Analytics** – GDPR-compliant, free tier available, European servers
 - **Openpanel Analytics** – Open-source option, privacy-focused
 - **Cronitor** – Uptime monitoring with Real User Monitoring (RUM) analytics
+- **Visit tracker (self-hosted)** – Per-visit log with time, organization, city, region, postcode and country on Cloudflare's free tier; see [visit-tracker/README.md](visit-tracker/README.md)
 
 ---
 
