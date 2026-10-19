@@ -9,12 +9,15 @@ A small, self-hosted visitor log for this website. It runs on Cloudflare's free 
 | Network hostname       | `eduroam-12.wlan.cam.ac.uk` → domain `cam.ac.uk` (reverse DNS, when it has one) |
 | Network type           | University / research, ISP / company, or cloud / VPN / proxy                    |
 | Location               | City, region, postcode, country, latitude/longitude                             |
-| Page                   | Path and title, how long it stayed on screen                                    |
+| Page                   | Path and title, how long it stayed on screen and how much of that was active    |
+| What they did          | Papers and sections read (with time), downloads, links, videos, figures, …      |
+| Whole visits           | Each visitor's pages in order, and whether they came on earlier days            |
+| Problems               | Broken links (404 pages, with where the link was) and JavaScript errors         |
 | Came from              | Referring site (Google Scholar, LinkedIn, …) and `utm_source`                   |
 | Device                 | Desktop/mobile/tablet, OS, browser, screen size, language                       |
 | IP address             | Erased automatically after 365 days (configurable)                              |
 
-It never records names, emails or anything typed on the site. Location comes from the IP address and is city-level: usually right for universities and offices, sometimes off by a city or two for mobile networks, and wrong for VPN users (those are tagged "Cloud / VPN / proxy").
+It never records names, emails, mouse movements or anything typed on the site (forms are recorded only by name when sent; search boxes not at all). Location comes from the IP address and is city-level: usually right for universities and offices, sometimes off by a city or two for mobile networks, and wrong for VPN users (those are tagged "Cloud / VPN / proxy").
 
 ## Setup (about 5 minutes)
 
@@ -40,6 +43,8 @@ The password is never stored anywhere: not in this repository, not in Cloudflare
 
 - **Filters**: date range, "Universities & research only", "Hide cloud, VPN & proxies", and free-text search over organization, city, postcode, page and IP.
 - **Click anything** (an organization, city, country, page, referrer, a circle on the map) to filter the whole dashboard to it. "All pages by this visitor" shows one visitor's path through the site.
+- **What visitors did**: _actions_ (downloads, links to other sites, videos, figures, BibTeX opened, …), _reading_ (each paper and section, with the average time spent on it), _scrolling_, and _problems_ (broken links to the site, with where the link was, and JavaScript errors). Click a row to see the visits where it happened.
+- **Show details** under a visit lists everything the visitor did on that page, the other pages of the same visit (from the page they arrived on to the one they left from), and when they came before. **Whole visits** at the top of "every visit" lists visits instead of single page views.
 - **Export CSV** downloads every visit in the current filter.
 - The view is kept in the URL, so you can bookmark a filtered view.
 

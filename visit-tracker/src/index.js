@@ -1,6 +1,6 @@
 import { classifyNetwork, isBot, parseUserAgent, referrerHost, registrableDomain } from "./classify.js";
 
-const MAX_BODY_BYTES = 4096;
+const MAX_BODY_BYTES = 16384;
 const MAX_DURATION_S = 4 * 60 * 60;
 const MAP_CACHE_KEY = "public-map";
 const MAP_CACHE_TTL_MS = 2 * 60 * 60 * 1000;
@@ -10,11 +10,33 @@ const PV_ID = /^[\w-]{8,64}$/;
 const FILTER_FIELDS = ["org", "kind", "country", "region", "city", "postal", "path", "ref_host", "host_domain", "device", "os", "browser", "visitor"];
 const SEARCH_FIELDS = ["org", "isp", "hostname", "city", "region", "postal", "country", "path", "title", "referrer", "ip"];
 const VISIT_COLUMNS =
-  "id, ts, visitor, ip, org, isp, asn, kind, hostname, host_domain, city, region, region_code, postal, country, continent, lat, lon, tz, path, title, referrer, ref_host, utm_source, device, os, browser, screen, lang, user_agent, duration_s, reloads, last_ts";
+  "id, ts, visitor, ip, org, isp, asn, kind, hostname, host_domain, city, region, region_code, postal, country, continent, lat, lon, tz, path, title, referrer, ref_host, utm_source, device, os, browser, screen, lang, user_agent, duration_s, active_s, scroll_pct, status, reloads, last_ts";
 const LABEL_KINDS = ["academic", "other"];
 const LABEL_CACHE_MS = 60 * 1000;
 const SESSION_MS = 30 * 86400000;
 const RELOAD_WINDOW_MS = 30 * 60000;
+// What a visitor can do on a page (see _includes/visit_tracker.liquid). Reading time arrives separately.
+const EVENT_TYPES = new Set([
+  "scroll",
+  "download",
+  "outbound",
+  "email",
+  "copy",
+  "custom",
+  "away",
+  "print",
+  "form",
+  "video",
+  "image",
+  "expand",
+  "link",
+  "error",
+]);
+const MAX_EVENTS = 200;
+// Activity shown with each visit in the list; the rest is fetched when the visit is opened.
+const LIST_EVENTS = 12;
+// A visitor's page views with gaps of less than this form one visit.
+const VISIT_GAP_DAYS = 30 / 1440;
 
 export default {
   async fetch(request, env, ctx) {
@@ -36,6 +58,9 @@ export default {
         case "/api/live":
         case "/api/export.csv":
         case "/api/labels":
+        case "/api/events":
+        case "/api/visitor":
+        case "/api/sessions":
           return await dashboardApi(request, env, url);
         default:
           return new Response("Not found", { status: 404 });
@@ -104,8 +129,8 @@ async function recordHit(request, env, ctx) {
   await env.DB.prepare(
     `INSERT OR IGNORE INTO visits
        (pv_id, ts, visitor, ip, org, isp, asn, kind, city, region, region_code, postal, country, continent, lat, lon, tz,
-        path, title, referrer, ref_host, utm_source, device, os, browser, screen, lang, user_agent)
-     VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, ?13, ?14, ?15, ?16, ?17, ?18, ?19, ?20, ?21, ?22, ?23, ?24, ?25, ?26, ?27, ?28)`
+        path, title, referrer, ref_host, utm_source, device, os, browser, screen, lang, user_agent, status)
+     VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, ?13, ?14, ?15, ?16, ?17, ?18, ?19, ?20, ?21, ?22, ?23, ?24, ?25, ?26, ?27, ?28, ?29)`
   )
     .bind(
       body.id,
@@ -135,7 +160,8 @@ async function recordHit(request, env, ctx) {
       browser,
       screen,
       lang,
-      userAgent.slice(0, 400)
+      userAgent.slice(0, 400),
+      body.status === 404 ? 404 : null
     )
     .run();
 
@@ -151,12 +177,89 @@ async function recordLeave(request, env) {
   const body = await readJson(request);
   const seconds = Math.round(Number(body?.seconds));
   if (!PV_ID.test(body?.id || "") || !Number.isFinite(seconds) || seconds < 0) return empty(400);
+  const scroll = Number.isInteger(body.scroll) && body.scroll >= 0 && body.scroll <= 100 ? body.scroll : null;
+  const active = body.active == null ? null : duration(body.active);
+  const now = Date.now();
+  const events = cleanEvents(body.events, now);
+  const reading = cleanReading(body.reading, now);
 
-  // The id may belong to the visit itself or to its latest reload.
-  await env.DB.prepare("UPDATE visits SET duration_s = MAX(COALESCE(duration_s, 0), ?1) WHERE pv_id = ?2 OR last_pv_id = ?2")
-    .bind(Math.min(seconds, MAX_DURATION_S), body.id)
-    .run();
+  // The id may belong to the visit itself or to its latest reload. Time on page, active time and scroll depth
+  // keep their highest value.
+  const visit = await env.DB.prepare(
+    `UPDATE visits SET duration_s = MAX(COALESCE(duration_s, 0), ?1),
+            scroll_pct = CASE WHEN ?3 IS NULL THEN scroll_pct ELSE MAX(COALESCE(scroll_pct, 0), ?3) END,
+            active_s = CASE WHEN ?4 IS NULL THEN active_s ELSE MAX(COALESCE(active_s, 0), MIN(?4, ?1)) END
+     WHERE pv_id = ?2 OR last_pv_id = ?2 RETURNING id`
+  )
+    .bind(Math.min(seconds, MAX_DURATION_S), body.id, scroll, active)
+    .first();
+  if (!visit || (!events.length && !reading.length)) return empty(204);
+
+  // At most MAX_EVENTS per visit, so a misbehaving page can't fill the database.
+  const room = `(SELECT COUNT(*) FROM events WHERE visit_id = ?1) < ${MAX_EVENTS}`;
+  await env.DB.batch([
+    ...events.map((e) =>
+      env.DB.prepare(`INSERT INTO events (visit_id, at, type, name, detail, seconds) SELECT ?1, ?2, ?3, ?4, ?5, ?6 WHERE ${room}`).bind(
+        visit.id,
+        e.at,
+        e.type,
+        e.name,
+        e.detail,
+        e.seconds
+      )
+    ),
+    // Reading time arrives as a running total per paper or section: one row each, keeping the highest total.
+    ...reading.flatMap((r) => [
+      env.DB.prepare("UPDATE events SET seconds = ?3 WHERE visit_id = ?1 AND type = 'read' AND name = ?2 AND COALESCE(seconds, 0) < ?3").bind(
+        visit.id,
+        r.name,
+        r.seconds
+      ),
+      env.DB.prepare(
+        `INSERT INTO events (visit_id, at, type, name, seconds) SELECT ?1, ?4, 'read', ?2, ?3
+         WHERE NOT EXISTS (SELECT 1 FROM events WHERE visit_id = ?1 AND type = 'read' AND name = ?2) AND ${room}`
+      ).bind(visit.id, r.name, r.seconds, r.at),
+    ]),
+  ]);
   return empty(204);
+}
+
+const when = (now, ago) => new Date(now - (Number.isFinite(ago) && ago >= 0 && ago <= 86400000 ? Math.round(ago) : 0)).toISOString();
+function duration(value) {
+  const seconds = Math.round(Number(value));
+  return Number.isFinite(seconds) && seconds >= 0 ? Math.min(seconds, MAX_DURATION_S) : null;
+}
+
+// Activity sent with a time-on-page report: [{ type, name, detail, seconds, ago: ms before the report }], at most 20.
+function cleanEvents(list, now) {
+  if (!Array.isArray(list)) return [];
+  return list
+    .slice(0, 20)
+    .map((e) => {
+      const name = str(e?.name, 150);
+      if (!name || !EVENT_TYPES.has(e.type)) return null;
+      return {
+        type: e.type,
+        name,
+        detail: str(e.detail, 300),
+        seconds: e.seconds == null ? null : duration(e.seconds),
+        at: when(now, Number(e.ago)),
+      };
+    })
+    .filter(Boolean);
+}
+
+// What was read and for how long: [{ name: paper or section, seconds, ago: ms since it was first read }], at most 20.
+function cleanReading(list, now) {
+  if (!Array.isArray(list)) return [];
+  return list
+    .slice(0, 20)
+    .map((r) => {
+      const name = str(r?.name, 150);
+      const seconds = duration(r?.seconds);
+      return name && seconds >= 1 ? { name, seconds, at: when(now, Number(r.ago)) } : null;
+    })
+    .filter(Boolean);
 }
 
 async function rejectEvent(request, env, origins) {
@@ -319,6 +422,12 @@ async function dashboardResponse(request, env, url) {
       return json(await live(env));
     case "/api/export.csv":
       return exportCsv(env, params);
+    case "/api/events":
+      return json(await visitEvents(env, params));
+    case "/api/visitor":
+      return json(await visitorHistory(env, params));
+    case "/api/sessions":
+      return json(await sessionList(env, params));
   }
   return json({ error: "Not found" }, 404);
 }
@@ -389,6 +498,12 @@ function buildFilter(params) {
     }
   }
 
+  // Visits during which something happened, e.g. ?event=Downloaded cv.pdf
+  if (params.get("event")) {
+    clauses.push("id IN (SELECT visit_id FROM events WHERE name = ?)");
+    args.push(params.get("event").slice(0, 150));
+  }
+
   const q = (params.get("q") || "").trim().slice(0, 100);
   if (q) {
     const like = `%${q.replace(/[\\%_]/g, (c) => `\\${c}`)}%`;
@@ -411,12 +526,18 @@ async function summary(env, params) {
   }[bucket];
   const stmt = (sql, ...before) => env.DB.prepare(sql).bind(...before, ...args);
 
-  const [totals, timeline, places, pages, referrers, devices] = await env.DB.batch([
+  // Events of the visits in the selection.
+  const ofVisits = `FROM events e JOIN (SELECT id, visitor, path, title FROM visits WHERE ${where}) v ON v.id = e.visit_id`;
+  const [totals, timeline, places, pages, referrers, devices, actions, reading, missing, errors] = await env.DB.batch([
     stmt(
       `SELECT COUNT(*) AS views, COUNT(DISTINCT visitor) AS visitors, COUNT(DISTINCT country) AS countries,
               COUNT(DISTINCT org) AS orgs, COUNT(DISTINCT CASE WHEN kind = 'academic' THEN org END) AS academic_orgs,
               COUNT(CASE WHEN kind = 'academic' THEN 1 END) AS academic_views,
-              AVG(duration_s) AS avg_duration, MIN(ts) AS first_ts, MAX(ts) AS last_ts
+              AVG(duration_s) AS avg_duration, AVG(active_s) AS avg_active, MIN(ts) AS first_ts, MAX(ts) AS last_ts,
+              COUNT(scroll_pct) AS scrolled_views, AVG(scroll_pct) AS avg_scroll,
+              COUNT(CASE WHEN scroll_pct >= 25 THEN 1 END) AS scroll_25, COUNT(CASE WHEN scroll_pct >= 50 THEN 1 END) AS scroll_50,
+              COUNT(CASE WHEN scroll_pct >= 75 THEN 1 END) AS scroll_75, COUNT(CASE WHEN scroll_pct >= 100 THEN 1 END) AS scroll_100,
+              COUNT(CASE WHEN status = 404 THEN 1 END) AS missing_views
        FROM visits WHERE ${where}`
     ),
     stmt(
@@ -431,7 +552,8 @@ async function summary(env, params) {
        GROUP BY country, region, city, lat, lon, org, kind ORDER BY views DESC LIMIT 5000`
     ),
     stmt(
-      `SELECT path, MAX(title) AS title, COUNT(*) AS views, COUNT(DISTINCT visitor) AS visitors, AVG(duration_s) AS avg_duration
+      `SELECT path, MAX(title) AS title, COUNT(*) AS views, COUNT(DISTINCT visitor) AS visitors, AVG(duration_s) AS avg_duration,
+              AVG(scroll_pct) AS avg_scroll
        FROM visits WHERE ${where} GROUP BY path ORDER BY views DESC LIMIT 50`
     ),
     stmt(
@@ -441,6 +563,28 @@ async function summary(env, params) {
     stmt(
       `SELECT device, os, browser, COUNT(*) AS views, COUNT(DISTINCT visitor) AS visitors
        FROM visits WHERE ${where} GROUP BY device, os, browser ORDER BY views DESC LIMIT 50`
+    ),
+    // What visitors did (downloads, links to other sites, videos, figures, …). Scrolling is in the totals, reading
+    // and errors have their own lists, and time away and links within the site stay with each visit.
+    stmt(
+      `SELECT e.type, e.name, COUNT(*) AS views, COUNT(DISTINCT v.visitor) AS visitors ${ofVisits}
+       WHERE e.type NOT IN ('scroll', 'read', 'away', 'link', 'error') GROUP BY e.type, e.name ORDER BY views DESC LIMIT 100`
+    ),
+    // What was read: papers and sections, how often and for how long.
+    stmt(
+      `SELECT e.name, COUNT(*) AS views, COUNT(DISTINCT v.visitor) AS visitors, AVG(e.seconds) AS avg_seconds,
+              COUNT(DISTINCT v.path) AS pages, MAX(v.path) AS path, MAX(v.title) AS title ${ofVisits}
+       WHERE e.type = 'read' GROUP BY e.name ORDER BY views DESC, avg_seconds DESC LIMIT 100`
+    ),
+    // Broken links: pages that don't exist, and where people found the link.
+    stmt(
+      `SELECT path, referrer, ref_host, COUNT(*) AS views, COUNT(DISTINCT visitor) AS visitors
+       FROM visits WHERE ${where} AND status = 404 GROUP BY path, referrer ORDER BY views DESC LIMIT 50`
+    ),
+    // JavaScript errors on the pages.
+    stmt(
+      `SELECT e.name, MAX(e.detail) AS detail, COUNT(*) AS views, COUNT(DISTINCT v.visitor) AS visitors ${ofVisits}
+       WHERE e.type = 'error' GROUP BY e.name ORDER BY views DESC LIMIT 50`
     ),
   ]);
 
@@ -454,6 +598,10 @@ async function summary(env, params) {
     pages: pages.results,
     referrers: referrers.results,
     devices: devices.results,
+    actions: actions.results,
+    reading: reading.results,
+    missing: missing.results,
+    errors: errors.results,
   };
 }
 
@@ -464,7 +612,115 @@ async function visitList(env, params) {
   const { results } = await env.DB.prepare(`SELECT ${VISIT_COLUMNS} FROM visits WHERE ${where} ORDER BY ts DESC, id DESC LIMIT ? OFFSET ?`)
     .bind(...args, limit + 1, offset)
     .all();
-  return { visits: results.slice(0, limit), more: results.length > limit };
+  const visits = results.slice(0, limit);
+  await Promise.all([addEvents(env, visits), addReturning(env, visits)]);
+  return { visits, more: results.length > limit };
+}
+
+// The first LIST_EVENTS things each visitor did on the page, and how many there were in all.
+async function addEvents(env, visits) {
+  if (!visits.length) return;
+  const byVisit = new Map(visits.map((v) => [v.id, []]));
+  const ids = [...byVisit.keys()];
+  for (let i = 0; i < ids.length; i += 90) {
+    const chunk = ids.slice(i, i + 90);
+    const { results } = await env.DB.prepare(
+      `SELECT visit_id, at, type, name, detail, seconds FROM events WHERE visit_id IN (${chunk.map(() => "?").join(",")}) ORDER BY at, id`
+    )
+      .bind(...chunk)
+      .all();
+    for (const e of results) byVisit.get(e.visit_id).push(e);
+  }
+  for (const v of visits) {
+    const events = byVisit.get(v.id);
+    v.events = events.slice(0, LIST_EVENTS);
+    v.event_count = events.length;
+  }
+}
+
+// For each visitor: on how many days they came, and when they first came (to mark returning visitors).
+async function addReturning(env, rows) {
+  const visitors = [...new Set(rows.map((v) => v.visitor).filter(Boolean))];
+  const byVisitor = new Map();
+  for (let i = 0; i < visitors.length; i += 90) {
+    const chunk = visitors.slice(i, i + 90);
+    const { results } = await env.DB.prepare(
+      `SELECT visitor, COUNT(DISTINCT date(ts)) AS days, MIN(ts) AS first_ts FROM visits
+       WHERE visitor IN (${chunk.map(() => "?").join(",")}) GROUP BY visitor`
+    )
+      .bind(...chunk)
+      .all();
+    for (const r of results) byVisitor.set(r.visitor, r);
+  }
+  for (const v of rows) {
+    const r = byVisitor.get(v.visitor);
+    v.visitor_days = r ? r.days : 1;
+    v.visitor_first = r ? r.first_ts : v.ts;
+  }
+}
+
+// Everything a visitor did on one page: ?visit=<visit id>
+async function visitEvents(env, params) {
+  const id = clampInt(params.get("visit"), 1, Number.MAX_SAFE_INTEGER, 0);
+  const { results } = await env.DB.prepare("SELECT at, type, name, detail, seconds FROM events WHERE visit_id = ?1 ORDER BY at, id LIMIT 500")
+    .bind(id)
+    .all();
+  return { events: results };
+}
+
+// A visitor's history around one visit: ?visitor=<id>&around=<ISO time>. Their page views within 12 hours either
+// side (the dashboard joins them into visits), how often they came overall, and their last page view before that.
+async function visitorHistory(env, params) {
+  const visitor = params.get("visitor") || "";
+  if (!/^[0-9a-f]{16}$/.test(visitor)) return { history: null, views: [] };
+  const around = parseDate(params.get("around")) || new Date();
+  const from = new Date(around - 43200000).toISOString();
+  const to = new Date(+around + 43200000).toISOString();
+  const [history, views] = await env.DB.batch([
+    env.DB.prepare(
+      `SELECT COUNT(*) AS views, COUNT(DISTINCT date(ts)) AS days, MIN(ts) AS first_ts, MAX(ts) AS last_ts,
+              (SELECT MAX(ts) FROM visits WHERE visitor = ?1 AND ts < ?2) AS earlier_ts
+       FROM visits WHERE visitor = ?1`
+    ).bind(visitor, from),
+    env.DB.prepare(
+      "SELECT id, ts, last_ts, path, title, duration_s, status, referrer, ref_host FROM visits WHERE visitor = ?1 AND ts >= ?2 AND ts <= ?3 ORDER BY ts, id LIMIT 300"
+    ).bind(visitor, from, to),
+  ]);
+  return { history: history.results[0], views: views.results };
+}
+
+// Whole visits: a visitor's page views with gaps of less than 30 minutes form one visit. A visit is listed when
+// any of its pages matches the filters, so ?path=/cv/ lists whole visits that included the CV. Newest first.
+async function sessionList(env, params) {
+  const { where, args, from, to } = buildFilter(params);
+  const limit = clampInt(params.get("limit"), 1, 90, 50);
+  const offset = clampInt(params.get("offset"), 0, 1e7, 0);
+  const { results } = await env.DB.prepare(
+    `WITH pv AS (
+       SELECT id, visitor, ts, path, title, duration_s, status, CASE WHEN ${where} THEN 1 ELSE 0 END AS matched,
+              MAX(julianday(COALESCE(last_ts, ts)), julianday(ts) + COALESCE(duration_s, 0) / 86400.0) AS ends
+       FROM visits WHERE ts >= ? AND ts < ?
+     ), gaps AS (
+       SELECT *, MAX(ends) OVER (PARTITION BY visitor ORDER BY ts, id ROWS BETWEEN UNBOUNDED PRECEDING AND 1 PRECEDING) AS prev_ends FROM pv
+     ), numbered AS (
+       SELECT *, SUM(CASE WHEN prev_ends IS NULL OR julianday(ts) - prev_ends > ${VISIT_GAP_DAYS} THEN 1 ELSE 0 END)
+                   OVER (PARTITION BY visitor ORDER BY ts, id ROWS UNBOUNDED PRECEDING) AS n
+       FROM gaps
+     ), sessions AS (
+       SELECT visitor, n, MIN(ts) AS start, MIN(id) AS first_id, COUNT(*) AS pages, SUM(duration_s) AS seconds,
+              json_group_array(json_object('id', id, 'ts', ts, 'path', path, 'title', title, 'seconds', duration_s, 'status', status)) AS views
+       FROM numbered GROUP BY visitor, n HAVING MAX(matched) = 1
+     )
+     SELECT s.start, s.first_id, s.pages, s.seconds, s.views, f.visitor, f.org, f.isp, f.asn, f.kind, f.hostname, f.host_domain,
+            f.city, f.region, f.postal, f.country, f.tz, f.referrer, f.ref_host, f.utm_source, f.device, f.os, f.browser, f.screen, f.lang
+     FROM sessions s JOIN visits f ON f.id = s.first_id
+     ORDER BY s.start DESC, s.first_id DESC LIMIT ? OFFSET ?`
+  )
+    .bind(...args, from.toISOString(), to.toISOString(), limit + 1, offset)
+    .all();
+  const sessions = results.slice(0, limit).map((s) => ({ ...s, views: JSON.parse(s.views).sort((a, b) => a.ts.localeCompare(b.ts) || a.id - b.id) }));
+  await addReturning(env, sessions);
+  return { sessions, more: results.length > limit };
 }
 
 async function live(env) {

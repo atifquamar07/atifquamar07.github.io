@@ -790,6 +790,140 @@ sitemap: false
       #more {
         margin-top: 0.9rem;
       }
+
+      /* ---------- what visitors did ---------- */
+      .seg-small button {
+        padding: 0.25rem 0.65rem;
+        font-size: 0.8rem;
+      }
+      .card-note {
+        margin: -0.35rem 0 0.7rem;
+        color: var(--text-light);
+        font-size: 0.8rem;
+      }
+      .card-note:empty {
+        display: none;
+      }
+      .bar-row.static {
+        cursor: default;
+      }
+      .bar-row.static:hover {
+        background: none;
+      }
+      .tag.bad {
+        background: color-mix(in srgb, var(--danger) 14%, transparent);
+        color: var(--danger);
+      }
+      /* The first few things a visitor did, under the page in the list of visits. */
+      .acts {
+        margin: 0.35rem 0 0.2rem;
+        padding: 0;
+        list-style: none;
+        font-size: 0.8rem;
+        line-height: 1.4;
+      }
+      .acts li,
+      .timeline li {
+        display: flex;
+        align-items: baseline;
+        gap: 8px;
+      }
+      .acts li + li {
+        margin-top: 2px;
+      }
+      .acts .t,
+      .timeline .t {
+        flex: none;
+        color: var(--text-light);
+        font-family: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+        font-size: 0.72rem;
+        font-variant-numeric: tabular-nums;
+      }
+      .returning {
+        color: var(--hover);
+        font-size: 0.8rem;
+        font-weight: 500;
+      }
+      /* A visit's details, opened under its row. */
+      tbody tr.detail-row td,
+      tbody tr.detail-row:hover td {
+        max-width: none;
+        padding: 0.4rem 0.85rem 1.1rem;
+        border-top-color: transparent;
+        border-radius: 0;
+        background: none;
+      }
+      .visit-detail {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(min(320px, 100%), 1fr));
+        gap: 1rem 2.5rem;
+        padding: 0.9rem 1rem;
+        border: 1px solid var(--border-light);
+        border-left: 3px solid var(--theme);
+        border-radius: 8px;
+        background: var(--bg);
+      }
+      .visit-detail h3 {
+        margin: 0 0 0.45rem;
+        color: var(--text-light);
+        font-size: 0.78rem;
+        font-weight: 600;
+        text-transform: lowercase;
+      }
+      .visit-detail section + section h3 {
+        margin-top: 0;
+      }
+      .visit-detail .facts {
+        margin: 0 0 0.6rem;
+        font-size: 0.85rem;
+      }
+      .timeline {
+        margin: 0;
+        padding: 0;
+        list-style: none;
+        font-size: 0.85rem;
+      }
+      .timeline li {
+        padding: 0.28rem 0;
+        border-top: 1px solid var(--border-light);
+      }
+      .timeline li:first-child {
+        border-top: 0;
+      }
+      .timeline .detail {
+        display: block;
+        overflow-wrap: anywhere;
+      }
+      .timeline li.current {
+        font-weight: 600;
+      }
+      .journey-sum {
+        margin: 0 0 0.4rem;
+        font-size: 0.85rem;
+      }
+      /* A whole visit: its pages in order. */
+      .path {
+        margin: 0;
+        padding-left: 1.3rem;
+      }
+      .path li + li {
+        margin-top: 2px;
+      }
+      .path li::marker {
+        color: var(--text-light);
+        font-size: 0.8rem;
+      }
+      .path .link {
+        vertical-align: top;
+      }
+      .path .gap {
+        color: var(--text-light);
+        list-style: none;
+        font-size: 0.8rem;
+      }
+      .visits-table[hidden] {
+        display: none !important;
+      }
       #more[hidden] {
         display: none;
       }
@@ -1028,10 +1162,12 @@ sitemap: false
           font-size: 0.78rem;
           font-weight: 600;
         }
-        .visits-table td.empty {
+        .visits-table td.empty,
+        .visits-table td.detail {
           display: block;
         }
-        .visits-table td.empty::before {
+        .visits-table td.empty::before,
+        .visits-table td.detail::before {
           content: none;
         }
       }
@@ -1265,11 +1401,29 @@ sitemap: false
 
       <section class="card">
         <div class="card-head">
-          <h2>every visit</h2>
-          <span class="card-sub">newest first · click an organization, page or IP to filter</span>
+          <h2>what visitors did</h2>
+          <div class="seg seg-small" role="group" aria-label="Show" id="activity-tabs">
+            <button type="button" data-tab="actions">actions</button>
+            <button type="button" data-tab="reading">reading</button>
+            <button type="button" data-tab="scrolling">scrolling</button>
+            <button type="button" data-tab="problems">problems</button>
+          </div>
         </div>
+        <p class="card-note" id="activity-note"></p>
+        <div id="activity"></div>
+      </section>
+
+      <section class="card">
+        <div class="card-head">
+          <h2>every visit</h2>
+          <div class="seg seg-small" role="group" aria-label="List" id="list-tabs">
+            <button type="button" data-list="views">page views</button>
+            <button type="button" data-list="sessions">whole visits</button>
+          </div>
+        </div>
+        <p class="card-note" id="visits-sub"></p>
         <div class="table-wrap">
-          <table class="visits-table">
+          <table class="visits-table" id="views-table">
             <thead>
               <tr>
                 <th>when (your time)</th>
@@ -1287,6 +1441,20 @@ sitemap: false
               </tr>
             </thead>
             <tbody id="visits"></tbody>
+          </table>
+          <table class="visits-table" id="sessions-table" hidden>
+            <thead>
+              <tr>
+                <th>started (your time)</th>
+                <th>organization / network</th>
+                <th>location</th>
+                <th>pages, in the order they were opened</th>
+                <th>came from</th>
+                <th>device</th>
+                <th>time in all</th>
+              </tr>
+            </thead>
+            <tbody id="sessions"></tbody>
           </table>
         </div>
         <button type="button" class="btn" id="more" hidden>load more</button>
@@ -1353,9 +1521,12 @@ sitemap: false
         os: "OS",
         browser: "browser",
         visitor: "visitor",
+        event: "did",
       };
+      // A visitor's page views with gaps of less than this form one visit (the tracker's list of whole visits uses the same).
+      const VISIT_GAP_MS = 30 * 60000;
 
-      const state = { range: "30", network: "", q: "", filters: {}, offset: 0, lastId: null, expanded: {} };
+      const state = { range: "30", network: "", q: "", filters: {}, offset: 0, lastId: null, expanded: {}, ...savedTabs() };
       let summaryData = null;
       let timelineSeries = [];
       let mapPoints = [];
@@ -1372,6 +1543,27 @@ sitemap: false
         hour: "2-digit",
         minute: "2-digit",
       });
+      const timeFmt = new Intl.DateTimeFormat("en-GB", { hour: "2-digit", minute: "2-digit" });
+      const secondsFmt = new Intl.DateTimeFormat("en-GB", { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+      const dayFmt = new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "short", year: "numeric" });
+
+      // Which tab of "what visitors did" and which list of visits are shown, remembered in this browser.
+      function savedTabs() {
+        try {
+          const saved = JSON.parse(localStorage.getItem("visitors-tabs") || "{}");
+          return {
+            tab: ["actions", "reading", "scrolling", "problems"].includes(saved.tab) ? saved.tab : "actions",
+            list: saved.list === "sessions" ? "sessions" : "views",
+          };
+        } catch {
+          return { tab: "actions", list: "views" };
+        }
+      }
+      function saveTabs() {
+        try {
+          localStorage.setItem("visitors-tabs", JSON.stringify({ tab: state.tab, list: state.list }));
+        } catch {}
+      }
 
       // ---------- small helpers ----------
 
@@ -1508,18 +1700,14 @@ sitemap: false
         syncControls();
         $("#main").classList.add("is-loading");
         try {
-          const [summary, list, liveData] = await Promise.all([
-            api("/api/summary", query()),
-            api("/api/visits", query({ limit: PAGE_SIZE, offset: 0 })),
-            api("/api/live"),
-          ]);
+          const listed = ++listToken;
+          const [summary, list, liveData] = await Promise.all([api("/api/summary", query()), fetchList(0), api("/api/live")]);
           if (token !== loadToken) return;
           summaryData = summary;
-          state.offset = list.visits.length;
           state.lastId = liveData.last_id;
           $("#error").hidden = true;
           render(summary, liveData);
-          renderVisits(list, false);
+          if (listed === listToken) renderVisits(list, false);
         } catch (err) {
           if (token !== loadToken) return;
           $("#error").textContent = `Could not load data: ${err.message}`;
@@ -1528,13 +1716,29 @@ sitemap: false
           if (token === loadToken) $("#main").classList.remove("is-loading");
         }
       }
+      // The list of page views, or of whole visits.
+      function fetchList(offset) {
+        return api(state.list === "sessions" ? "/api/sessions" : "/api/visits", query({ limit: PAGE_SIZE, offset }));
+      }
+      let listToken = 0;
+      async function loadList() {
+        const token = ++listToken;
+        $("#more").hidden = true;
+        try {
+          const list = await fetchList(0);
+          if (token === listToken) renderVisits(list, false);
+        } catch (err) {
+          $("#error").textContent = `Could not load data: ${err.message}`;
+          $("#error").hidden = false;
+        }
+      }
       async function loadMore() {
+        const token = listToken;
         const button = $("#more");
         button.disabled = true;
         try {
-          const list = await api("/api/visits", query({ limit: PAGE_SIZE, offset: state.offset }));
-          state.offset += list.visits.length;
-          renderVisits(list, true);
+          const list = await fetchList(state.offset);
+          if (token === listToken) renderVisits(list, true);
         } finally {
           button.disabled = false;
         }
@@ -1638,7 +1842,14 @@ sitemap: false
         renderList("pages", summary.pages, {
           label: (p) => p.title || p.path,
           sub: (p) =>
-            [p.path, plural(p.visitors, "visitor"), p.avg_duration == null ? null : `${duration(p.avg_duration)} avg`].filter(Boolean).join(" · "),
+            [
+              p.path,
+              plural(p.visitors, "visitor"),
+              p.avg_duration == null ? null : `${duration(p.avg_duration)} avg`,
+              p.avg_scroll == null ? null : `${Math.round(p.avg_scroll)}% scrolled`,
+            ]
+              .filter(Boolean)
+              .join(" · "),
           filter: (p) => ({ path: p.path }),
         });
         renderList("referrers", summary.referrers, {
@@ -1651,6 +1862,7 @@ sitemap: false
           sub: (d) => plural(d.visitors, "visitor"),
           filter: (d) => ({ device: d.device, os: d.os, browser: d.browser }),
         });
+        renderActivity();
       }
 
       function groupPlaces(rows, keyOf, init) {
@@ -1681,7 +1893,11 @@ sitemap: false
           ["organizations", fmt(t.orgs)],
           ["academic orgs", fmt(t.academic_orgs), `${pct(t.academic_views, t.views)} of page views`],
           ["countries", fmt(t.countries)],
-          ["avg. time on page", duration(t.avg_duration), t.avg_duration == null ? "saved when a visitor leaves" : null],
+          [
+            "avg. time on page",
+            duration(t.avg_duration),
+            t.avg_duration == null ? "saved when a visitor leaves" : t.avg_active != null ? `${duration(t.avg_active)} of it active` : null,
+          ],
           ["active now", fmt(liveVisitors), "visitors in the last 5 min", "live-value"],
         ];
         $("#kpis").replaceChildren(
@@ -1702,11 +1918,11 @@ sitemap: false
         );
       }
 
-      function renderList(id, items, { label, sub, filter }) {
+      function renderList(id, items, { label, sub, filter, empty }) {
         const el = document.getElementById(id);
         el.replaceChildren();
         if (!items.length) {
-          el.append(h("div", { class: "empty" }, "nothing in this selection"));
+          el.append(h("div", { class: "empty" }, empty || "nothing in this selection"));
           return;
         }
         const expanded = state.expanded[id];
@@ -1721,8 +1937,11 @@ sitemap: false
                 "li",
                 {},
                 h(
-                  "button",
-                  { type: "button", class: "bar-row", title: "Filter to this", onclick: () => applyFilter(filter(item)) },
+                  // Rows filter the dashboard when clicked, unless the list has nothing to filter by.
+                  filter ? "button" : "div",
+                  filter
+                    ? { type: "button", class: "bar-row", title: "Filter to this", onclick: () => applyFilter(filter(item)) }
+                    : { class: "bar-row static" },
                   h(
                     "div",
                     { class: "bar-top" },
@@ -1750,7 +1969,7 @@ sitemap: false
                 class: "more-toggle",
                 onclick: () => {
                   state.expanded[id] = !expanded;
-                  renderList(id, items, { label, sub, filter });
+                  renderList(id, items, { label, sub, filter, empty });
                 },
               },
               expanded ? "show fewer" : `show all ${Math.min(items.length, 50)}`
@@ -2392,84 +2611,219 @@ sitemap: false
         map.fitBounds(bounds, { padding, maxZoom: 7, duration: 600 });
       }
 
+      // ---------- what visitors did ----------
+
+      // How an event reads in a visit's activity.
+      function eventText(e) {
+        if (e.type === "read") return `Read “${e.name}” · ${duration(e.seconds)}`;
+        if (e.type === "away") return `Switched to another tab or app for ${duration(e.seconds)}, then came back`;
+        if (e.type === "error") return `JavaScript error: ${e.name}`;
+        return e.name;
+      }
+      function pathOf(address) {
+        try {
+          return new URL(address).pathname;
+        } catch {
+          return address;
+        }
+      }
+
+      function renderActivity() {
+        const summary = summaryData;
+        const t = summary.totals;
+        const tab = state.tab;
+        for (const b of document.querySelectorAll("#activity-tabs button")) b.setAttribute("aria-pressed", String(b.dataset.tab === tab));
+        const note = $("#activity-note");
+        if (tab === "reading") {
+          note.textContent = "papers and sections in the middle of the screen while the visitor was active, with the average time spent on each";
+          renderList("activity", summary.reading, {
+            label: (r) => r.name,
+            sub: (r) =>
+              [
+                r.pages === 1 ? `on ${r.title || r.path}` : `on ${r.pages} pages`,
+                `${duration(r.avg_seconds)} on average`,
+                plural(r.visitors, "visitor"),
+              ].join(" · "),
+            filter: (r) => ({ event: r.name }),
+            empty: "nothing read yet: reading time is counted for each paper, and for the sections of longer pages",
+          });
+        } else if (tab === "scrolling") {
+          note.textContent = t.scrolled_views
+            ? `${plural(t.scrolled_views, "view")} of pages taller than the screen · on average visitors scrolled ${Math.round(t.avg_scroll)}% of the way down`
+            : "";
+          const rows = t.scrolled_views ? [25, 50, 75, 100].map((mark) => ({ mark, views: t[`scroll_${mark}`] })) : [];
+          renderList("activity", rows, {
+            label: (r) => `scrolled to ${r.mark}%`,
+            sub: (r) => `${pct(r.views, t.scrolled_views)} of those views`,
+            filter: null,
+            empty: "no scrolling recorded yet (pages that fit on the screen are left out)",
+          });
+        } else if (tab === "problems") {
+          const errors = summary.errors.reduce((sum, e) => sum + e.views, 0);
+          note.textContent = `${plural(t.missing_views || 0, "visit")} to pages that don't exist · ${plural(errors, "JavaScript error")}`;
+          const rows = [...summary.missing.map((m) => ({ missing: true, ...m })), ...summary.errors].sort((a, b) => b.views - a.views);
+          renderList("activity", rows, {
+            label: (r) => (r.missing ? [`page not found: ${r.path}`, h("span", { class: "tag bad" }, "404")] : r.name),
+            sub: (r) =>
+              r.missing
+                ? r.ref_host
+                  ? `linked from ${r.ref_host}`
+                  : r.referrer
+                    ? `linked from your page ${pathOf(r.referrer)}`
+                    : "no referrer: typed in, bookmarked or opened from an app"
+                : [r.detail, plural(r.visitors, "visitor")].filter(Boolean).join(" · "),
+            filter: (r) => (r.missing ? { path: r.path } : { event: r.name }),
+            empty: "no problems in this selection: no visits to pages that don't exist, and no JavaScript errors",
+          });
+        } else {
+          note.textContent = "downloads, links to other sites, videos, figures, sections opened, forms sent, printing and copied text";
+          renderList("activity", summary.actions, {
+            label: (a) => a.name,
+            sub: (a) => plural(a.visitors, "visitor"),
+            filter: (a) => ({ event: a.name }),
+            empty: "nothing recorded yet in this selection",
+          });
+        }
+      }
+
       // ---------- visits table ----------
 
       function renderVisits(list, append) {
-        const body = $("#visits");
+        const sessions = state.list === "sessions";
+        for (const b of document.querySelectorAll("#list-tabs button")) b.setAttribute("aria-pressed", String(b.dataset.list === state.list));
+        $("#views-table").hidden = sessions;
+        $("#sessions-table").hidden = !sessions;
+        $("#visits-sub").textContent = sessions
+          ? "newest first · a visit is one visitor's pages with less than 30 minutes between them"
+          : "newest first · click an organization, page or IP to filter · open a visit's details to see everything they did";
+        const body = sessions ? $("#sessions") : $("#visits");
+        const rows = (sessions ? list.sessions : list.visits) || [];
         if (!append) body.replaceChildren();
-        if (!append && !list.visits.length) {
+        if (!append && !rows.length) {
           body.append(h("tr", {}, h("td", { colspan: 8, class: "empty" }, "no visits match these filters")));
         }
-        for (const v of list.visits) body.append(visitRow(v));
+        for (const row of rows) body.append(sessions ? sessionRow(row) : visitRow(row));
+        state.offset = (append ? state.offset : 0) + rows.length;
         $("#more").hidden = !list.more;
       }
 
-      function visitRow(v) {
-        const when = new Date(v.ts);
-        const theirTime = v.tz ? timeIn(when, v.tz) : null;
+      // Seen on an earlier day too (by the same network address and browser).
+      function returning(v, ts) {
+        if (!v.visitor_first || v.visitor_first.slice(0, 10) >= ts.slice(0, 10)) return null;
+        return h(
+          "div",
+          { class: "returning", title: `Came on ${plural(v.visitor_days, "day")}, first on ${dayFmt.format(new Date(v.visitor_first))}` },
+          `returning · came on ${plural(v.visitor_days, "day")}`
+        );
+      }
+      // Page titles without the site name at the end ("Publications | Atif Quamar" -> "Publications"), for lists of pages.
+      const shortTitle = (title) => (title && title.includes(" | ") ? title.slice(0, title.lastIndexOf(" | ")) : title);
+      const notFound = () => h("span", { class: "tag bad", title: "This page doesn't exist: the visitor followed a broken link" }, "not found");
+
+      // Cells that page views and whole visits share.
+      function orgCell(v, ts) {
         const kind =
           v.kind === "academic"
             ? h("span", { class: "tag academic" }, "academic")
             : v.kind === "cloud"
               ? h("span", { class: "tag" }, "cloud / VPN")
               : null;
+        return h(
+          "td",
+          { "data-label": "organization" },
+          h(
+            "div",
+            {},
+            v.org ? h("button", { type: "button", class: "link", onclick: () => applyFilter({ org: v.org }) }, prettyOrg(v.org)) : "Unknown network",
+            kind
+          ),
+          v.isp && v.org !== v.isp ? h("div", { class: "muted" }, `via ${prettyOrg(v.isp)}`) : null,
+          v.hostname ? h("div", { class: "muted mono" }, v.hostname) : null,
+          v.asn ? h("div", { class: "muted" }, `AS${v.asn}`) : null,
+          returning(v, ts),
+          v.ip ? h("button", { type: "button", class: "link small", onclick: () => openLabelDialog(v) }, "name this network") : null
+        );
+      }
+      function locationCell(v) {
+        return h(
+          "td",
+          { "data-label": "location" },
+          h("div", {}, [place(v.city, v.region) || "Unknown city", v.postal ? ` ${v.postal}` : ""].join("")),
+          h("div", { class: "muted" }, `${flag(v.country)}${countryName(v.country)}`),
+          v.lat != null ? h("div", { class: "muted mono" }, `${v.lat.toFixed(2)}, ${v.lon.toFixed(2)}`) : null
+        );
+      }
+      function sourceCell(v) {
         const source = v.ref_host
           ? h("button", { type: "button", class: "link", onclick: () => applyFilter({ ref_host: v.ref_host }) }, v.ref_host)
           : h("span", { class: "muted" }, v.referrer ? "within the site" : "direct / bookmark");
         return h(
+          "td",
+          { "data-label": "came from" },
+          h("div", {}, source),
+          v.utm_source ? h("div", { class: "muted" }, `utm: ${v.utm_source}`) : null
+        );
+      }
+      function deviceCell(v) {
+        return h(
+          "td",
+          { "data-label": "device" },
+          h("div", {}, `${cap(v.device)} · ${v.os}`),
+          h("div", { class: "muted" }, [v.browser, v.screen, v.lang].filter(Boolean).join(" · "))
+        );
+      }
+      function whenCell(when, v, label) {
+        const theirTime = v.tz ? timeIn(when, v.tz) : null;
+        return h(
+          "td",
+          { class: "num", "data-label": label },
+          h("div", {}, dateTimeFmt.format(when)),
+          h("div", { class: "muted" }, ago(when)),
+          theirTime ? h("div", { class: "muted", title: v.tz }, `their time: ${theirTime}`) : null,
+          v.reloads
+            ? h(
+                "div",
+                { class: "muted", title: "Reloads within 30 minutes count as one visit" },
+                `reloaded ${plural(v.reloads, "time")}, last at ${timeFmt.format(new Date(v.last_ts))}`
+              )
+            : null
+        );
+      }
+
+      function visitRow(v) {
+        const when = new Date(v.ts);
+        const details = h("button", { type: "button", class: "link small", onclick: (e) => toggleDetails(e.currentTarget, v) }, "show details");
+        return h(
           "tr",
           {},
-          h(
-            "td",
-            { class: "num", "data-label": "when" },
-            h("div", {}, dateTimeFmt.format(when)),
-            h("div", { class: "muted" }, ago(when)),
-            theirTime ? h("div", { class: "muted", title: v.tz }, `their time: ${theirTime}`) : null,
-            v.reloads
-              ? h(
-                  "div",
-                  { class: "muted", title: "Reloads within 30 minutes count as one visit" },
-                  `reloaded ${plural(v.reloads, "time")}, last at ${new Date(v.last_ts).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" })}`
-                )
-              : null
-          ),
-          h(
-            "td",
-            { "data-label": "organization" },
-            h(
-              "div",
-              {},
-              v.org
-                ? h("button", { type: "button", class: "link", onclick: () => applyFilter({ org: v.org }) }, prettyOrg(v.org))
-                : "Unknown network",
-              kind
-            ),
-            v.isp && v.org !== v.isp ? h("div", { class: "muted" }, `via ${prettyOrg(v.isp)}`) : null,
-            v.hostname ? h("div", { class: "muted mono" }, v.hostname) : null,
-            v.asn ? h("div", { class: "muted" }, `AS${v.asn}`) : null,
-            v.ip ? h("button", { type: "button", class: "link small", onclick: () => openLabelDialog(v) }, "name this network") : null
-          ),
-          h(
-            "td",
-            { "data-label": "location" },
-            h("div", {}, [place(v.city, v.region) || "Unknown city", v.postal ? ` ${v.postal}` : ""].join("")),
-            h("div", { class: "muted" }, `${flag(v.country)}${countryName(v.country)}`),
-            v.lat != null ? h("div", { class: "muted mono" }, `${v.lat.toFixed(2)}, ${v.lon.toFixed(2)}`) : null
-          ),
+          whenCell(when, v, "when"),
+          orgCell(v, v.ts),
+          locationCell(v),
           h(
             "td",
             { "data-label": "page" },
-            h("div", {}, h("button", { type: "button", class: "link", onclick: () => applyFilter({ path: v.path }) }, v.title || v.path)),
-            h("div", { class: "muted" }, v.path)
+            h(
+              "div",
+              {},
+              h(
+                "button",
+                { type: "button", class: "link", onclick: () => applyFilter({ path: v.path }) },
+                v.status === 404 ? v.path : v.title || v.path
+              ),
+              v.status === 404 ? notFound() : null
+            ),
+            h("div", { class: "muted" }, v.path),
+            activityLines(v),
+            details
           ),
-          h("td", { "data-label": "came from" }, h("div", {}, source), v.utm_source ? h("div", { class: "muted" }, `utm: ${v.utm_source}`) : null),
+          sourceCell(v),
+          deviceCell(v),
           h(
             "td",
-            { "data-label": "device" },
-            h("div", {}, `${cap(v.device)} · ${v.os}`),
-            h("div", { class: "muted" }, [v.browser, v.screen, v.lang].filter(Boolean).join(" · "))
+            { class: "num", "data-label": "time on page" },
+            h("div", {}, duration(v.duration_s)),
+            v.active_s != null && v.duration_s ? h("div", { class: "muted" }, `${duration(v.active_s)} active`) : null
           ),
-          h("td", { class: "num", "data-label": "time on page" }, duration(v.duration_s)),
           h(
             "td",
             { "data-label": "IP address" },
@@ -2477,6 +2831,214 @@ sitemap: false
             v.visitor
               ? h("button", { type: "button", class: "link small", onclick: () => applyFilter({ visitor: v.visitor }) }, "all pages by this visitor")
               : null
+          )
+        );
+      }
+
+      // The first few things a visitor did on the page (only the deepest scroll mark, to keep the list short).
+      function activityLines(v) {
+        const events = v.events || [];
+        if (!events.length) return null;
+        const deepest = events.filter((e) => e.type === "scroll").pop();
+        const shown = events.filter((e) => e.type !== "scroll" || e === deepest).slice(0, 5);
+        const more = (v.event_count || events.length) - shown.length;
+        return h(
+          "ul",
+          { class: "acts" },
+          shown.map((e) => h("li", {}, h("span", { class: "t" }, timeFmt.format(new Date(e.at))), h("span", {}, eventText(e)))),
+          more > 0 ? h("li", { class: "muted" }, `+${fmt(more)} more in the details`) : null
+        );
+      }
+
+      // Everything that happened on the page, starting with opening it.
+      function timeline(v, events) {
+        return h(
+          "ol",
+          { class: "timeline" },
+          h("li", {}, h("span", { class: "t" }, secondsFmt.format(new Date(v.ts))), h("span", {}, `Opened ${v.title || v.path}`)),
+          events.map((e) =>
+            h(
+              "li",
+              {},
+              h("span", { class: "t" }, secondsFmt.format(new Date(e.at))),
+              h("span", {}, eventText(e), e.detail && e.type !== "scroll" ? h("span", { class: "muted mono detail" }, e.detail) : null)
+            )
+          ),
+          events.length ? null : h("li", { class: "muted" }, "nothing else was recorded on this page")
+        );
+      }
+
+      // Splits a visitor's page views into visits, as the tracker does, and returns the one with page view `id`.
+      function visitOf(views, id) {
+        const visits = [];
+        let end = -Infinity;
+        for (const p of views) {
+          const start = Date.parse(p.ts);
+          if (start - end > VISIT_GAP_MS) visits.push([]);
+          visits[visits.length - 1].push(p);
+          end = Math.max(end, Date.parse(p.last_ts || p.ts), start + (p.duration_s || 0) * 1000);
+        }
+        return visits.find((pages) => pages.some((p) => p.id === id)) || [];
+      }
+
+      // The whole visit this page view was part of (entry page to exit page), and what is known about the visitor.
+      function visitSections(v, data) {
+        const pages = visitOf(data.views, v.id);
+        if (!pages.length || !data.history) return [h("p", { class: "muted small" }, "no other pages recorded")];
+        const total = pages.reduce((sum, p) => sum + (p.duration_s || 0), 0);
+        const before = data.views.filter((p) => p.ts < pages[0].ts).pop()?.ts || data.history.earlier_ts;
+        const history = data.history;
+        return [
+          h("h3", {}, "this visit"),
+          h(
+            "p",
+            { class: "journey-sum" },
+            `${plural(pages.length, "page")} · ${duration(total)} in all · came ${
+              pages[0].ref_host
+                ? `from ${pages[0].ref_host}`
+                : pages[0].referrer
+                  ? "from another page of the site"
+                  : "directly (typed in, bookmarked or from an app)"
+            }`
+          ),
+          h(
+            "ol",
+            { class: "timeline" },
+            pages.map((p, i) =>
+              h(
+                "li",
+                { class: p.id === v.id ? "current" : null },
+                h("span", { class: "t" }, timeFmt.format(new Date(p.ts))),
+                h(
+                  "span",
+                  {},
+                  p.status === 404 ? p.path : shortTitle(p.title) || p.path,
+                  p.status === 404 ? notFound() : null,
+                  h(
+                    "span",
+                    { class: "muted" },
+                    [
+                      "",
+                      p.duration_s != null ? duration(p.duration_s) : null,
+                      pages.length > 1 && i === 0 ? "arrived here" : null,
+                      pages.length > 1 && i === pages.length - 1 ? "left from here" : null,
+                      p.id === v.id ? "this page" : null,
+                    ]
+                      .filter((part) => part != null)
+                      .join(" · ")
+                  )
+                )
+              )
+            )
+          ),
+          h("h3", { style: "margin-top: 0.9rem" }, "this visitor"),
+          h(
+            "p",
+            { class: "journey-sum" },
+            history.days > 1
+              ? `came on ${plural(history.days, "day")}, ${plural(history.views, "page view")} in all`
+              : `only on this day, ${plural(history.views, "page view")}`,
+            h("br"),
+            `first seen ${dateTimeFmt.format(new Date(history.first_ts))} · last seen ${dateTimeFmt.format(new Date(history.last_ts))}`,
+            h("br"),
+            before ? `visit before this one: ${dateTimeFmt.format(new Date(before))}` : "this was their first visit"
+          ),
+          h(
+            "p",
+            { class: "muted small" },
+            "Recognised by network address and browser: on another network or browser, the same person counts as someone new."
+          ),
+        ];
+      }
+
+      // Opens (or closes) a visit's details under its row.
+      function toggleDetails(button, v) {
+        const tr = button.closest("tr");
+        const next = tr.nextElementSibling;
+        if (next && next.classList.contains("detail-row")) {
+          next.remove();
+          button.textContent = "show details";
+          return;
+        }
+        button.textContent = "hide details";
+        const activity = h("div", {}, timeline(v, v.events || []));
+        const journey = h("section", {}, h("p", { class: "muted small" }, "loading the rest of the visit…"));
+        const facts = [
+          v.duration_s != null ? `${duration(v.duration_s)} on screen${v.active_s != null ? `, ${duration(v.active_s)} of it active` : ""}` : null,
+          v.scroll_pct != null ? `scrolled ${v.scroll_pct}% of the way down` : null,
+        ].filter(Boolean);
+        tr.after(
+          h(
+            "tr",
+            { class: "detail-row" },
+            h(
+              "td",
+              { colspan: 8, class: "detail" },
+              h(
+                "div",
+                { class: "visit-detail" },
+                h("section", {}, h("h3", {}, "on this page"), facts.length ? h("p", { class: "facts" }, facts.join(" · ")) : null, activity),
+                journey
+              )
+            )
+          )
+        );
+        if ((v.event_count || 0) > (v.events || []).length) {
+          api("/api/events", new URLSearchParams({ visit: v.id }))
+            .then((data) => activity.replaceChildren(timeline(v, data.events)))
+            .catch(() => {});
+        }
+        if (v.visitor) {
+          api("/api/visitor", new URLSearchParams({ visitor: v.visitor, around: v.ts }))
+            .then((data) => journey.replaceChildren(...visitSections(v, data)))
+            .catch(() => journey.replaceChildren(h("p", { class: "muted small" }, "could not load the rest of the visit")));
+        } else journey.remove();
+      }
+
+      // A whole visit: the pages in the order they were opened, from the page they arrived on to the one they left from.
+      function sessionRow(s) {
+        const when = new Date(s.start);
+        // Long visits show their first three and last two pages.
+        const shown = s.views.length > 6 ? [...s.views.slice(0, 3), null, ...s.views.slice(-2)] : s.views;
+        return h(
+          "tr",
+          {},
+          whenCell(when, s, "started"),
+          orgCell(s, s.start),
+          locationCell(s),
+          h(
+            "td",
+            { "data-label": "pages" },
+            h(
+              "ol",
+              { class: "path" },
+              shown.map((p) =>
+                p
+                  ? h(
+                      "li",
+                      {},
+                      h(
+                        "button",
+                        { type: "button", class: "link", onclick: () => applyFilter({ path: p.path }) },
+                        p.status === 404 ? p.path : shortTitle(p.title) || p.path
+                      ),
+                      p.status === 404 ? notFound() : null,
+                      p.seconds != null ? h("span", { class: "muted" }, ` · ${duration(p.seconds)}`) : null
+                    )
+                  : h("li", { class: "gap" }, `⋮ ${plural(s.views.length - 5, "more page")}`)
+              )
+            ),
+            s.visitor
+              ? h("button", { type: "button", class: "link small", onclick: () => applyFilter({ visitor: s.visitor }) }, "all pages by this visitor")
+              : null
+          ),
+          sourceCell(s),
+          deviceCell(s),
+          h(
+            "td",
+            { class: "num", "data-label": "time in all" },
+            h("div", {}, duration(s.seconds)),
+            h("div", { class: "muted" }, plural(s.pages, "page"))
           )
         );
       }
@@ -2747,6 +3309,20 @@ sitemap: false
       });
       $("#refresh").addEventListener("click", load);
       $("#more").addEventListener("click", loadMore);
+      $("#activity-tabs").addEventListener("click", (e) => {
+        const button = e.target.closest("button[data-tab]");
+        if (!button || !summaryData) return;
+        state.tab = button.dataset.tab;
+        saveTabs();
+        renderActivity();
+      });
+      $("#list-tabs").addEventListener("click", (e) => {
+        const button = e.target.closest("button[data-list]");
+        if (!button || button.dataset.list === state.list) return;
+        state.list = button.dataset.list;
+        saveTabs();
+        loadList();
+      });
       let resizeTimer;
       window.addEventListener("resize", () => {
         clearTimeout(resizeTimer);
