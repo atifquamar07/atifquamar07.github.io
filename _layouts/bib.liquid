@@ -1,6 +1,6 @@
 ---
 ---
-<div class="row">
+<div class="row" data-vt-context="{{ entry.title | strip_html | escape }}">
   {% comment %}
       Temporarily hide publication thumbnail/venue cards for the text-only design preview.
       Remove this comment block to restore the original rendering.
@@ -288,7 +288,7 @@
         {% endif %}
       {% endif %}
       {% if entry.video and site.enable_video_embedding %}
-        <a class="abstract btn btn-sm z-depth-0" role="button">Video</a>
+        <a class="abstract btn btn-sm z-depth-0" role="button" data-vt-event="Opened video">Video</a>
       {% elsif entry.video %}
         <a href="{{ entry.video }}" class="btn btn-sm z-depth-0" role="button">Video</a>
       {% endif %}
@@ -310,7 +310,9 @@
         {% endif %}
       {% endif %}
       {% if entry.bibtex_show %}
-        <a class="bibtex btn btn-sm z-depth-0" role="button"><i class="fa-solid fa-quote-right" aria-hidden="true"></i> Bib</a>
+        <a class="bibtex btn btn-sm z-depth-0" role="button" data-vt-event="Opened BibTeX"
+          ><i class="fa-solid fa-quote-right" aria-hidden="true"></i> Bib</a
+        >
       {% endif %}
     </div>
     {% if site.enable_publication_badges %}
