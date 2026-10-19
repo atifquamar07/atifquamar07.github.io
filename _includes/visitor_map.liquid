@@ -32,7 +32,7 @@
         }
       }
 
-      fetch(endpoint + "/map.json")
+      fetch(endpoint + "/map")
         .then(function (res) {
           return res.ok ? res.json() : null;
         })
