@@ -7,7 +7,7 @@ layout: default
       <aside class="profile-sidebar" aria-label="Profile">
         <div class="profile-panel">
           {% if page.profile.image %}
-            <div class="profile-photo">
+            <div class="profile-photo" data-landscape-avoid>
               {% assign profile_image_path = page.profile.image | prepend: 'assets/img/' %}
               {% if page.profile.image_circular %}
                 {% assign profile_image_class = 'img-fluid z-depth-1 rounded-circle' %}
@@ -123,7 +123,7 @@ layout: default
       </aside>
     {% endif %}
 
-    <article class="about-content">
+    <article class="about-content" data-landscape-content>
       <section class="home-section research-section" id="research">
         <h2 class="section-title">
           <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>

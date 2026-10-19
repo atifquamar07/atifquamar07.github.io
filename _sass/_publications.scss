@@ -75,6 +75,8 @@
       margin-bottom: 1rem;
       padding: 1.35rem 1.5rem;
       background: var(--publication-bg);
+      // A little see-through, so the loss-landscape backdrop shows behind the cards.
+      background: color-mix(in srgb, var(--publication-bg) 65%, transparent);
       border: 1px solid var(--publication-border);
       border-radius: 14px;
       box-shadow: none;

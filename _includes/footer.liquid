@@ -18,13 +18,30 @@
     </div>
   </footer>
 {% else %}
-  <footer class="sticky-bottom mt-5" role="contentinfo">
+  <!--
+    At the end of the page: a rule, the copyright on the left and a note on the backdrop on the right. On the about page it lines up with the main column, beside the fixed profile panel.
+  -->
+  <footer class="sticky-bottom mt-5{% if page.layout == 'about' %} footer-about{% endif %}" role="contentinfo">
     {% if site.newsletter.enabled %}
       {% include newsletter.liquid %}
     {% endif %}
 
     <div class="container">
-      {{ footer_contents }}
+      <div class="footer-row">
+        <p class="footer-copy">
+          &copy; {{ site.time | date: '%Y' }}
+          {{ site.first_name }}
+          {{ site.middle_name }}
+          {{ site.last_name }}. {{ site.footer_text }}
+          {% if site.impressum_path %}
+            <a href="{{ site.url }}{{ site.baseurl }}{{ site.impressum_path }}">Impressum</a>.
+          {% endif %}
+          {% if site.last_updated %}
+            Last updated: {{ 'now' | date: '%B %d, %Y' }}.
+          {% endif %}
+        </p>
+        <p class="footer-note">Built with Jekyll. The loss landscape is computed entirely in your browser.</p>
+      </div>
     </div>
   </footer>
 {% endif %}

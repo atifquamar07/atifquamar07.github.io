@@ -24,13 +24,42 @@ footer.fixed-bottom {
   }
 }
 
+// Set like the backdrop's caption (assets/js/ambient-field.js): IBM Plex Mono
+// at the size of its hint line, in the secondary text color.
 footer.sticky-bottom {
-  border-top: 1px solid var(--global-divider-color);
-  padding-top: 2rem;
   padding-bottom: 2rem;
-  font-size: 0.78rem;
+  color: var(--global-text-color-light);
+  font-family: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  font-size: 10.5px;
 
-  .container {
-    text-align: center;
+  .footer-row {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 0.35rem 1.5rem;
+    padding-top: 1.1rem;
+  }
+
+  p {
+    margin: 0;
+  }
+
+  a {
+    color: inherit;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+
+    &:hover {
+      color: var(--global-theme-color);
+    }
+  }
+}
+
+// On the about page, line up with the main column (the sidebar is 17.5rem with
+// a 2.75rem gap, see _components.scss), so the footer never runs under the
+// fixed profile panel or the backdrop's caption in the bottom-left corner.
+@media (min-width: 768px) {
+  footer.footer-about .footer-row {
+    margin-left: calc(17.5rem + 2.75rem);
   }
 }

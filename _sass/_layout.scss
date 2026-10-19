@@ -23,8 +23,10 @@ body {
   }
 }
 
-// Canvas backdrop drawn by assets/js/ambient-field.js: faint comets with long
-// tails drifting across the viewport, dimmed behind the text column.
+// Canvas backdrop drawn by assets/js/ambient-field.js: contour lines of a loss
+// landscape with SGD, momentum and Adam racing down it, dimmed behind the text
+// column, and a caption in the bottom-left corner where there is room for one.
+// Clicks reach it through the page, so the canvas never takes them.
 .ambient-field {
   position: fixed;
   inset: 0;

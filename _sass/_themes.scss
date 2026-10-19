@@ -29,6 +29,14 @@
   --global-shadow-color-strong: rgba(31, 35, 40, 0.12);
   --global-highlight-color: #{v.$red-color-dark};
 
+  // Loss-landscape backdrop (assets/js/ambient-field.js): r, g, b triplets.
+  --landscape-line: 168, 100, 21;
+  --landscape-sgd: 168, 100, 21;
+  --landscape-momentum: 70, 104, 160;
+  --landscape-adam: 38, 128, 108;
+  --landscape-muon: 132, 84, 160;
+  --landscape-alpha: 0.5;
+
   --publication-bg: #ffffff;
   --publication-border: #e6d8cf;
   --publication-title: #211a15;
@@ -112,6 +120,13 @@ html[data-theme="dark"] {
   --global-shadow-color: rgba(0, 0, 0, 0.2);
   --global-shadow-color-strong: rgba(0, 0, 0, 0.28);
   --global-highlight-color: #f85149;
+
+  --landscape-line: 221, 179, 147;
+  --landscape-sgd: 221, 179, 147;
+  --landscape-momentum: 132, 166, 222;
+  --landscape-adam: 112, 204, 178;
+  --landscape-muon: 196, 160, 232;
+  --landscape-alpha: 0.36;
 
   --publication-bg: #161b22;
   --publication-border: #3d3936;
