@@ -692,6 +692,37 @@ sitemap: false
         max-height: calc(4 * (3.7rem + 11px));
         overflow-y: auto;
       }
+      /* Scrollbars in the site's colours: a slim rounded thumb in the accent, no track. Chrome and Safari use the
+         ::-webkit-scrollbar rules; Firefox uses scrollbar-color (Chrome would let it override the rules below). */
+      .bars.scroll::-webkit-scrollbar,
+      .table-wrap::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+      }
+      .bars.scroll::-webkit-scrollbar-track,
+      .table-wrap::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      .bars.scroll::-webkit-scrollbar-thumb,
+      .table-wrap::-webkit-scrollbar-thumb {
+        border-radius: 99px;
+        background: color-mix(in srgb, var(--theme) 45%, transparent);
+      }
+      .bars.scroll::-webkit-scrollbar-thumb:hover,
+      .table-wrap::-webkit-scrollbar-thumb:hover {
+        background: var(--theme);
+      }
+      .bars.scroll::-webkit-scrollbar-corner,
+      .table-wrap::-webkit-scrollbar-corner {
+        background: transparent;
+      }
+      @supports not selector(::-webkit-scrollbar) {
+        .bars.scroll,
+        .table-wrap {
+          scrollbar-width: thin;
+          scrollbar-color: color-mix(in srgb, var(--theme) 45%, transparent) transparent;
+        }
+      }
       .list-count {
         margin-top: 0.5rem;
         color: var(--text-light);
