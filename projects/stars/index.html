@@ -16,44 +16,391 @@
         "@context": "https://schema.org"
     }
   </script> <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https:; style-src 'self' 'unsafe-inline' https:; img-src 'self' data: https:; font-src 'self' data: https:; media-src 'self' https:; frame-src 'self' https:; connect-src 'self' https:;"> <script>
+  /* Visit tracker (see visit-tracker/README.md): page views, time on page, and what visitors do on the page.
+     Nothing typed is ever recorded (not form contents, not search queries), and neither are mouse movements.
+     An element with data-vt-context="Paper title" adds that title to the events of everything inside it and counts
+     the time spent reading it; data-vt-section="Name" only counts reading time; data-vt-event="Name" records clicks. */
   (function () {
     var endpoint = "https://visit-tracker.atifquamar.workers.dev".replace(/\/+$/, "");
-    var params = new URLSearchParams(location.search);
     try {
       /* Browsers that have signed in to the /visitors dashboard (yours) are not counted. */
       if (localStorage.getItem("visit-tracker-ignore") === "1") return;
     } catch (e) {}
-    if (!navigator.sendBeacon || navigator.webdriver) return;
+    if (!navigator.sendBeacon || navigator.webdriver || !window.URL) return;
 
-    var id = window.crypto && crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(36) + Math.random().toString(36).slice(2);
     function send(path, data) {
       try {
         navigator.sendBeacon(endpoint + path, JSON.stringify(data));
       } catch (e) {}
     }
+    function clean(text, max) {
+      text = String(text || "")
+        .replace(/\s+/g, " ")
+        .trim();
+      return text.length > max ? text.slice(0, max - 1) + "…" : text;
+    }
+    function decode(text) {
+      try {
+        return decodeURIComponent(text);
+      } catch (e) {
+        return text;
+      }
+    }
+
+    /* A page that doesn't exist (a broken link to the site): the server said 404, or the page's title says so. */
+    function missing() {
+      var nav = window.performance && performance.getEntriesByType ? performance.getEntriesByType("navigation")[0] : null;
+      if (nav && nav.responseStatus && nav.name === location.href) return nav.responseStatus === 404;
+      return /(^|\W)404(\W|$)|^(page )?not found/i.test(document.title);
+    }
+
+    var now = Date.now();
+    var page = {
+      id: window.crypto && crypto.randomUUID ? crypto.randomUUID() : now.toString(36) + Math.random().toString(36).slice(2),
+      visibleMs: 0,
+      shownAt: document.visibilityState === "visible" ? now : 0,
+      hiddenAt: 0,
+      activeMs: 0,
+      scroll: null,
+      marks: {},
+      queue: [],
+      reading: {},
+      seen: {},
+      errors: 0,
+    };
 
     send("/hit", {
-      id: id,
+      id: page.id,
       path: location.pathname,
       title: document.title,
       ref: document.referrer,
-      utm: params.get("utm_source"),
+      utm: new URLSearchParams(location.search).get("utm_source"),
       screen: screen.width + "x" + screen.height,
       lang: navigator.language,
+      status: missing() ? 404 : undefined,
     });
 
+    /* Time on page, active time, reading time, scroll depth and the activity since the last report. Sent when the
+       visitor switches away or leaves, and a few seconds after something happens; the tracker keeps the highest values. */
+    var reportTimer = null;
+    function report() {
+      clearTimeout(reportTimer);
+      reportTimer = null;
+      var at = Date.now();
+      var seconds = Math.round((page.visibleMs + (page.shownAt ? at - page.shownAt : 0)) / 1000);
+      /* Reading time that grew since the last report, longest first. */
+      var reading = Object.keys(page.reading)
+        .map(function (name) {
+          var r = page.reading[name];
+          return { name: name, seconds: Math.round(r.ms / 1000), ago: at - r.at, sent: r.sent || 0 };
+        })
+        .filter(function (r) {
+          return r.seconds >= 3 && r.seconds > r.sent;
+        })
+        .sort(function (a, b) {
+          return b.seconds - a.seconds;
+        })
+        .slice(0, 20)
+        .map(function (r) {
+          page.reading[r.name].sent = r.seconds;
+          return { name: r.name, seconds: r.seconds, ago: r.ago };
+        });
+      do {
+        var events = page.queue.splice(0, 20).map(function (e) {
+          return { type: e.type, name: e.name, detail: e.detail, seconds: e.seconds, ago: at - e.at };
+        });
+        send("/leave", { id: page.id, seconds: seconds, active: Math.round(page.activeMs / 1000), scroll: page.scroll, events: events, reading: reading });
+        reading = undefined;
+      } while (page.queue.length);
+    }
 
-    /* Report how long the page was actually on screen whenever the visitor switches away or leaves. */
-    var visibleMs = 0;
-    var shownAt = document.visibilityState === "visible" ? Date.now() : 0;
+    function track(type, name, detail, seconds) {
+      if (!name || page.queue.length >= 100) return;
+      page.queue.push({
+        type: type,
+        name: String(name).slice(0, 150),
+        detail: detail == null ? null : String(detail).slice(0, 300),
+        seconds: seconds,
+        at: Date.now(),
+      });
+      if (!reportTimer) reportTimer = setTimeout(report, 5000);
+    }
+    /* Once per page view, e.g. the first time a video is played. */
+    function once(key) {
+      if (page.seen[key]) return false;
+      return (page.seen[key] = true);
+    }
+
+    /* Switching to another tab or app, and coming back to this page (if they were away for 5 seconds or more). */
     document.addEventListener("visibilitychange", function () {
+      var at = Date.now();
       if (document.visibilityState === "hidden") {
-        if (shownAt) visibleMs += Date.now() - shownAt;
-        shownAt = 0;
-        send("/leave", { id: id, seconds: Math.round(visibleMs / 1000) });
+        if (page.shownAt) page.visibleMs += at - page.shownAt;
+        page.shownAt = 0;
+        page.hiddenAt = at;
+        report();
       } else {
-        shownAt = Date.now();
+        page.shownAt = at;
+        lastInput = at;
+        var away = page.hiddenAt ? Math.round((at - page.hiddenAt) / 1000) : 0;
+        page.hiddenAt = 0;
+        if (away >= 5) track("away", "Switched away and came back", null, away);
       }
+    });
+    /* Browsers that don't report the page as hidden when the visitor navigates away still send the last report. */
+    window.addEventListener("pagehide", report);
+
+    /* The title of the surrounding [data-vt-context] element, e.g. a paper's, added to an event's name. */
+    function context(el) {
+      var holder = el && el.closest ? el.closest("[data-vt-context]") : null;
+      var text = holder ? clean(holder.getAttribute("data-vt-context"), 120) : "";
+      return text ? " · " + text : "";
+    }
+    /* What a link, button or figure says: its label or visible text (without text meant only for screen readers,
+       such as "(current)"), in quotes. */
+    function label(el) {
+      var copy = el.cloneNode(true);
+      var hidden = copy.querySelectorAll(".sr-only, .visually-hidden, [aria-hidden=true]");
+      for (var i = 0; i < hidden.length; i++) hidden[i].remove();
+      var image = el.querySelector("img[alt]");
+      var text = clean(el.getAttribute("aria-label") || copy.textContent || el.getAttribute("title") || (image && image.alt), 60);
+      return text ? "“" + text + "”" : "";
+    }
+
+    /* Active time: the page is on screen and the visitor did something in the last minute (scrolled, clicked, typed,
+       moved the mouse) or a video on it is playing. Each second of it is also credited to what's in the middle of the
+       screen: the paper ([data-vt-context]) or section ([data-vt-section], else the h2/h3 heading above) being read. */
+    var lastInput = Date.now();
+    function input() {
+      lastInput = Date.now();
+    }
+    ["pointerdown", "pointermove", "keydown", "wheel", "touchstart", "scroll"].forEach(function (type) {
+      window.addEventListener(type, input, { passive: true, capture: true });
+    });
+    function readingNow() {
+      var y = window.innerHeight * 0.4;
+      var el = document.elementFromPoint(window.innerWidth / 2, y);
+      var holder = el && el.closest ? el.closest("[data-vt-section], [data-vt-context]") : null;
+      if (holder) return clean(holder.getAttribute("data-vt-section") || holder.getAttribute("data-vt-context"), 150);
+      var root = document.querySelector("main, article, [role=main]") || document.body;
+      var headings = root ? root.querySelectorAll("h2, h3") : [];
+      if (headings.length < 2) return null;
+      var name = null;
+      for (var i = 0; i < headings.length; i++) {
+        if (headings[i].getBoundingClientRect().top > y) break;
+        name = clean(headings[i].textContent, 150);
+      }
+      return name;
+    }
+    function playing() {
+      var media = document.querySelectorAll("video, audio");
+      for (var i = 0; i < media.length; i++) if (!media[i].paused && !media[i].ended) return true;
+      return false;
+    }
+    var lastTick = Date.now();
+    setInterval(function () {
+      var at = Date.now();
+      var elapsed = Math.min(at - lastTick, 2000);
+      lastTick = at;
+      if (document.visibilityState !== "visible" || (at - lastInput > 60000 && !playing())) return;
+      page.activeMs += elapsed;
+      var name = readingNow();
+      if (!name) return;
+      var r = page.reading[name];
+      if (r) r.ms += elapsed;
+      else if (Object.keys(page.reading).length < 50) page.reading[name] = { ms: elapsed, at: at };
+    }, 1000);
+
+    /* How far down the page the visitor scrolled, as 25 / 50 / 75 / 100% marks. Pages that fit on the screen are skipped. */
+    function scrolled() {
+      var height = Math.max(document.documentElement.scrollHeight, document.body ? document.body.scrollHeight : 0);
+      var view = window.innerHeight;
+      if (height <= view * 1.15) return;
+      var bottom = window.scrollY + view;
+      var percent = bottom >= height - 2 ? 100 : Math.floor((100 * bottom) / height);
+      if (page.scroll == null || percent > page.scroll) page.scroll = percent;
+      [25, 50, 75, 100].forEach(function (mark) {
+        if (percent < mark || page.marks[mark]) return;
+        page.marks[mark] = true;
+        track("scroll", "Scrolled to " + mark + "%");
+      });
+    }
+    var scrollTimer = null;
+    window.addEventListener(
+      "scroll",
+      function () {
+        if (!scrollTimer)
+          scrollTimer = setTimeout(function () {
+            scrollTimer = null;
+            scrolled();
+          }, 200);
+      },
+      { passive: true }
+    );
+
+    /* Elements marked with data-vt-event, figures opened, sections expanded, downloads, links to other sites,
+       email links, and which link (in the menu, the footer or the page itself) took the visitor to their next page. */
+    var FILE =
+      /\.(pdf|zip|gz|tgz|bz2|xz|7z|rar|tar|bib|ris|ppt|pptx|key|odp|doc|docx|odt|rtf|xls|xlsx|ods|csv|tsv|txt|tex|ipynb|mp3|wav|mp4|mov|webm|epub|dmg|exe|msi|apk)$/i;
+    var IMAGE = /\.(png|jpe?g|gif|webp|avif|svg)$/i;
+    function clicked(e) {
+      var target = e.target && e.target.closest ? e.target : null;
+      if (!target) return;
+      var el = target.closest("[data-vt-event]");
+      if (el) return track("custom", el.getAttribute("data-vt-event") + context(el), el.getAttribute("data-vt-detail") || el.href || null);
+      var link = target.closest("a[href]");
+      var image = target.closest("img");
+      if (image && (image.hasAttribute("data-zoomable") || (link ? IMAGE.test(link.pathname || "") : image.closest("figure")))) return figure(image, link);
+      var toggle = target.closest("[data-toggle=collapse], [data-bs-toggle=collapse], summary");
+      if (toggle) {
+        /* A <details> element reports itself when it opens. */
+        if (toggle.tagName !== "SUMMARY" && toggle.getAttribute("aria-expanded") !== "true") track("expand", "Expanded " + (label(toggle) || "a section") + context(toggle));
+        return;
+      }
+      if (link) followed(link);
+    }
+    function figure(image, link) {
+      var holder = image.closest("figure");
+      var caption = holder && holder.querySelector("figcaption");
+      var name = caption ? clean(caption.textContent, 80) : clean(image.alt, 80);
+      var file = decode((image.currentSrc || image.src || "").split(/[?#]/)[0].split("/").pop());
+      track("image", (link || image.hasAttribute("data-zoomable") ? "Opened " : "Clicked ") + (name ? "figure “" + name + "”" : file || "an image") + context(image), image.currentSrc || image.src);
+    }
+    function followed(el) {
+      var url;
+      try {
+        url = new URL(el.href, location.href);
+      } catch (err) {
+        return;
+      }
+      if (url.protocol === "mailto:") return track("email", "Clicked an email link" + context(el), decode(url.pathname));
+      if (!/^https?:$/.test(url.protocol)) return;
+      var file = decode(url.pathname.split("/").pop() || "");
+      if (el.hasAttribute("download") || FILE.test(file)) return track("download", "Downloaded " + (file || url.hostname) + context(el), url.href);
+      if (url.hostname !== location.hostname) return track("outbound", "Opened " + url.hostname.replace(/^www\./, "") + context(el), url.href);
+      var text = label(el) || "a link";
+      if (url.pathname === location.pathname && url.search === location.search) {
+        if (url.hash.length > 1) track("link", "Jumped to " + text + " on the page", url.hash);
+        return;
+      }
+      var where = el.closest("nav, header, [role=navigation], [role=banner]") ? "the menu" : el.closest("footer, [role=contentinfo]") ? "the footer" : "the page";
+      track("link", "Clicked " + text + " in " + where + context(el), decode(url.pathname + url.search + url.hash));
+    }
+    document.addEventListener("click", clicked, true);
+    document.addEventListener(
+      "auxclick",
+      function (e) {
+        if (e.button === 1) clicked(e);
+      },
+      true
+    );
+
+    /* <details> sections opened. */
+    document.addEventListener(
+      "toggle",
+      function (e) {
+        var el = e.target;
+        if (el.tagName !== "DETAILS" || !el.open) return;
+        var summary = el.querySelector("summary");
+        track("expand", "Expanded " + ((summary && label(summary)) || "a section") + context(el));
+      },
+      true
+    );
+
+    /* Printing the page, or saving it as a PDF. */
+    window.addEventListener("beforeprint", function () {
+      if (once("print")) track("print", "Printed or saved as PDF");
+    });
+
+    /* A form was sent. Only the form's name is recorded, never anything typed into it, and search boxes are skipped. */
+    document.addEventListener(
+      "submit",
+      function (e) {
+        var form = e.target;
+        if (!form || form.tagName !== "FORM") return;
+        if (form.getAttribute("role") === "search" || form.querySelector("input[type=search]")) return;
+        var heading = form.querySelector("legend, h1, h2, h3, h4");
+        var name = clean(form.getAttribute("aria-label") || form.getAttribute("name") || (heading && heading.textContent) || form.id, 60);
+        track("form", "Sent " + (name ? "the “" + name + "” form" : "a form") + context(form));
+        report();
+      },
+      true
+    );
+
+    /* Videos and audio on the page: when they're played, and how far (25 / 50 / 75 / 100%). Videos embedded from
+       YouTube, Vimeo and the like only tell the page that they were clicked. */
+    function mediaName(el) {
+      var src = decode((el.currentSrc || el.src || "").split(/[?#]/)[0].split("/").pop());
+      return clean(el.getAttribute("title") || el.getAttribute("aria-label") || src, 80) || "a video";
+    }
+    var progress = window.WeakMap ? new WeakMap() : null;
+    document.addEventListener(
+      "play",
+      function (e) {
+        var el = e.target;
+        if (!/^(VIDEO|AUDIO)$/.test(el.tagName)) return;
+        if (progress && !progress.has(el)) progress.set(el, {});
+        if (once("play " + mediaName(el))) track("video", "Played " + mediaName(el) + context(el), el.currentSrc || el.src);
+      },
+      true
+    );
+    document.addEventListener(
+      "timeupdate",
+      function (e) {
+        var el = e.target;
+        var marks = progress && progress.get(el);
+        if (!marks || !(el.duration > 0) || el.duration === Infinity) return;
+        var percent = (100 * el.currentTime) / el.duration;
+        [25, 50, 75, 100].forEach(function (mark) {
+          if (percent < (mark === 100 ? 98 : mark) || marks[mark]) return;
+          marks[mark] = true;
+          track("video", (el.tagName === "AUDIO" ? "Listened to " : "Watched ") + mark + "% of " + mediaName(el) + context(el), null, Math.round(el.currentTime));
+        });
+      },
+      true
+    );
+    var EMBED = /(^|\.)(youtube(-nocookie)?\.com|youtu\.be|vimeo\.com|loom\.com|wistia\.(com|net)|dailymotion\.com|bilibili\.com)$/;
+    window.addEventListener("blur", function () {
+      setTimeout(function () {
+        var el = document.activeElement;
+        if (!el || el.tagName !== "IFRAME") return;
+        var host;
+        try {
+          host = new URL(el.src, location.href).hostname;
+        } catch (err) {
+          return;
+        }
+        if (!EMBED.test(host)) return;
+        var name = clean(el.getAttribute("title"), 80) || host.replace(/^(www|player)\./, "") + " video";
+        if (once("embed " + el.src)) track("video", "Played " + name + context(el), el.src);
+      }, 0);
+    });
+
+    /* Text copied from the page (never from a form field, so nothing a visitor typed). */
+    document.addEventListener("copy", function () {
+      if (!window.getSelection) return;
+      var active = document.activeElement;
+      if (active && (/^(INPUT|TEXTAREA|SELECT)$/.test(active.tagName) || active.isContentEditable)) return;
+      var selection = window.getSelection();
+      var text = clean(String(selection), 1000);
+      if (!text) return;
+      var node = selection.anchorNode;
+      track("copy", "Copied text" + context(node && node.nodeType !== 1 ? node.parentElement : node), text.slice(0, 120));
+    });
+
+    /* JavaScript errors on the site's pages (at most 5 per page view). */
+    function failed(message, where) {
+      message = clean(message, 150);
+      if (!message || message === "Script error." || page.errors >= 5) return;
+      page.errors++;
+      track("error", message, where);
+    }
+    window.addEventListener("error", function (e) {
+      if (e.target === window || e.target == null) failed(e.message, e.filename ? e.filename.split(/[?#]/)[0] + ":" + e.lineno + ":" + e.colno : null);
+    });
+    window.addEventListener("unhandledrejection", function (e) {
+      var reason = e.reason;
+      failed("Unhandled promise rejection: " + (reason && reason.message ? reason.message : String(reason)), null);
     });
   })();
 </script> <script type="text/javascript">
