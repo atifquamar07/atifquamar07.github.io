@@ -581,7 +581,8 @@ sitemap: false
 
       /* ---------- map ---------- */
       #map {
-        height: 420px;
+        /* Twice as wide as tall: the whole world (Greenland to Cape Horn) fits edge to edge. */
+        aspect-ratio: 2 / 1;
         border-radius: 6px;
         overflow: hidden;
         background: var(--bg);
@@ -1244,8 +1245,9 @@ sitemap: false
           margin: 0 -1rem;
           padding: 0 0.25rem;
         }
+        /* Taller on phones, so the map isn't a thin strip; the world still fits its width. */
         #map {
-          height: 340px;
+          aspect-ratio: 4 / 3;
         }
       }
     </style>
@@ -2434,7 +2436,8 @@ sitemap: false
             data: pointsGeoJson(),
             cluster: true,
             clusterMaxZoom: 5,
-            clusterRadius: 28,
+            // Wider than two of the largest circles (18 px each), so neighbouring numbers never overlap.
+            clusterRadius: 40,
             clusterProperties: { views: ["+", ["get", "views"]] },
           });
           const single = ["!", ["has", "point_count"]];
@@ -2536,6 +2539,14 @@ sitemap: false
           mapReady = true;
           applyMapTheme();
           fitMap();
+          // Until you zoom or pan, the whole world stays in view when the window changes size.
+          let moved = false;
+          map.on("movestart", (e) => {
+            if (e.originalEvent) moved = true;
+          });
+          map.on("resize", () => {
+            if (!moved) map.fitBounds(WORLD, { padding: 0, duration: 0 });
+          });
           // Keep the credits behind their (i) button on small maps; they are also in the page footer.
           if (map.getContainer().clientWidth < 640) document.querySelector(".maplibregl-ctrl-attrib")?.classList.remove("maplibregl-compact-show");
         });
@@ -2627,14 +2638,16 @@ sitemap: false
         }
       }
 
+      // The map opens on the whole world, split at the Bering Strait (like most world maps) so every continent is in
+      // one piece and the land is centred; numbers zoom in to the places behind them.
+      const WORLD = [
+        [-169, -56],
+        [191, 78],
+      ];
       function fitMap() {
-        if (!mapReady || mapFitted || !mapPoints.length) return;
+        if (!mapReady || mapFitted) return;
         mapFitted = true;
-        const bounds = new maplibregl.LngLatBounds();
-        for (const p of mapPoints) bounds.extend([p.lon, p.lat]);
-        // Less padding on narrow (phone) maps, so all locations still fit.
-        const padding = Math.min(60, map.getContainer().clientWidth / 10);
-        map.fitBounds(bounds, { padding, maxZoom: 7, duration: 600 });
+        map.fitBounds(WORLD, { padding: 0, duration: 0 });
       }
 
       // ---------- what visitors did ----------
