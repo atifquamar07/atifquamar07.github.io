@@ -32,6 +32,7 @@
   var LR = [0.0007, 0.00012, 0.0028, 0.0035]; // SGD, momentum, Adam, Muon: tuned so each shows its textbook behavior
   var MUON_BETA = 0.95; // Muon's momentum
   var MUON_DECAY = 360; // ticks over which Muon's rate decays to zero (12 s)
+  var MUON_SETTLE = 20; // update norm below which Muon's step shrinks with it, so it settles instead of jittering
   var MAX_STEP = 0.012; // largest step per tick, in viewport fractions
   var TRAIL = 160; // ticks of trail kept per optimizer
   var LIFE = 16; // seconds a run lasts before it fades
@@ -249,6 +250,9 @@
       // orthogonalize the update. The point is a 1×2 matrix, for which that
       // keeps the direction and brings the length close to one, so the step
       // size comes from the rate, decayed linearly as Muon is usually run.
+      // A unit-length step never shrinks near a minimum, so it would hop
+      // across it every tick until the decay ran out; below MUON_SETTLE the
+      // step scales with the update's norm and Muon settles like the others.
       o.k++;
       o.mx = MUON_BETA * o.mx + gx;
       o.my = MUON_BETA * o.my + gy;
@@ -263,7 +267,7 @@
         ux *= s;
         uy *= s;
       }
-      var rate = LR[3] * Math.max(0, 1 - o.k / MUON_DECAY);
+      var rate = LR[3] * Math.max(0, 1 - o.k / MUON_DECAY) * Math.min(1, un / MUON_SETTLE);
       dx = -rate * ux;
       dy = -rate * uy;
     }
