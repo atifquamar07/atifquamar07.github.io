@@ -2,6 +2,9 @@
 # top. `text` is Markdown: **bold**, [link](https://...), emoji like :tada:.
 # Quote the text if it starts with [ or contains ": ".
 
+- date: 2026-10-25
+  text: Won the **Best Technical Solution Award** at a case competition organized by **BCG X**.
+
 - date: 2026-09-29
   text: Our new work on [Self-Adaptive Multi Agent Systems](https://arxiv.org/abs/2609.35412) is now up on arXiv!
 

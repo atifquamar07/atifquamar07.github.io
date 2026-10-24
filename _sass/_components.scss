@@ -308,6 +308,105 @@ ul.task-list input[type="checkbox"] {
     }
   }
 
+  // The backdrop's caption as HTML, after the About section, set like the
+  // canvas one (IBM Plex Mono, marks shaped and colored like the runs). Only
+  // phones show it: on wider screens the canvas draws it in the bottom-left corner.
+  .profile-landscape {
+    margin: -1rem 0 2.5rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--global-border-light-color);
+    color: var(--global-text-color-light);
+    font-family: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+    font-size: 11px;
+    font-weight: 400;
+
+    // The theme colors every p and li directly, so set them here too.
+    p,
+    li {
+      color: var(--global-text-color-light);
+    }
+
+    h2 {
+      margin: 0 0 0.4rem;
+      color: var(--global-text-color-light);
+      font-family: inherit;
+      font-size: 12.5px;
+      font-weight: 400;
+
+      span {
+        color: rgb(var(--landscape-line));
+        font-weight: 500;
+        white-space: nowrap;
+      }
+    }
+
+    h2 span,
+    .landscape-formula {
+      transition: opacity 0.2s linear;
+    }
+
+    p {
+      margin: 0;
+    }
+
+    .landscape-formula {
+      white-space: pre-wrap;
+      line-height: 1.6;
+    }
+
+    .landscape-legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.3rem 1rem;
+      margin: 0.65rem 0 0.45rem;
+      padding: 0;
+      list-style: none;
+
+      li {
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+      }
+    }
+
+    .landscape-note {
+      font-size: 10.5px;
+    }
+  }
+
+  .landscape-mark {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    background: currentColor;
+  }
+
+  .landscape-mark-sgd {
+    color: rgb(var(--landscape-sgd));
+    width: 6.5px;
+    height: 6.5px;
+    border-radius: 50%;
+  }
+
+  .landscape-mark-momentum {
+    color: rgb(var(--landscape-momentum));
+    border: 1.6px solid currentColor;
+    border-radius: 50%;
+    background: none;
+  }
+
+  .landscape-mark-adam {
+    color: rgb(var(--landscape-adam));
+    width: 6px;
+    height: 6px;
+    transform: rotate(45deg);
+  }
+
+  .landscape-mark-muon {
+    color: rgb(var(--landscape-muon));
+    clip-path: polygon(50% 0, 100% 100%, 0 100%);
+  }
+
   .profile-list {
     display: flex;
     flex-wrap: wrap;
@@ -460,7 +559,6 @@ ul.task-list input[type="checkbox"] {
       // Bound the list on first paint, before JavaScript measures the rows.
       max-height: calc(var(--news-visible-items, 6) * 2.82rem);
       overflow-y: auto;
-      overscroll-behavior: contain;
       scrollbar-gutter: stable;
       scrollbar-width: thin;
       scrollbar-color: var(--news-scrollbar-thumb) transparent;
@@ -550,6 +648,10 @@ ul.task-list input[type="checkbox"] {
 }
 
 @media (min-width: 768px) {
+  .about-page .profile-landscape {
+    display: none;
+  }
+
   .about-page {
     .about-shell {
       grid-template-columns: 17.5rem minmax(0, 1fr);

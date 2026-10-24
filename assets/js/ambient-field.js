@@ -7,7 +7,8 @@
 // stay clear of anything marked data-landscape-avoid (the profile photo), and a
 // gentle hill under each such element keeps any run from coming to rest there.
 // A caption in the bottom-left corner names the surface, shows its formula and
-// explains the click, wherever there is room for it beside the text.
+// explains the click, wherever there is room for it beside the text; where
+// there isn't (on a phone), the page's HTML copy of it is shown instead.
 // Everything is dimmed behind the main column, pauses when the tab is hidden,
 // draws finished paths instead of animating under prefers-reduced-motion, and
 // takes its colors from the --landscape-* custom properties, so it follows the
@@ -714,6 +715,12 @@
     { formula: false, notes: false },
   ];
   var caption = null; // { x, y: baseline of the bottom line, version, w, up }
+  // The HTML copy (on the about page, after the About section), shown when
+  // the canvas has no room for the caption.
+  var html = document.querySelector("[data-landscape-caption]"),
+    htmlName = html && html.querySelector("[data-landscape-name]"),
+    htmlFormula = html && html.querySelector("[data-landscape-formula]"),
+    htmlShown = { k: -1, alpha: -1 };
 
   // The caption's lines for surface F, bottom first; `y` is each baseline's
   // offset from the bottom one.
@@ -788,6 +795,27 @@
       caption = { x: x, y: bottom, version: version, w: size.w, up: size.up };
       return true;
     });
+    if (html) html.hidden = !!caption;
+  }
+
+  // Keep the HTML copy on the surface being drawn, fading its name and formula
+  // across a morph the way the canvas caption does.
+  function updateHtmlCaption(k, shown) {
+    if (!html || html.hidden) return;
+    if (k !== htmlShown.k) {
+      htmlShown.k = k;
+      htmlName.textContent = FUNCS[k].name;
+      htmlFormula.textContent = FUNCS[k].formula
+        .map(function (part, i) {
+          return (i ? "    " : "f = ") + part;
+        })
+        .join("\n");
+    }
+    var alpha = Math.round(shown * 20) / 20;
+    if (alpha !== htmlShown.alpha) {
+      htmlShown.alpha = alpha;
+      htmlName.style.opacity = htmlFormula.style.opacity = alpha;
+    }
   }
 
   // Whether a fixed element (the profile panel, say) covers any part of `box`.
@@ -819,6 +847,9 @@
   }
 
   function drawCaption() {
+    var k = st.b !== null && st.m >= 0.5 ? st.b : st.a,
+      shown = st.b === null ? 1 : ease(Math.abs(st.m - 0.5) / 0.15);
+    updateHtmlCaption(k, shown);
     if (!caption) return;
     var x = caption.x,
       y = caption.y,
@@ -840,8 +871,6 @@
     ctx.fill();
     ctx.globalCompositeOperation = "source-over";
 
-    var k = st.b !== null && st.m >= 0.5 ? st.b : st.a,
-      shown = st.b === null ? 1 : ease(Math.abs(st.m - 0.5) / 0.15);
     ctx.textAlign = "left";
     ctx.textBaseline = "alphabetic";
     captionLines(caption.version, FUNCS[k]).forEach(function (line) {

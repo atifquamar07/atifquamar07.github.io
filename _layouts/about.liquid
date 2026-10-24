@@ -132,6 +132,19 @@ layout: default
         <div class="section-body about-copy clearfix">{{ content }}</div>
       </section>
 
+      <!-- The backdrop's caption, for screens with no room to draw it (assets/js/ambient-field.js shows it). -->
+      <section class="profile-landscape" aria-label="Loss landscape" data-landscape-caption hidden>
+        <h2>the background is a loss landscape &middot; <span data-landscape-name></span></h2>
+        <p class="landscape-formula" data-landscape-formula></p>
+        <ul class="landscape-legend">
+          <li><span class="landscape-mark landscape-mark-sgd" aria-hidden="true"></span>sgd</li>
+          <li><span class="landscape-mark landscape-mark-momentum" aria-hidden="true"></span>momentum</li>
+          <li><span class="landscape-mark landscape-mark-adam" aria-hidden="true"></span>adam</li>
+          <li><span class="landscape-mark landscape-mark-muon" aria-hidden="true"></span>muon</li>
+        </ul>
+        <p class="landscape-note">tap any empty spot to race them downhill</p>
+      </section>
+
       <!-- News -->
       {% if page.announcements and page.announcements.enabled %}
         <section class="home-section news-section" id="news">
