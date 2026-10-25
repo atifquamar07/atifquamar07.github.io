@@ -692,28 +692,36 @@
   }
 
   // ── Caption ───────────────────────────────────────────────────────────────
-  // Bottom-left, from the top down: "loss landscape · <surface>", its formula,
+  // Bottom-left, from the top down: "the background is a loss landscape ·
+  // <surface>", its formula,
   // the legend and how to start a run (the footer says it is all computed in
   // the browser). When the surface changes, its name and formula fade out
   // before the next one's fade in, so the two never overlap, and the contours
   // are cleared from behind the caption so it stays legible.
   // It is drawn only where no text can sit on it: left of the scrolling
   // content (the element marked data-landscape-content, else the main
-  // column), clear of fixed panels, above a fixed footer. Shorter versions
-  // (without the formula, then without the hint) are tried in turn.
+  // column), clear of fixed panels, above a fixed footer. The formula goes on
+  // one line, in a slightly smaller face if that is what it takes; shorter
+  // versions (with just "loss landscape ·", then the formula broken over two
+  // lines, then without it, then without the hint) are tried in turn.
   var MONO = '"IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace';
-  var FONT_NAME = "500 12.5px " + MONO,
-    FONT_PREFIX = "12.5px " + MONO,
+  var FONT_NAME = "500 11px " + MONO,
+    FONT_PREFIX = "11px " + MONO,
     FONT_TEXT = "11px " + MONO,
     FONT_NOTE = "10.5px " + MONO;
-  var PREFIX = "loss landscape · ";
+  var PREFIX = "the background is a loss landscape · ",
+    PREFIX_SHORT = "loss landscape · ";
   var LEGEND = ["sgd", "momentum", "adam", "muon"];
-  var NOTES = ["click any empty spot to race them"];
+  var NOTES = ["click any empty spot to race them downhill"];
   var VERSIONS = [
-    { formula: true, notes: true },
-    { formula: false, notes: true },
-    { formula: false, notes: false },
+    { prefix: PREFIX, formula: "line", notes: true },
+    { prefix: PREFIX_SHORT, formula: "line", notes: true },
+    { prefix: PREFIX_SHORT, formula: "wrap", notes: true },
+    { prefix: PREFIX_SHORT, formula: false, notes: true },
+    { prefix: PREFIX_SHORT, formula: false, notes: false },
   ];
+  var FORMULA_MIN = 9.5; // px a one-line formula may shrink to
+  var formulaPx = 11; // its size in the fitted caption
   var caption = null; // { x, y: baseline of the bottom line, version, w, up }
   // The HTML copy (on the about page, after the About section), shown when
   // the canvas has no room for the caption.
@@ -738,14 +746,21 @@
     lines.push({ kind: "legend", y: y });
     y -= 22;
     if (version.formula) {
-      for (i = F.formula.length - 1; i >= 0; i--) {
-        lines.push({ kind: "formula", text: (i ? "    " : "f = ") + F.formula[i], y: y });
+      var parts = version.formula === "wrap" ? F.formula : [F.formula.join(" ")];
+      for (i = parts.length - 1; i >= 0; i--) {
+        lines.push({ kind: "formula", text: (i ? "    " : "f = ") + parts[i], y: y });
         y -= 15;
       }
       y -= 3;
     }
-    lines.push({ kind: "name", text: F.name, y: y });
+    lines.push({ kind: "name", prefix: version.prefix, text: F.name, y: y });
     return lines;
+  }
+
+  function lineFont(line) {
+    if (line.kind === "note") return FONT_NOTE;
+    if (line.kind === "formula") return formulaPx + "px " + MONO;
+    return FONT_TEXT;
   }
 
   function lineWidth(line) {
@@ -757,11 +772,11 @@
     }
     if (line.kind === "name") {
       ctx.font = FONT_PREFIX;
-      var w = ctx.measureText(PREFIX).width;
+      var w = ctx.measureText(line.prefix).width;
       ctx.font = FONT_NAME;
       return w + ctx.measureText(line.text).width;
     }
-    ctx.font = line.kind === "note" ? FONT_NOTE : FONT_TEXT;
+    ctx.font = lineFont(line);
     return ctx.measureText(line.text).width;
   }
 
@@ -789,13 +804,21 @@
       bottom = (foot && isFixed(foot) ? foot.getBoundingClientRect().top : H) - 20,
       x = 22;
     VERSIONS.some(function (version) {
-      var size = captionSize(version),
-        box = { l: x - 4, r: x + size.w + 4, t: bottom - size.up - 4, b: bottom + 6 };
-      if (box.r > right - 16 || box.t < top || fixedUnder(box)) return false;
-      caption = { x: x, y: bottom, version: version, w: size.w, up: size.up };
-      return true;
+      var min = version.formula === "line" ? FORMULA_MIN : 11;
+      for (formulaPx = 11; formulaPx >= min; formulaPx -= 0.5) {
+        var size = captionSize(version),
+          box = { l: x - 4, r: x + size.w + 4, t: bottom - size.up - 4, b: bottom + 6 };
+        if (box.r > right - 16) continue;
+        if (box.t < top || fixedUnder(box)) return false;
+        caption = { x: x, y: bottom, version: version, w: size.w, up: size.up };
+        return true;
+      }
+      return false;
     });
-    if (html) html.hidden = !!caption;
+    if (html) {
+      html.hidden = !!caption;
+      htmlShown.k = -1; // fit its formula again at the new width
+    }
   }
 
   // Keep the HTML copy on the surface being drawn, fading its name and formula
@@ -805,11 +828,11 @@
     if (k !== htmlShown.k) {
       htmlShown.k = k;
       htmlName.textContent = FUNCS[k].name;
-      htmlFormula.textContent = FUNCS[k].formula
-        .map(function (part, i) {
-          return (i ? "    " : "f = ") + part;
-        })
-        .join("\n");
+      // One line, shrunk to the column's width if it has to be.
+      htmlFormula.textContent = "f = " + FUNCS[k].formula.join(" ");
+      htmlFormula.style.fontSize = "";
+      var over = htmlFormula.scrollWidth / htmlFormula.clientWidth;
+      if (over > 1) htmlFormula.style.fontSize = Math.max(8, Math.floor(22 / over) / 2) + "px";
     }
     var alpha = Math.round(shown * 20) / 20;
     if (alpha !== htmlShown.alpha) {
@@ -890,14 +913,14 @@
         ctx.font = FONT_PREFIX;
         ctx.globalAlpha = 1;
         ctx.fillStyle = colors.label;
-        ctx.fillText(PREFIX, x, ly);
-        var px = x + ctx.measureText(PREFIX).width;
+        ctx.fillText(line.prefix, x, ly);
+        var px = x + ctx.measureText(line.prefix).width;
         ctx.font = FONT_NAME;
         ctx.globalAlpha = shown;
         ctx.fillStyle = "rgb(" + colors.line + ")";
         ctx.fillText(line.text, px, ly);
       } else {
-        ctx.font = line.kind === "note" ? FONT_NOTE : FONT_TEXT;
+        ctx.font = lineFont(line);
         ctx.globalAlpha = line.kind === "formula" ? shown : 1;
         ctx.fillStyle = colors.label;
         ctx.fillText(line.text, x, ly);

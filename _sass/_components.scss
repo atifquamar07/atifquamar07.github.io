@@ -330,7 +330,7 @@ ul.task-list input[type="checkbox"] {
       margin: 0 0 0.4rem;
       color: var(--global-text-color-light);
       font-family: inherit;
-      font-size: 12.5px;
+      font-size: 11px;
       font-weight: 400;
 
       span {
@@ -350,7 +350,7 @@ ul.task-list input[type="checkbox"] {
     }
 
     .landscape-formula {
-      white-space: pre-wrap;
+      white-space: nowrap;
       line-height: 1.6;
     }
 
