@@ -11,6 +11,10 @@ ALLOWED_ORIGINS = "https://www.atifquamar.com,https://atifquamar.com"
 # Stored IP addresses are erased after this many days (0 keeps them forever).
 # Location, organization and hostname are kept.
 IP_RETENTION_DAYS = "365"
+# AI summaries of finished visits (needs the GEMINI_API_KEY secret): the models, in order (when one is rate limited
+# or overloaded the next is used), and at most how many visits are summarized each hour. Each visit is sent once.
+GEMINI_MODELS = "gemini-3.8-flash,gemini-3.6-flash,gemini-3.5-flash-lite"
+SUMMARIES_PER_RUN = "8"
 
 [[d1_databases]]
 binding = "DB"

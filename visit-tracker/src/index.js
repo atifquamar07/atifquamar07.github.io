@@ -31,12 +31,21 @@ const EVENT_TYPES = new Set([
   "expand",
   "link",
   "error",
+  "seen",
+  "search",
+  "click",
+  "rage",
+  "dead",
 ]);
-const MAX_EVENTS = 200;
+// Activity that is only counted (papers scrolled past, clicks for the click map), not listed with each visit.
+const QUIET_EVENTS = "('seen', 'click')";
+const MAX_EVENTS = 300;
 // Activity shown with each visit in the list; the rest is fetched when the visit is opened.
 const LIST_EVENTS = 12;
 // A visitor's page views with gaps of less than this form one visit.
 const VISIT_GAP_DAYS = 30 / 1440;
+// Whole visits sent to the dashboard's insights at most (newest first).
+const MAX_INSIGHT_VISITS = 3000;
 
 export default {
   async fetch(request, env, ctx) {
@@ -61,6 +70,8 @@ export default {
         case "/api/events":
         case "/api/visitor":
         case "/api/sessions":
+        case "/api/insights":
+        case "/api/clicks":
           return await dashboardApi(request, env, url);
         default:
           return new Response("Not found", { status: 404 });
@@ -72,7 +83,7 @@ export default {
   },
 
   async scheduled(controller, env, ctx) {
-    ctx.waitUntil(Promise.all([refreshMapCache(env), eraseOldIps(env)]));
+    ctx.waitUntil(Promise.all([refreshMapCache(env), eraseOldIps(env), summarizeVisits(env)]));
   },
 };
 
@@ -364,6 +375,197 @@ async function eraseOldIps(env) {
 }
 
 // ---------------------------------------------------------------------------
+// AI summaries: once a visit is over (30 minutes without activity), an AI model (Gemini, with the GEMINI_API_KEY
+// secret) writes in a sentence or two what the visitor was probably trying to do, and guesses who they might be.
+// Each visit is sent at most once: after an answer it is never sent again, and visits where nothing happened are
+// skipped without a call. When a model can't answer (rate limited, overloaded, too slow), the next one in
+// GEMINI_MODELS is asked instead, and the busy one is left out for the rest of the hour's run; when none can,
+// nothing is saved and the visit is tried again the next hour. The model sees the network name, city, device, where the
+// visitor came from and what they did, never IP addresses, hostnames or visitor ids.
+
+const SUMMARY_DAYS = 30;
+const SUMMARY_MODELS = "gemini-3.8-flash,gemini-3.6-flash,gemini-3.5-flash-lite";
+const SUMMARY_PROMPT = `You read the log of one visit to a researcher's personal academic website (pages such as home, publications, CV, blog, projects, teaching).
+
+In "summary", say what the visitor was most likely trying to do, in one or two short, plain sentences in the third person ("They ..."), naming the specific papers, pages or files involved. Base it only on the log: long reading means interest, BibTeX means citing, a PDF, arXiv or DOI link means getting the paper, code or GitHub links mean looking for code, the CV and home page mean checking the researcher's background, an email link means trying to get in touch, clicks on things that aren't links or clicks repeated again and again mean they got stuck, and a very short visit is a quick look. Say so when it's unclear. Don't retell the log step by step.
+
+In "who", guess in a few words who the visitor might be (for example a researcher in the same field, a recruiter or hiring manager, a prospective student, a collaborator, a reviewer, someone who knows the researcher, a crawler), from their network, location, where they came from and what they did. In "confidence", say how sure you are of that guess.`;
+const SUMMARY_SCHEMA = {
+  type: "OBJECT",
+  properties: {
+    summary: { type: "STRING" },
+    who: { type: "STRING" },
+    confidence: { type: "STRING", enum: ["low", "medium", "high"] },
+  },
+  required: ["summary", "who", "confidence"],
+};
+
+async function summarizeVisits(env) {
+  if (!env.GEMINI_API_KEY) return;
+  const calls = clampInt(env.SUMMARIES_PER_RUN, 0, 50, 8);
+  if (!calls) return;
+  // In order of preference; a model that is busy is dropped from this list for the rest of the run.
+  const models = String(env.GEMINI_MODELS || SUMMARY_MODELS)
+    .split(",")
+    .map((m) => m.trim())
+    .filter(Boolean);
+  const now = Date.now();
+  // Finished visits of the last SUMMARY_DAYS without a summary, newest first.
+  const { results: visits } = await env.DB.prepare(
+    `WITH pv AS (
+       SELECT id, visitor, ts, path, title, duration_s, active_s, scroll_pct, status,
+              MAX(julianday(COALESCE(last_ts, ts)), julianday(ts) + COALESCE(duration_s, 0) / 86400.0) AS ends
+       FROM visits WHERE ts >= ?1
+     ), gaps AS (
+       SELECT *, MAX(ends) OVER (PARTITION BY visitor ORDER BY ts, id ROWS BETWEEN UNBOUNDED PRECEDING AND 1 PRECEDING) AS prev_ends FROM pv
+     ), numbered AS (
+       SELECT *, SUM(CASE WHEN prev_ends IS NULL OR julianday(ts) - prev_ends > ${VISIT_GAP_DAYS} THEN 1 ELSE 0 END)
+                   OVER (PARTITION BY visitor ORDER BY ts, id ROWS UNBOUNDED PRECEDING) AS n
+       FROM gaps
+     ), sessions AS (
+       SELECT visitor, n, MIN(id) AS first_id, MAX(ends) AS ends,
+              json_group_array(json_object('id', id, 'ts', ts, 'path', path, 'title', title, 'seconds', duration_s, 'active', active_s,
+                                           'scroll', scroll_pct, 'status', status)) AS views
+       FROM numbered GROUP BY visitor, n
+     )
+     SELECT s.first_id, s.views, f.ts, f.org, f.kind, f.city, f.region, f.country, f.device, f.os, f.browser, f.lang, f.tz,
+            f.referrer, f.ref_host, f.utm_source,
+            (SELECT COUNT(DISTINCT date(ts)) FROM visits WHERE visitor = s.visitor AND ts < date(f.ts)) AS earlier_days
+     FROM sessions s JOIN visits f ON f.id = s.first_id
+     WHERE s.ends < julianday(?2) AND s.first_id NOT IN (SELECT visit_id FROM summaries)
+     ORDER BY f.ts DESC LIMIT 100`
+  )
+    .bind(new Date(now - SUMMARY_DAYS * 86400000).toISOString(), new Date(now - RELOAD_WINDOW_MS).toISOString())
+    .all();
+  let made = 0;
+  for (const visit of visits) {
+    if (made >= calls) break;
+    const views = JSON.parse(visit.views).sort((a, b) => a.ts.localeCompare(b.ts) || a.id - b.id);
+    const { results: events } = await env.DB.prepare(
+      `SELECT visit_id, at, type, name, detail, seconds FROM events
+       WHERE visit_id IN (${views.map(() => "?").join(",")}) AND type NOT IN ('click', 'scroll') ORDER BY at, id LIMIT 400`
+    )
+      .bind(...views.map((v) => v.id))
+      .all();
+    const save = (status, answer = {}) =>
+      env.DB.prepare(
+        "INSERT OR IGNORE INTO summaries (visit_id, status, summary, who, confidence, model, created) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7)"
+      )
+        .bind(
+          visit.first_id,
+          status,
+          answer.summary || null,
+          answer.who || null,
+          answer.confidence || null,
+          answer.model || null,
+          new Date().toISOString()
+        )
+        .run();
+    const active = views.reduce((sum, v) => sum + (v.active ?? v.seconds ?? 0), 0);
+    // Nothing to say about one page glanced at: no actions, nothing read for more than a few seconds.
+    const acted = events.some((e) => e.type !== "seen" && e.type !== "away" && (e.type !== "read" || e.seconds >= 10));
+    if (views.length === 1 && active < 10 && !acted) {
+      await save("skipped");
+      continue;
+    }
+    made++;
+    const log = visitLog(visit, views, events);
+    let answer = null;
+    while (models.length && !(answer = await askGemini(env, models[0], log))) models.shift();
+    if (!answer) return; // every model is busy: tried again next hour
+    await save(answer.summary ? "done" : "failed", answer);
+  }
+}
+
+// One visit as plain text for the model: who, where from, then each page with what happened on it.
+function visitLog(visit, views, events) {
+  const start = Date.parse(views[0].ts);
+  const at = (iso) => {
+    const sec = Math.max(0, Math.round((Date.parse(iso) - start) / 1000));
+    return `+${Math.floor(sec / 60)}:${String(sec % 60).padStart(2, "0")}`;
+  };
+  let local = null;
+  try {
+    local = visit.tz
+      ? new Intl.DateTimeFormat("en-GB", { weekday: "long", hour: "2-digit", minute: "2-digit", timeZone: visit.tz }).format(new Date(start))
+      : null;
+  } catch {}
+  const kind = { academic: " (university / research network)", cloud: " (cloud / VPN / proxy)" }[visit.kind] || "";
+  const lines = [
+    `Network: ${visit.org || "unknown"}${kind}`,
+    `Location: ${[visit.city, visit.region, visit.country].filter(Boolean).join(", ") || "unknown"}`,
+    `Device: ${[visit.device, visit.os, visit.browser, visit.lang].filter(Boolean).join(", ")}`,
+    `Came from: ${visit.ref_host ? visit.referrer || visit.ref_host : visit.utm_source ? `a link tagged utm_source=${visit.utm_source}` : "nowhere (typed in, a bookmark, or an app)"}`,
+    `Visitor's local time: ${local || "unknown"}`,
+    `Earlier visits: ${visit.earlier_days ? `on ${visit.earlier_days} earlier day(s)` : "none recorded"}`,
+    "Pages, in the order they were opened (times since the visit started):",
+  ];
+  views.forEach((v, i) => {
+    const page = v.status === 404 ? `a page that doesn't exist (${v.path})` : `${v.title || v.path} (${v.path})`;
+    const time = v.seconds == null ? "time unknown" : `${v.seconds} s on screen, ${v.active ?? v.seconds} s of it active`;
+    lines.push(`${i + 1}. ${at(v.ts)} ${page}: ${time}${v.scroll != null ? `, scrolled ${v.scroll}% down` : ""}`);
+    const seen = [];
+    for (const e of events) {
+      if (e.visit_id !== v.id) continue;
+      if (e.type === "seen") seen.push(e.name);
+      else {
+        const detail = e.detail && e.detail[0] !== "{" ? ` [${e.detail.slice(0, 150)}]` : "";
+        const label =
+          e.type === "read" ? `read "${e.name}" for ${e.seconds} s` : e.type === "away" ? `switched to another tab for ${e.seconds} s` : e.name;
+        lines.push(`   ${at(e.at)} ${e.type}: ${label}${detail}`);
+      }
+    }
+    if (seen.length) lines.push(`   papers that came into view: ${seen.join("; ")}`);
+  });
+  return lines.join("\n").slice(0, 12000);
+}
+
+// { summary, who, confidence, model } from the model; { model } when its answer can't be used; null when it
+// couldn't answer at all (rate limited, overloaded, too slow), so another model or a later run can be tried.
+async function askGemini(env, model, log) {
+  let res;
+  try {
+    res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "x-goog-api-key": env.GEMINI_API_KEY },
+      body: JSON.stringify({
+        systemInstruction: { parts: [{ text: SUMMARY_PROMPT }] },
+        contents: [{ role: "user", parts: [{ text: log }] }],
+        // A short summary needs little reasoning: less thinking is faster and uses fewer tokens.
+        generationConfig: {
+          temperature: 0.3,
+          responseMimeType: "application/json",
+          responseSchema: SUMMARY_SCHEMA,
+          thinkingConfig: { thinkingLevel: "low" },
+        },
+      }),
+      signal: AbortSignal.timeout(60000),
+    });
+  } catch (err) {
+    console.error(`summary: no answer from ${model}`, err);
+    return null;
+  }
+  if (!res.ok) {
+    console.error(`summary: ${model} said ${res.status}`, (await res.text()).slice(0, 300));
+    return null;
+  }
+  try {
+    const data = await res.json();
+    const text = (data.candidates?.[0]?.content?.parts || []).map((part) => part.text || "").join("");
+    const answer = JSON.parse(text);
+    return {
+      summary: str(answer.summary, 700),
+      who: str(answer.who, 200),
+      confidence: ["low", "medium", "high"].includes(answer.confidence) ? answer.confidence : null,
+      model,
+    };
+  } catch (err) {
+    console.error("summary: unusable answer", err);
+    return { model };
+  }
+}
+
+// ---------------------------------------------------------------------------
 // Private dashboard API, used by the /visitors/ page on the website.
 // The password is never stored: the DASHBOARD_PASSWORD_HASH secret holds only a salted PBKDF2 hash
 // (made by `npm run password`). Signing in returns a token that is valid for 30 days.
@@ -428,6 +630,10 @@ async function dashboardResponse(request, env, url) {
       return json(await visitorHistory(env, params));
     case "/api/sessions":
       return json(await sessionList(env, params));
+    case "/api/insights":
+      return insights(env, params);
+    case "/api/clicks":
+      return json(await clickMap(env, params));
   }
   return json({ error: "Not found" }, 404);
 }
@@ -568,7 +774,8 @@ async function summary(env, params) {
     // and errors have their own lists, and time away and links within the site stay with each visit.
     stmt(
       `SELECT e.type, e.name, COUNT(*) AS views, COUNT(DISTINCT v.visitor) AS visitors ${ofVisits}
-       WHERE e.type NOT IN ('scroll', 'read', 'away', 'link', 'error') GROUP BY e.type, e.name ORDER BY views DESC LIMIT 100`
+       WHERE e.type NOT IN ('scroll', 'read', 'away', 'link', 'error', 'seen', 'search', 'click', 'rage', 'dead')
+       GROUP BY e.type, e.name ORDER BY views DESC LIMIT 100`
     ),
     // What was read: papers and sections, how often and for how long.
     stmt(
@@ -625,7 +832,8 @@ async function addEvents(env, visits) {
   for (let i = 0; i < ids.length; i += 90) {
     const chunk = ids.slice(i, i + 90);
     const { results } = await env.DB.prepare(
-      `SELECT visit_id, at, type, name, detail, seconds FROM events WHERE visit_id IN (${chunk.map(() => "?").join(",")}) ORDER BY at, id`
+      `SELECT visit_id, at, type, name, detail, seconds FROM events
+       WHERE visit_id IN (${chunk.map(() => "?").join(",")}) AND type NOT IN ${QUIET_EVENTS} ORDER BY at, id`
     )
       .bind(...chunk)
       .all();
@@ -662,31 +870,43 @@ async function addReturning(env, rows) {
 // Everything a visitor did on one page: ?visit=<visit id>
 async function visitEvents(env, params) {
   const id = clampInt(params.get("visit"), 1, Number.MAX_SAFE_INTEGER, 0);
-  const { results } = await env.DB.prepare("SELECT at, type, name, detail, seconds FROM events WHERE visit_id = ?1 ORDER BY at, id LIMIT 500")
+  const { results } = await env.DB.prepare(
+    "SELECT at, type, name, detail, seconds FROM events WHERE visit_id = ?1 AND type <> 'click' ORDER BY at, id LIMIT 500"
+  )
     .bind(id)
     .all();
   return { events: results };
 }
 
 // A visitor's history around one visit: ?visitor=<id>&around=<ISO time>. Their page views within 12 hours either
-// side (the dashboard joins them into visits), how often they came overall, and their last page view before that.
+// side (the dashboard joins them into visits) with everything they did on each, how often they came overall, and
+// their last page view before that.
 async function visitorHistory(env, params) {
   const visitor = params.get("visitor") || "";
   if (!/^[0-9a-f]{16}$/.test(visitor)) return { history: null, views: [] };
   const around = parseDate(params.get("around")) || new Date();
   const from = new Date(around - 43200000).toISOString();
   const to = new Date(+around + 43200000).toISOString();
-  const [history, views] = await env.DB.batch([
+  const [history, views, events, summaries] = await env.DB.batch([
     env.DB.prepare(
       `SELECT COUNT(*) AS views, COUNT(DISTINCT date(ts)) AS days, MIN(ts) AS first_ts, MAX(ts) AS last_ts,
               (SELECT MAX(ts) FROM visits WHERE visitor = ?1 AND ts < ?2) AS earlier_ts
        FROM visits WHERE visitor = ?1`
     ).bind(visitor, from),
     env.DB.prepare(
-      "SELECT id, ts, last_ts, path, title, duration_s, status, referrer, ref_host FROM visits WHERE visitor = ?1 AND ts >= ?2 AND ts <= ?3 ORDER BY ts, id LIMIT 300"
+      `SELECT id, ts, last_ts, path, title, duration_s, active_s, scroll_pct, reloads, status, referrer, ref_host
+       FROM visits WHERE visitor = ?1 AND ts >= ?2 AND ts <= ?3 ORDER BY ts, id LIMIT 300`
+    ).bind(visitor, from, to),
+    env.DB.prepare(
+      `SELECT e.visit_id, e.at, e.type, e.name, e.detail, e.seconds FROM events e JOIN visits v ON v.id = e.visit_id
+       WHERE v.visitor = ?1 AND v.ts >= ?2 AND v.ts <= ?3 AND e.type <> 'click' ORDER BY e.at, e.id LIMIT 3000`
+    ).bind(visitor, from, to),
+    env.DB.prepare(
+      `SELECT a.visit_id, a.summary, a.who, a.confidence, a.model FROM summaries a JOIN visits v ON v.id = a.visit_id
+       WHERE v.visitor = ?1 AND v.ts >= ?2 AND v.ts <= ?3 AND a.status = 'done'`
     ).bind(visitor, from, to),
   ]);
-  return { history: history.results[0], views: views.results };
+  return { history: history.results[0], views: views.results, events: events.results, summaries: summaries.results };
 }
 
 // Whole visits: a visitor's page views with gaps of less than 30 minutes form one visit. A visit is listed when
@@ -712,8 +932,9 @@ async function sessionList(env, params) {
        FROM numbered GROUP BY visitor, n HAVING MAX(matched) = 1
      )
      SELECT s.start, s.first_id, s.pages, s.seconds, s.views, f.visitor, f.org, f.isp, f.asn, f.kind, f.hostname, f.host_domain,
-            f.city, f.region, f.postal, f.country, f.tz, f.referrer, f.ref_host, f.utm_source, f.device, f.os, f.browser, f.screen, f.lang
-     FROM sessions s JOIN visits f ON f.id = s.first_id
+            f.city, f.region, f.postal, f.country, f.tz, f.referrer, f.ref_host, f.utm_source, f.device, f.os, f.browser, f.screen, f.lang,
+            a.summary AS ai_summary, a.who AS ai_who, a.confidence AS ai_confidence, a.model AS ai_model
+     FROM sessions s JOIN visits f ON f.id = s.first_id LEFT JOIN summaries a ON a.visit_id = s.first_id AND a.status = 'done'
      ORDER BY s.start DESC, s.first_id DESC LIMIT ? OFFSET ?`
   )
     .bind(...args, from.toISOString(), to.toISOString(), limit + 1, offset)
@@ -721,6 +942,73 @@ async function sessionList(env, params) {
   const sessions = results.slice(0, limit).map((s) => ({ ...s, views: JSON.parse(s.views).sort((a, b) => a.ts.localeCompare(b.ts) || a.id - b.id) }));
   await addReturning(env, sessions);
   return { sessions, more: results.length > limit };
+}
+
+// What visitors were after, worked out by the dashboard from their whole visits: each visit with its pages and
+// everything done on them (papers scrolled past and clicks are only counted). Newest first, at most
+// MAX_INSIGHT_VISITS. The database builds the JSON, so the Worker only joins it.
+async function insights(env, params) {
+  const { where, args, from, to } = buildFilter(params);
+  const [visits, seen] = await env.DB.batch([
+    env.DB.prepare(
+      `WITH pv AS (
+         SELECT id, visitor, ts, path, title, duration_s, active_s, scroll_pct, status, CASE WHEN ${where} THEN 1 ELSE 0 END AS matched,
+                MAX(julianday(COALESCE(last_ts, ts)), julianday(ts) + COALESCE(duration_s, 0) / 86400.0) AS ends
+         FROM visits WHERE ts >= ? AND ts < ?
+       ), gaps AS (
+         SELECT *, MAX(ends) OVER (PARTITION BY visitor ORDER BY ts, id ROWS BETWEEN UNBOUNDED PRECEDING AND 1 PRECEDING) AS prev_ends FROM pv
+       ), numbered AS (
+         SELECT *, SUM(CASE WHEN prev_ends IS NULL OR julianday(ts) - prev_ends > ${VISIT_GAP_DAYS} THEN 1 ELSE 0 END)
+                     OVER (PARTITION BY visitor ORDER BY ts, id ROWS UNBOUNDED PRECEDING) AS n
+         FROM gaps
+       ), ev AS (
+         SELECT visit_id, json_group_array(json_array(type, name, detail, seconds, at)) AS list
+         FROM (SELECT visit_id, type, name, detail, seconds, at FROM events
+               WHERE visit_id IN (SELECT id FROM numbered) AND type NOT IN ${QUIET_EVENTS} ORDER BY at, id)
+         GROUP BY visit_id
+       ), sessions AS (
+         SELECT visitor, n, MIN(ts) AS start, MIN(id) AS first_id,
+                json_group_array(json_array(id, ts, path, title, duration_s, active_s, scroll_pct, status, json(COALESCE(ev.list, '[]')))) AS views
+         FROM numbered LEFT JOIN ev ON ev.visit_id = numbered.id
+         GROUP BY visitor, n HAVING MAX(matched) = 1
+       )
+       SELECT json_object('start', s.start, 'visitor', s.visitor, 'views', json(s.views), 'org', f.org, 'isp', f.isp, 'kind', f.kind,
+                          'hostname', f.hostname, 'city', f.city, 'region', f.region, 'country', f.country, 'referrer', f.referrer,
+                          'ref_host', f.ref_host, 'utm', f.utm_source, 'device', f.device, 'os', f.os, 'browser', f.browser,
+                          'screen', f.screen, 'lang', f.lang, 'tz', f.tz,
+                          'ai', json((SELECT json_object('summary', summary, 'who', who, 'confidence', confidence, 'model', model) FROM summaries
+                                      WHERE visit_id = s.first_id AND status = 'done'))) AS visit
+       FROM sessions s JOIN visits f ON f.id = s.first_id
+       ORDER BY s.start DESC, s.first_id DESC LIMIT ${MAX_INSIGHT_VISITS + 1}`
+    ).bind(...args, from.toISOString(), to.toISOString()),
+    // Papers and sections that scrolled into view, and by how many visitors.
+    env.DB.prepare(
+      `SELECT e.name, COUNT(*) AS views, COUNT(DISTINCT v.visitor) AS visitors
+       FROM events e JOIN (SELECT id, visitor FROM visits WHERE ${where}) v ON v.id = e.visit_id
+       WHERE e.type = 'seen' GROUP BY e.name`
+    ).bind(...args),
+  ]);
+  const rows = visits.results.slice(0, MAX_INSIGHT_VISITS).map((r) => r.visit);
+  return new Response(`{"visits":[${rows.join(",")}],"more":${visits.results.length > MAX_INSIGHT_VISITS},"seen":${JSON.stringify(seen.results)}}`, {
+    headers: { ...PRIVATE_HEADERS, "Content-Type": "application/json; charset=utf-8" },
+  });
+}
+
+// Where visitors clicked, for the click map: ?path=<page> (with the usual filters) gives that page's clicks, and
+// without a page, the pages that have any.
+async function clickMap(env, params) {
+  const { where, args } = buildFilter(params);
+  const of = `FROM events e JOIN (SELECT id, path, device FROM visits WHERE ${where}) v ON v.id = e.visit_id WHERE e.type IN ('click', 'rage', 'dead')`;
+  if (!params.has("path")) {
+    const { results } = await env.DB.prepare(`SELECT v.path, COUNT(*) AS clicks ${of} GROUP BY v.path ORDER BY clicks DESC LIMIT 100`)
+      .bind(...args)
+      .all();
+    return { pages: results };
+  }
+  const { results } = await env.DB.prepare(`SELECT e.type, e.name, e.detail, v.device ${of} ORDER BY e.id DESC LIMIT 5000`)
+    .bind(...args)
+    .all();
+  return { clicks: results };
 }
 
 async function live(env) {

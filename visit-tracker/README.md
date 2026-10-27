@@ -2,22 +2,26 @@
 
 A small, self-hosted visitor log for this website. It runs on Cloudflare's free tier (a Worker plus a D1 database) and records every page view with:
 
-| What                   | Example                                                                         |
-| ---------------------- | ------------------------------------------------------------------------------- |
-| Exact time             | 18 Oct 2026, 14:03:12, shown in your time and in the visitor's local time       |
-| Organization / network | Carnegie Mellon University, Google LLC, Etisalat                                |
-| Network hostname       | `eduroam-12.wlan.cam.ac.uk` → domain `cam.ac.uk` (reverse DNS, when it has one) |
-| Network type           | University / research, ISP / company, or cloud / VPN / proxy                    |
-| Location               | City, region, postcode, country, latitude/longitude                             |
-| Page                   | Path and title, how long it stayed on screen and how much of that was active    |
-| What they did          | Papers and sections read (with time), downloads, links, videos, figures, …      |
-| Whole visits           | Each visitor's pages in order, and whether they came on earlier days            |
-| Problems               | Broken links (404 pages, with where the link was) and JavaScript errors         |
-| Came from              | Referring site (Google Scholar, LinkedIn, …) and `utm_source`                   |
-| Device                 | Desktop/mobile/tablet, OS, browser, screen size, language                       |
-| IP address             | Erased automatically after 365 days (configurable)                              |
+| What                   | Example                                                                                                                          |
+| ---------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
+| Exact time             | 18 Oct 2026, 14:03:12, shown in your time and in the visitor's local time                                                        |
+| Organization / network | Carnegie Mellon University, Google LLC, Etisalat                                                                                 |
+| Network hostname       | `eduroam-12.wlan.cam.ac.uk` → domain `cam.ac.uk` (reverse DNS, when it has one)                                                  |
+| Network type           | University / research, ISP / company, or cloud / VPN / proxy                                                                     |
+| Location               | City, region, postcode, country, latitude/longitude                                                                              |
+| Page                   | Path and title, how long it stayed on screen and how much of that was active                                                     |
+| What they did          | Papers and sections read (with time), downloads, links, videos, figures, …                                                       |
+| Papers seen            | Which papers were on screen for at least a second, read or not                                                                   |
+| Searches               | What was typed into the site's search boxes (e.g. the publications filter)                                                       |
+| Clicks                 | Where on the page each click landed, clicks on things that aren't links, and clicks repeated in frustration                      |
+| AI summary             | Optional: a sentence or two on what each visit was after, and who the visitor might be, written by Gemini once the visit is over |
+| Whole visits           | Each visitor's pages in order, and whether they came on earlier days                                                             |
+| Problems               | Broken links (404 pages, with where the link was) and JavaScript errors                                                          |
+| Came from              | Referring site (Google Scholar, LinkedIn, …) and `utm_source`                                                                    |
+| Device                 | Desktop/mobile/tablet, OS, browser, screen size, language                                                                        |
+| IP address             | Erased automatically after 365 days (configurable)                                                                               |
 
-It never records names, emails, mouse movements or anything typed on the site (forms are recorded only by name when sent; search boxes not at all). Location comes from the IP address and is city-level: usually right for universities and offices, sometimes off by a city or two for mobile networks, and wrong for VPN users (those are tagged "Cloud / VPN / proxy").
+It never records names, emails, mouse movements or what is typed into forms (forms are recorded only by name when sent). What is typed into the site's search boxes is recorded, as it shows what a visitor was looking for. Location comes from the IP address and is city-level: usually right for universities and offices, sometimes off by a city or two for mobile networks, and wrong for VPN users (those are tagged "Cloud / VPN / proxy").
 
 ## Setup (about 5 minutes)
 
@@ -43,8 +47,14 @@ The password is never stored anywhere: not in this repository, not in Cloudflare
 
 - **Filters**: date range, "Universities & research only", "Hide cloud, VPN & proxies", and free-text search over organization, city, postcode, page and IP.
 - **Click anything** (an organization, city, country, page, referrer, a circle on the map) to filter the whole dashboard to it. "All pages by this visitor" shows one visitor's path through the site.
-- **What visitors did**: _actions_ (downloads, links to other sites, videos, figures, BibTeX opened, …), _reading_ (each paper and section, with the average time spent on it), _scrolling_, and _problems_ (broken links to the site, with where the link was, and JavaScript errors). Click a row to see the visits where it happened.
-- **Show details** under a visit lists everything the visitor did on that page, the other pages of the same visit (from the page they arrived on to the one they left from), and when they came before. **Whole visits** at the top of "every visit" lists visits instead of single page views.
+- **Why people came**: each visit's likely reason (citing a paper, getting a paper, looking for code, trying to reach you, checking your background, reading your research, …), guessed from what the visitor did. Hover a reason for the evidence; click one to see those visits, each told in one line ("Came from Google Scholar to publications → read “…” (1m 20s) → opened its BibTeX → left after 3m").
+- **Papers**: for each paper, how many people it came into view for, read it (and for how long), opened its abstract or video, its BibTeX, its PDF, its paper links and code, and clicked its title expecting a link.
+- **How visitors moved through the site**: first pages (and how many left right away), where they went from each page, last pages, and whole paths.
+- **Worth a closer look**: universities, labs and companies whose network names them (internet providers, clouds and VPNs are left out, as they don't say who the visitor is) and who did more than glance: cited, downloaded, got in touch, checked your CV, read seriously or came back. Strongest interest first, with what they did and when; click one for their visits.
+- **Came from** groups where visits started by kind of site: search engine, research site (Scholar, arXiv, Semantic Scholar, …), AI assistant (ChatGPT, Perplexity, …), code, social, email, direct.
+- **What visitors did**: _actions_ (downloads, links to other sites, videos, figures, BibTeX opened, …), _reading_ (each paper and section, with the average time spent on it), _searches_, _engagement_ (active time and pages per visit, scrolling), and _problems_ (broken links to the site, JavaScript errors, and clicks that didn't respond). Click a row to see the visits where it happened.
+- **Click map**: where visitors clicked on a page, drawn over the page as it looks now, for computers or phones.
+- **Show the whole visit** under a row opens that visit step by step: its likely reason and one-line story, who and where from, then each page in order with what was done on it and when (time since the visit started), the papers that came into view, and whether the visitor came before. **Whole visits** at the top of "every visit" lists visits instead of single page views.
 - **Export CSV** downloads every visit in the current filter.
 - The view is kept in the URL, so you can bookmark a filtered view.
 
@@ -55,6 +65,22 @@ What the columns of "every visit" mean:
 | Page         | The page of your website that was opened, e.g. "publications" (`/publications/`).                                                                                                                                    |
 | Came from    | The website where the visitor clicked a link to that page, e.g. `scholar.google.com`. "Direct / bookmark" means a typed address, a bookmark, or an app that hides it; "within the site" means another page of yours. |
 | Time on page | How long the page was on screen; filled in when the visitor leaves or switches tabs.                                                                                                                                 |
+
+## AI summaries (optional)
+
+With a Gemini API key, the Worker asks Gemini (the first of `GEMINI_MODELS` in `wrangler.toml` that isn't busy: `gemini-3.8-flash`, then `gemini-3.6-flash`, then `gemini-3.5-flash-lite`) to write, for each finished visit, what the visitor was probably trying to do and who they might be. They appear marked "AI" in the dashboard: in "why people came", "worth a closer look", the list of whole visits, and at the top of each opened visit.
+
+- Each visit is sent **once**, after it is over (30 minutes without activity), and never again; visits where nothing happened (one page, under 10 seconds, no actions) are skipped without a call.
+- It runs with the hourly cron, at most `SUMMARIES_PER_RUN` visits an hour (8, so at most 192 calls a day). When a model can't answer (rate limited, overloaded, or no answer within a minute), the next one is asked, and the busy one is left out for the rest of that hour. When none can, nothing is saved and the visit is tried again the next hour. The dashboard shows which model wrote each summary.
+- Gemini sees each visit's network name, city, device, where the visitor came from, and their pages and actions; never IP addresses, hostnames or visitor ids. On Gemini's free tier, Google may use what it is sent to improve its products.
+
+To switch it on, save the key as a Worker secret (it is never stored in the repository or sent to the dashboard):
+
+```bash
+cd visit-tracker && npx wrangler secret put GEMINI_API_KEY
+```
+
+To switch it off, delete the secret (`npx wrangler secret delete GEMINI_API_KEY`). For local testing, pass the key to `wrangler dev` with `--env-file ../.env` (git ignores `.env`).
 
 ## Naming networks (e.g. your university's Wi-Fi)
 
@@ -74,7 +100,7 @@ Name a single address unless you are sure a whole block belongs to the same plac
 
 IP addresses are personal data under GDPR (EU visitors) and the UAE's PDPL. Add a short notice to the site, for example in the footer or on the contact page:
 
-> This site keeps a basic visit log (time, page, approximate location and network, from your IP address) to understand its audience. No cookies are used and nothing is shared with third parties.
+> This site keeps a visit log (time, page, approximate location and network from your IP address, and what you click, read or search for on the site) to understand its audience. No cookies are used and nothing is shared with third parties.
 
 The tracker sets no cookies. To leave out your own visits, the dashboard stores a flag in the local storage of browsers that have signed in. IP addresses are erased after `IP_RETENTION_DAYS` (in `wrangler.toml`); everything else is kept.
 

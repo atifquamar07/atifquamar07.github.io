@@ -16,3 +16,6 @@ vendor
 # Visit tracker (Cloudflare Worker) local state and secrets
 visit-tracker/.wrangler/
 visit-tracker/.dev.vars
+
+# Local secrets (e.g. GEMINI_API_KEY for the visit tracker)
+.env
