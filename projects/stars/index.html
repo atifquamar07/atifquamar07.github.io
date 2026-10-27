@@ -17,9 +17,12 @@
     }
   </script> <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https:; style-src 'self' 'unsafe-inline' https:; img-src 'self' data: https:; font-src 'self' data: https:; media-src 'self' https:; frame-src 'self' https:; connect-src 'self' https:;"> <script>
   /* Visit tracker (see visit-tracker/README.md): page views, time on page, and what visitors do on the page.
-     Nothing typed is ever recorded (not form contents, not search queries), and neither are mouse movements.
-     An element with data-vt-context="Paper title" adds that title to the events of everything inside it and counts
-     the time spent reading it; data-vt-section="Name" only counts reading time; data-vt-event="Name" records clicks. */
+     Form contents are never recorded and neither are mouse movements; what is typed into the site's search boxes
+     (e.g. the publications filter) is, as it shows what a visitor was looking for. Clicks are recorded by position
+     on the clicked element, for the dashboard's click map.
+     An element with data-vt-context="Paper title" adds that title to the events of everything inside it, counts
+     the time spent reading it and notes when it scrolled into view; data-vt-section="Name" only counts reading
+     time; data-vt-event="Name" records clicks. */
   (function () {
     var endpoint = "https://visit-tracker.atifquamar.workers.dev".replace(/\/+$/, "");
     try {
@@ -27,6 +30,10 @@
       if (localStorage.getItem("visit-tracker-ignore") === "1") return;
     } catch (e) {}
     if (!navigator.sendBeacon || navigator.webdriver || !window.URL) return;
+    try {
+      /* The dashboard's click map shows the site's pages in a frame: those aren't visits. */
+      if (window.top !== window && window.top.location.pathname.indexOf("/visitors") === 0) return;
+    } catch (e) {}
 
     function send(path, data) {
       try {
@@ -66,6 +73,9 @@
       queue: [],
       reading: {},
       seen: {},
+      seenCount: 0,
+      searches: 0,
+      clicks: 0,
       errors: 0,
     };
 
@@ -387,6 +397,138 @@
       var node = selection.anchorNode;
       track("copy", "Copied text" + context(node && node.nodeType !== 1 ? node.parentElement : node), text.slice(0, 120));
     });
+
+    /* Papers ([data-vt-context]) that were on screen for at least a second: at least half of one, or half the screen
+       for longer ones. Compared with what was read and clicked, this shows what was passed over. */
+    function watchSeen() {
+      if (!window.IntersectionObserver) return;
+      var timers = window.Map ? new Map() : null;
+      if (!timers) return;
+      var observer = new IntersectionObserver(
+        function (entries) {
+          entries.forEach(function (entry) {
+            var el = entry.target;
+            var shown = entry.isIntersecting && (entry.intersectionRatio >= 0.5 || entry.intersectionRect.height >= window.innerHeight * 0.5);
+            if (shown && !timers.has(el)) {
+              timers.set(
+                el,
+                setTimeout(function () {
+                  observer.unobserve(el);
+                  timers.delete(el);
+                  if (document.visibilityState !== "visible") return;
+                  var name = clean(el.getAttribute("data-vt-context"), 150);
+                  if (name && once("seen " + name) && ++page.seenCount <= 80) track("seen", name);
+                }, 1000)
+              );
+            } else if (!shown && timers.has(el)) {
+              clearTimeout(timers.get(el));
+              timers.delete(el);
+            }
+          });
+        },
+        { threshold: [0, 0.25, 0.5, 0.75, 1] }
+      );
+      var papers = document.querySelectorAll("[data-vt-context]");
+      for (var i = 0; i < papers.length; i++) observer.observe(papers[i]);
+    }
+    if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", watchSeen);
+    else watchSeen();
+
+    /* What was typed into a search box once the visitor paused for 1.5 s, and for the publications filter how many
+       papers were left. Words typed on the way to a longer search are dropped by the dashboard. */
+    var SEARCH = "#bibsearch, input[type=search], [role=search] input";
+    var searchTimer = null;
+    var searchField = null;
+    var lastSearch = "";
+    function searched() {
+      clearTimeout(searchTimer);
+      searchTimer = null;
+      var field = searchField;
+      if (!field) return;
+      var query = clean(field.value, 100);
+      if (query.length < 2 || query === lastSearch || page.searches >= 15) return;
+      lastSearch = query;
+      page.searches++;
+      var where = field.id === "bibsearch" ? "publications" : "the site";
+      var results = "";
+      if (field.id === "bibsearch") {
+        var left = document.querySelectorAll(".bibliography > li:not(.unloaded)").length;
+        results = " (" + (left ? left + (left === 1 ? " paper" : " papers") : "nothing") + " found)";
+      }
+      track("search", "Searched " + where + " for “" + query + "”" + results, query);
+    }
+    document.addEventListener(
+      "input",
+      function (e) {
+        if (!e.target || !e.target.matches || !e.target.matches(SEARCH)) return;
+        searchField = e.target;
+        clearTimeout(searchTimer);
+        searchTimer = setTimeout(searched, 1500);
+      },
+      true
+    );
+    window.addEventListener("pagehide", searched, true);
+
+    /* Clicks, for the click map: where on the clicked element (as a fraction of its size), found again by its path
+       from the nearest element with an id, and where on the page in case the page has changed since. Also clicks
+       repeated in frustration (3 within a second on the same spot) and clicks on things that look like they should
+       do something but don't, such as a paper's title. */
+    function pathTo(el) {
+      var steps = [];
+      while (el && el.nodeType === 1 && el !== document.documentElement) {
+        if (el.id && /^[A-Za-z][\w-]*$/.test(el.id)) {
+          steps.unshift("#" + el.id);
+          break;
+        }
+        var tag = el.tagName.toLowerCase();
+        var n = 1;
+        for (var sib = el.previousElementSibling; sib; sib = sib.previousElementSibling) if (sib.tagName === el.tagName) n++;
+        steps.unshift(tag + ":nth-of-type(" + n + ")");
+        if (tag === "body") break;
+        el = el.parentElement;
+      }
+      var path = steps.join(">");
+      return path.length <= 200 ? path : null;
+    }
+    var INTERACTIVE = "a[href], button, input, select, textarea, label, summary, video, audio, iframe, [role=button], [role=link], [onclick], [data-toggle], [data-bs-toggle], [data-vt-event], [tabindex], img[data-zoomable]";
+    var LOOKS_CLICKABLE = "img, h1, h2, h3, h4, h5, h6, .title, strong, b, u, [data-vt-context] em";
+    var burst = [];
+    function pointed(e) {
+      var el = e.target && e.target.nodeType === 1 ? e.target : e.target && e.target.parentElement;
+      if (!el || !el.getBoundingClientRect || page.clicks >= 40) return;
+      var box = el.getBoundingClientRect();
+      if (!box.width || !box.height) return;
+      page.clicks++;
+      var round = function (n) {
+        return Math.round(Math.min(Math.max(n, 0), 1) * 1000) / 1000;
+      };
+      var width = document.documentElement.scrollWidth || window.innerWidth;
+      var spot = JSON.stringify({
+        s: pathTo(el),
+        x: round((e.clientX - box.left) / box.width),
+        y: round((e.clientY - box.top) / box.height),
+        px: round((e.clientX + window.scrollX) / width),
+        py: Math.round(e.clientY + window.scrollY),
+        w: width,
+      });
+      var what = el.closest(INTERACTIVE);
+      /* Anything else is named by its own text when short, not copied whole like a link (it may be the whole page). */
+      var text = what ? "" : clean(el.textContent, 200);
+      var name = what ? label(what) : text && text.length < 120 ? "“" + clean(text, 60) + "”" : el.alt ? "“" + clean(el.alt, 60) + "”" : "";
+      name = name || el.tagName.toLowerCase();
+      track("click", "Clicked " + name + context(el), spot);
+
+      var selected = window.getSelection && String(window.getSelection());
+      var at = Date.now();
+      burst = burst.filter(function (c) {
+        return at - c.at < 1000 && Math.abs(c.x - e.clientX) < 30 && Math.abs(c.y - e.clientY) < 30;
+      });
+      burst.push({ at: at, x: e.clientX, y: e.clientY });
+      if (burst.length === 3 && !selected) track("rage", "Clicked " + name + " again and again" + context(el), spot);
+
+      if (!what && !selected && el.closest(LOOKS_CLICKABLE) && once("dead " + name)) track("dead", "Clicked " + name + ", which isn't a link" + context(el), spot);
+    }
+    document.addEventListener("click", pointed, true);
 
     /* JavaScript errors on the site's pages (at most 5 per page view). */
     function failed(message, where) {
