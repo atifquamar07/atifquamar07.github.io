@@ -647,6 +647,25 @@ ul.task-list input[type="checkbox"] {
   }
 }
 
+// Logo of the venue or institution beside a news item, set in `_data/news.yml`.
+.news {
+  .news-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.65rem;
+  }
+
+  .news-icon {
+    flex: none;
+    // Wide enough for wordmarks; square logos are centered in the slot.
+    width: 1.625rem;
+    height: 1.25rem;
+    // Center the logo on the first line of text.
+    margin-top: calc((1.5em - 1.25rem) / 2);
+    object-fit: contain;
+  }
+}
+
 @media (min-width: 768px) {
   .about-page .profile-landscape {
     display: none;

@@ -25,7 +25,30 @@
           <tr>
             <th scope="row" style="width: 20%">{{ item.date | date: '%b %Y' }}</th>
             <td>
-              {{ item.text | markdownify | remove: '<p>' | remove: '</p>' | emojify }}
+              <div class="news-item">
+                {% if item.icon %}
+                  {% assign icon_path = item.icon | prepend: '/assets/img/news/' | append: '.png' %}
+                  {% assign icon_dark_path = item.icon | prepend: '/assets/img/news/' | append: '-dark.png' %}
+                  {% assign icon_dark = site.static_files | where: 'path', icon_dark_path | first %}
+                  <img
+                    class="news-icon{% if icon_dark %} only-light{% endif %}"
+                    src="{{ icon_path | relative_url }}"
+                    alt=""
+                    width="26"
+                    height="20"
+                  >
+                  {% if icon_dark %}
+                    <img
+                      class="news-icon only-dark"
+                      src="{{ icon_dark_path | relative_url }}"
+                      alt=""
+                      width="26"
+                      height="20"
+                    >
+                  {% endif %}
+                {% endif %}
+                <span>{{ item.text | markdownify | remove: '<p>' | remove: '</p>' | emojify }}</span>
+              </div>
             </td>
           </tr>
         {% endfor %}
