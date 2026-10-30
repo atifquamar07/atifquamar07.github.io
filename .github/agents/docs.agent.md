@@ -132,7 +132,7 @@ This repository includes custom instruction files to enhance GitHub Copilot's ef
 
 **Environment Setup:**
 
-- `.github/workflows/copilot-setup-steps.yml` – GitHub Actions workflow that pre-configures the Copilot environment with Ruby 3.3.5, Python 3.13, Node.js, ImageMagick, and nbconvert before agent execution
+- `.github/workflows/copilot-setup-steps.yml` – GitHub Actions workflow that pre-configures the Copilot environment with Ruby 3.3, Python 3.13, Node.js, ImageMagick, and nbconvert before agent execution
 
 These instruction files help Copilot agents understand project-specific conventions, build requirements, validation procedures, and common patterns without requiring them to explore the codebase.
 
