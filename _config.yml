@@ -551,6 +551,11 @@ third_party_libraries:
     url:
       js: "https://cdn.jsdelivr.net/npm/mermaid@{{version}}/dist/mermaid.min.js"
     version: "10.7.0"
+  pdfjs:
+    url:
+      js: "https://cdn.jsdelivr.net/npm/pdfjs-dist@{{version}}/legacy/build/pdf.min.mjs"
+      worker: "https://cdn.jsdelivr.net/npm/pdfjs-dist@{{version}}/legacy/build/pdf.worker.min.mjs"
+    version: "4.10.38"
   photoswipe:
     integrity:
       js: "sha256-VCBpdxvrNNxGHNuTdNqK9kPFkev2XY7DYzHdmgaB69Q="

@@ -1,0 +1,63 @@
+---
+layout: default
+---
+{% comment %}
+  CV page that shows page.cv_pdf in an in-page viewer (assets/js/cv-viewer.js)
+  instead of rendering the CV from _data.
+{% endcomment %}
+
+{% if page.cv_pdf contains '://' %}
+  {% assign cv_pdf_url = page.cv_pdf %}
+{% else %}
+  {% assign cv_pdf_url = page.cv_pdf | relative_url %}
+{% endif %}
+
+<div class="post cv-page">
+  <header class="post-header">
+    <h1 class="post-title">{{ page.title }}</h1>
+    {% if page.description %}
+      <p class="post-description">{{ page.description }}</p>
+    {% endif %}
+  </header>
+
+  <article>
+    <div class="cv-viewer" data-pdf-url="{{ cv_pdf_url }}">
+      <div class="cv-viewer-toolbar" role="toolbar" aria-label="CV viewer">
+        <span class="cv-viewer-page-count" aria-live="polite"> Page <span data-current-page>1</span> of <span data-total-pages>–</span> </span>
+        <div class="cv-viewer-zoom" role="group" aria-label="Zoom">
+          <button type="button" class="cv-viewer-btn" data-zoom="out" aria-label="Zoom out" disabled>
+            <i class="fa-solid fa-minus"></i>
+          </button>
+          <button type="button" class="cv-viewer-btn cv-viewer-zoom-level" data-zoom="reset" title="Fit to width" disabled>100%</button>
+          <button type="button" class="cv-viewer-btn" data-zoom="in" aria-label="Zoom in" disabled>
+            <i class="fa-solid fa-plus"></i>
+          </button>
+        </div>
+        <div class="cv-viewer-actions">
+          <a
+            class="cv-viewer-btn"
+            href="{{ cv_pdf_url }}"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Open in new tab"
+            title="Open in new tab"
+          >
+            <i class="fa-solid fa-up-right-from-square"></i>
+          </a>
+          <a class="cv-viewer-btn cv-viewer-download" href="{{ cv_pdf_url }}" download="{{ site.first_name }}_{{ site.last_name }}_CV.pdf">
+            <i class="fa-solid fa-download"></i>
+            Download
+          </a>
+        </div>
+      </div>
+      <div class="cv-viewer-stage">
+        <p class="cv-viewer-status">
+          Loading CV…
+          <noscript><a href="{{ cv_pdf_url }}">Open the PDF</a> instead.</noscript>
+        </p>
+      </div>
+    </div>
+  </article>
+</div>
+
+<script type="module" src="{{ '/assets/js/cv-viewer.js' | relative_url }}"></script>

@@ -464,3 +464,172 @@ ul.timeline li::before {
      color: var(--global-text-color);
 }
 */
+
+/*****************************
+ * CV PDF viewer (_layouts/cv_viewer.liquid)
+ *****************************/
+
+.cv-viewer {
+  border: 1px solid var(--publication-border);
+  border-radius: 14px;
+  // A little see-through, like the publication cards, so the backdrop shows behind it.
+  background: color-mix(in srgb, var(--publication-bg) 65%, transparent);
+
+  .cv-viewer-toolbar {
+    position: sticky;
+    // Stay just below the fixed navbar while scrolling through the pages.
+    top: 52px;
+    z-index: 2;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem 1rem;
+    padding: 0.6rem 0.85rem;
+    border-bottom: 1px solid var(--publication-border);
+    border-radius: 14px 14px 0 0;
+    background: color-mix(in srgb, var(--global-bg-color) 90%, transparent);
+    backdrop-filter: blur(8px);
+    color: var(--publication-muted);
+    font-size: 0.8rem;
+  }
+
+  .cv-viewer-page-count {
+    font-variant-numeric: tabular-nums;
+  }
+
+  .cv-viewer-zoom,
+  .cv-viewer-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+  }
+
+  .cv-viewer-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    min-width: 2rem;
+    height: 2rem;
+    padding: 0 0.6rem;
+    color: var(--publication-muted);
+    background: var(--publication-pill-bg);
+    border: 1px solid var(--publication-border);
+    border-radius: 6px;
+    font-size: 0.76rem;
+    font-weight: 500;
+    line-height: 1;
+    text-decoration: none;
+    cursor: pointer;
+    transition:
+      color 0.2s ease,
+      background-color 0.2s ease,
+      border-color 0.2s ease;
+
+    &:hover:not(:disabled),
+    &:focus-visible {
+      color: var(--publication-accent);
+      background: var(--publication-bg);
+      border-color: var(--publication-accent);
+      text-decoration: none;
+    }
+
+    &:disabled {
+      opacity: 0.45;
+      cursor: default;
+    }
+  }
+
+  .cv-viewer-zoom-level {
+    min-width: 3.4rem;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .cv-viewer-download {
+    color: var(--global-theme-text-color);
+    background: var(--global-theme-color);
+    border-color: var(--global-theme-color);
+
+    &:hover:not(:disabled),
+    &:focus-visible {
+      color: var(--global-hover-text-color);
+      background: var(--global-hover-color);
+      border-color: var(--global-hover-color);
+    }
+  }
+
+  .cv-viewer-stage {
+    overflow-x: auto;
+    padding: 1.25rem;
+    border-radius: 0 0 14px 14px;
+    background: color-mix(in srgb, var(--publication-pill-bg) 70%, transparent);
+  }
+
+  &:not(.is-ready) .cv-viewer-stage {
+    display: grid;
+    place-items: center;
+    min-height: 24rem;
+  }
+
+  .cv-viewer-status {
+    margin: 0;
+    color: var(--global-text-color-light);
+    text-align: center;
+  }
+
+  .cv-viewer-page {
+    position: relative;
+    margin: 0 auto 1.25rem;
+    overflow: hidden;
+    background: #fff;
+    border-radius: 4px;
+    box-shadow:
+      0 1px 2px var(--global-shadow-color-strong),
+      0 8px 24px var(--global-shadow-color);
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+
+    canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+  }
+
+  .cv-viewer-links a {
+    position: absolute;
+    border-radius: 2px;
+
+    &:hover,
+    &:focus-visible {
+      background: var(--global-focus-color);
+    }
+  }
+
+  @media (max-width: 575px) {
+    .cv-viewer-toolbar {
+      padding: 0.5rem 0.6rem;
+    }
+
+    // Phones pinch-zoom instead, which keeps the toolbar on one row.
+    .cv-viewer-zoom {
+      display: none;
+    }
+
+    .cv-viewer-stage {
+      padding: 0.6rem;
+    }
+
+    .cv-viewer-page {
+      margin-bottom: 0.6rem;
+    }
+  }
+}
+
+// Take the glare off the white pages in dark mode.
+html[data-theme="dark"] .cv-viewer .cv-viewer-page canvas {
+  filter: brightness(0.9);
+}

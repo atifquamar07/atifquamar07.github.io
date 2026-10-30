@@ -1,5 +1,5 @@
 ---
-layout: cv
+layout: cv_viewer
 permalink: /cv/
 title: cv
 nav: true
@@ -7,6 +7,4 @@ nav_order: 4
 cv_pdf: cv.pdf
 cv_format: rendercv # options: rendercv, jsonresume
 description: Research experience, education, interests, and publications.
-toc:
-  sidebar: left
 ---
